@@ -1,0 +1,20 @@
+## Interface: 50400
+## Title: Frenemy
+## Version: @project-version@
+## Notes: A customizable view of friends and guildmates.
+## Author: Torhal
+## SavedVariables: FrenemyDB
+## OptionalDeps: Ace3, CallbackHandler-1.0, LibQTip-1.0, LibStub
+
+#@no-lib-strip@
+# Libs\LibStub\LibStub.lua
+
+# Libs\AceConfig-3.0\AceConfig-3.0.xml
+# Libs\AceGUI-3.0\AceGUI-3.0.xml
+# Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+# Libs\LibQTip-1.0\lib.xml
+#@end-no-lib-strip@
+
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+Frenemy.lua

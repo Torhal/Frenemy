@@ -1,0 +1,15 @@
+package-as: Frenemy
+
+enable-nolib-creation: yes
+
+externals:
+  Libs/LibStub:
+    url: svn://svn.wowace.com/wow/libstub/mainline/trunk
+  Libs/CallbackHandler-1.0:
+    url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
+  Libs/AceConfig-3.0:
+    url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
+  Libs/AceGUI-3.0:
+    url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
+  Libs/LibQTip-1.0:
+    url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
