@@ -68,7 +68,7 @@ local BROADCAST_ICON = [[|TInterface\FriendsFrame\BroadcastIcon:0|t]]
 
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
 
-local GROUP_CHECKMARK = [[|TInterface\Buttons\UI-CheckBox-Check:0|t]]
+local GROUP_CHECKMARK = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
 
 local PLAYER_FACTION = _G.UnitFactionGroup("player")
 local PLAYER_REALM = _G.GetRealmName()
