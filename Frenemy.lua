@@ -405,8 +405,9 @@ do
 
 		if not Tooltip then
 			Tooltip = LibQTip:Acquire(FOLDER_NAME, NUM_TOOLTIP_COLUMNS)
-			Tooltip:SetAutoHideDelay(0.25, anchor_frame)
+			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchor_frame)
 			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
+			Tooltip:SetScale(DB.Tooltip.Scale)
 			Tooltip:SmartAnchorTo(anchor_frame)
 
 			Tooltip.OnRelease = Tooltip_OnRelease
@@ -433,7 +434,6 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-
 					Tooltip:SetCell(line, WoWFriendsColumns.Level, COLUMN_ICON_LEVEL, WoWFriendsColSpans.Level)
 					Tooltip:SetCell(line, WoWFriendsColumns.RealID, _G.BATTLENET_FRIEND, WoWFriendsColSpans.RealID)
 					Tooltip:SetCell(line, WoWFriendsColumns.Name, _G.NAME, WoWFriendsColSpans.Name)
