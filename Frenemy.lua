@@ -119,18 +119,24 @@ local SORT_ORDER_ASCENDING = 1
 local SORT_ORDER_DESCENDING = 2
 
 -------------------------------------------------------------------------------
+-- Variables
+-------------------------------------------------------------------------------
+local DB
+local Tooltip
+
+-- Statistics: Populated and maintained in UpdateStatistics()
+local OnlineBattleNetCount
+local TotalBattleNetCount
+
+local OnlineFriendsCount
+local TotalFriendsCount
+
+local OnlineGuildMembersCount
+local TotalGuildMembersCount
+
+-------------------------------------------------------------------------------
 -- Enumerations.
 -------------------------------------------------------------------------------
-local function EnumerateSortFieldNames(sortFieldNames)
-	local enumeration = {}
-
-	for index = 1, #sortFieldNames do
-		enumeration[sortFieldNames[index]] = index
-	end
-
-	return enumeration
-end
-
 local BattleNetAppSortFieldNames = {
 	"GameText",
 	"PresenceName",
@@ -160,10 +166,22 @@ local WoWFriendsSortFieldNames = {
 	"ZoneName",
 }
 
-local BattleNetAppSortFields = EnumerateSortFieldNames(BattleNetAppSortFieldNames)
-local BattleNetGamesSortFields = EnumerateSortFieldNames(BattleNetGamesSortFieldNames)
-local GuildSortFields = EnumerateSortFieldNames(GuildSortFieldNames)
-local WoWFriendsSortFields = EnumerateSortFieldNames(WoWFriendsSortFieldNames)
+local function EnumerateSortFieldNames(sortFieldNames)
+	local enumeration = {}
+
+	for index = 1, #sortFieldNames do
+		enumeration[sortFieldNames[index]] = index
+	end
+
+	return enumeration
+end
+
+local SortFields = {
+	BattleNetApp = EnumerateSortFieldNames(BattleNetAppSortFieldNames),
+	BattleNetGames = EnumerateSortFieldNames(BattleNetGamesSortFieldNames),
+	Guild = EnumerateSortFieldNames(GuildSortFieldNames),
+	WoWFriends = EnumerateSortFieldNames(WoWFriendsSortFieldNames),
+}
 
 -------------------------------------------------------------------------------
 -- Default settings
@@ -187,22 +205,6 @@ local DB_DEFAULTS = {
 		},
 	}
 }
-
--------------------------------------------------------------------------------
--- Variables
--------------------------------------------------------------------------------
-local DB
-local Tooltip
-
--- Statistics: Populated and maintained in UpdateStatistics()
-local OnlineBattleNetCount
-local TotalBattleNetCount
-
-local OnlineFriendsCount
-local TotalFriendsCount
-
-local OnlineGuildMembersCount
-local TotalGuildMembersCount
 
 -------------------------------------------------------------------------------
 -- Helpers
