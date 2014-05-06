@@ -249,52 +249,52 @@ local function UpdateStatistics()
 end
 
 -------------------------------------------------------------------------------
--- DataObject methods.
+-- Tooltip.
 -------------------------------------------------------------------------------
 local DrawTooltip
 do
 	local BattleNetColumns = {
-		Game = 1,
-		RealID = 2,
-		Name = 3,
-		Info = 4,
+		Client = 1,
+		PresenceName = 2,
+		ToonName = 3,
+		GameText = 4,
 	}
 
 	local BattleNetColSpans = {
-		Game = 1,
-		RealID = 1,
-		Name = 1,
-		Info = 2,
+		Client = 1,
+		PresenceName = 1,
+		ToonName = 1,
+		GameText = 2,
 	}
 
 	local GuildColumns = {
 		Level = 1,
-		Name = 2,
+		ToonName = 2,
 		Rank = 3,
-		Zone = 4,
+		ZoneName = 4,
 	}
 
 	local GuildColSpans = {
 		Level = 1,
-		Name = 1,
+		ToonName = 1,
 		Rank = 1,
-		Zone = 1,
+		ZoneName = 1,
 	}
 
 	local WoWFriendsColumns = {
 		Level = 1,
-		RealID = 2,
-		Name = 3,
-		Zone = 4,
-		Realm = 5,
+		PresenceName = 2,
+		ToonName = 3,
+		ZoneName = 4,
+		RealmName = 5,
 	}
 
 	local WoWFriendsColSpans = {
 		Level = 1,
-		RealID = 1,
-		Name = 1,
-		Zone = 1,
-		Realm = 1,
+		PresenceName = 1,
+		ToonName = 1,
+		ZoneName = 1,
+		RealmName = 1,
 	}
 
 	local BattleNetAppList = {}
@@ -317,6 +317,9 @@ do
 		end
 	end
 
+	-------------------------------------------------------------------------------
+	-- Data compilation.
+	-------------------------------------------------------------------------------
 	local function GenerateTooltipData()
 		table.wipe(BattleNetAppList)
 		table.wipe(BattleNetPlayingList)
@@ -333,6 +336,7 @@ do
 					Class = class,
 					Level = level,
 					Note = note and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
+					PresenceName = _G.NOT_APPLICABLE,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
 					ZoneName = zoneName,
@@ -402,6 +406,7 @@ do
 						Note = (note and note ~= "") and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
 						OfficerNote = (officerNote and officerNote ~= "") and STATUS_ICON_NOTE .. _G.ORANGE_FONT_COLOR_CODE .. officerNote .. "|r" or nil,
 						Rank = rank,
+						RankIndex = rankIndex,
 						StatusIcon = status,
 						ToonName = _G.Ambiguate(toonName, "guild"),
 						ZoneName = isMobile and _G.REMOTE_CHAT or zoneName,
@@ -411,11 +416,9 @@ do
 		end
 	end
 
-	local function ToggleSectionVisibility(tooltipCell, sectionName)
-		DB.Tooltip.CollapsedSections[sectionName] = not DB.Tooltip.CollapsedSections[sectionName]
-		DrawTooltip(TooltipAnchor)
-	end
-
+	-------------------------------------------------------------------------------
+	-- Controls
+	-------------------------------------------------------------------------------
 	local function ShowBattleNetFriendDropdownMenu(tooltipCell, playerEntry, button)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
@@ -449,31 +452,39 @@ do
 		end
 	end
 
+	local function ToggleSectionVisibility(tooltipCell, sectionName)
+		DB.Tooltip.CollapsedSections[sectionName] = not DB.Tooltip.CollapsedSections[sectionName]
+		DrawTooltip(TooltipAnchor)
+	end
+
+	-------------------------------------------------------------------------------
+	-- Display rendering
+	-------------------------------------------------------------------------------
 	local function RenderBattleNetLines(sourceList, headerLine)
-		Tooltip:SetCell(headerLine, BattleNetColumns.RealID, _G.BATTLENET_FRIEND, BattleNetColSpans.RealID)
-		Tooltip:SetCell(headerLine, BattleNetColumns.Name, _G.NAME, BattleNetColSpans.Name)
-		Tooltip:SetCell(headerLine, BattleNetColumns.Info, _G.INFO, BattleNetColSpans.Info)
+		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, _G.BATTLENET_FRIEND, BattleNetColSpans.PresenceName)
+		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, _G.NAME, BattleNetColSpans.ToonName)
+		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, _G.INFO, BattleNetColSpans.GameText)
 
 		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
 		for index = 1, #sourceList do
 			local player = sourceList[index]
 			local line = Tooltip:AddLine()
-			Tooltip:SetCell(line, BattleNetColumns.Game, CLIENT_ICON_TEXTURE_CODES[player.Client], BattleNetColSpans.Game)
-			Tooltip:SetCell(line, BattleNetColumns.RealID, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), BattleNetColSpans.RealID)
-			Tooltip:SetCell(line, BattleNetColumns.Name, ("%s%s|r"):format(_G.FRIENDS_OTHER_NAME_COLOR_CODE, player.ToonName), BattleNetColSpans.Name)
-			Tooltip:SetCell(line, BattleNetColumns.Info, player.GameText, BattleNetColSpans.Info)
+			Tooltip:SetCell(line, BattleNetColumns.Client, CLIENT_ICON_TEXTURE_CODES[player.Client], BattleNetColSpans.Client)
+			Tooltip:SetCell(line, BattleNetColumns.PresenceName, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), BattleNetColSpans.PresenceName)
+			Tooltip:SetCell(line, BattleNetColumns.ToonName, ("%s%s|r"):format(_G.FRIENDS_OTHER_NAME_COLOR_CODE, player.ToonName), BattleNetColSpans.ToonName)
+			Tooltip:SetCell(line, BattleNetColumns.GameText, player.GameText, BattleNetColSpans.GameText)
 
-			Tooltip:SetCellScript(line, BattleNetColumns.RealID, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+			Tooltip:SetCellScript(line, BattleNetColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
 
 			if player.Note then
 				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Game, player.Note, "GameTooltipTextSmall", 0)
+				Tooltip:SetCell(line, BattleNetColumns.Client, player.Note, "GameTooltipTextSmall", 0)
 			end
 
 			if player.BroadcastText then
 				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Game, player.BroadcastText, "GameTooltipTextSmall", 0)
+				Tooltip:SetCell(line, BattleNetColumns.Client, player.BroadcastText, "GameTooltipTextSmall", 0)
 			end
 		end
 
@@ -529,10 +540,10 @@ do
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 					Tooltip:SetCell(line, WoWFriendsColumns.Level, COLUMN_ICON_LEVEL, WoWFriendsColSpans.Level)
-					Tooltip:SetCell(line, WoWFriendsColumns.RealID, _G.BATTLENET_FRIEND, WoWFriendsColSpans.RealID)
-					Tooltip:SetCell(line, WoWFriendsColumns.Name, _G.NAME, WoWFriendsColSpans.Name)
-					Tooltip:SetCell(line, WoWFriendsColumns.Zone, _G.ZONE, WoWFriendsColSpans.Zone)
-					Tooltip:SetCell(line, WoWFriendsColumns.Realm, _G.FRIENDS_LIST_REALM, WoWFriendsColSpans.Realm)
+					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, _G.BATTLENET_FRIEND, WoWFriendsColSpans.PresenceName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, _G.NAME, WoWFriendsColSpans.ToonName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, _G.ZONE, WoWFriendsColSpans.ZoneName)
+					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, _G.FRIENDS_LIST_REALM, WoWFriendsColSpans.RealmName)
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -547,12 +558,12 @@ do
 
 							line = Tooltip:AddLine()
 							Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
-							Tooltip:SetCell(line, WoWFriendsColumns.RealID, ("%s%s"):format(player.StatusIcon, _G.NOT_APPLICABLE), WoWFriendsColSpans.RealID)
-							Tooltip:SetCell(line, WoWFriendsColumns.Name, ("%s|cff%s%s|r%s"):format(PLAYER_FACTION_ICON, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.Name)
-							Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
-							Tooltip:SetCell(line, WoWFriendsColumns.Realm, PLAYER_REALM, WoWFriendsColSpans.Realm)
+							Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, player.PresenceName), WoWFriendsColSpans.PresenceName)
+							Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(PLAYER_FACTION_ICON, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
+							Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
+							Tooltip:SetCell(line, WoWFriendsColumns.RealmName, PLAYER_REALM, WoWFriendsColSpans.RealmName)
 
-							Tooltip:SetCellScript(line, WoWFriendsColumns.Name, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
+							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
 
 							if player.Note then
 								line = Tooltip:AddLine()
@@ -572,15 +583,15 @@ do
 
 							line = Tooltip:AddLine()
 							Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
-							Tooltip:SetCell(line, WoWFriendsColumns.RealID, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), WoWFriendsColSpans.RealID)
-							Tooltip:SetCell(line, WoWFriendsColumns.Name, ("%s|cff%s%s|r%s"):format(player.FactionIcon, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.Name)
-							Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
-							Tooltip:SetCell(line, WoWFriendsColumns.Realm, player.RealmName, WoWFriendsColSpans.Realm)
+							Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), WoWFriendsColSpans.PresenceName)
+							Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
+							Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
+							Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
-							Tooltip:SetCellScript(line, WoWFriendsColumns.RealID, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
 
 							if player.RealmName == PLAYER_REALM then
-								Tooltip:SetCellScript(line, WoWFriendsColumns.Name, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
+								Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
 							end
 
 							if player.Note then
@@ -616,7 +627,7 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-					Tooltip:SetCell(line, BattleNetColumns.Game, COLUMN_ICON_GAME)
+					Tooltip:SetCell(line, BattleNetColumns.Client, COLUMN_ICON_GAME)
 
 					RenderBattleNetLines(BattleNetPlayingList, line)
 				else
@@ -663,10 +674,10 @@ do
 				line = Tooltip:AddLine()
 				Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
-				Tooltip:SetCell(line, GuildColumns.Level, COLUMN_ICON_LEVEL, GuildColSpans.Name)
-				Tooltip:SetCell(line, GuildColumns.Name, _G.NAME, GuildColSpans.Name)
+				Tooltip:SetCell(line, GuildColumns.Level, COLUMN_ICON_LEVEL, GuildColSpans.ToonName)
+				Tooltip:SetCell(line, GuildColumns.ToonName, _G.NAME, GuildColSpans.ToonName)
 				Tooltip:SetCell(line, GuildColumns.Rank, _G.RANK, GuildColSpans.Rank)
-				Tooltip:SetCell(line, GuildColumns.Zone, _G.ZONE, GuildColSpans.Zone)
+				Tooltip:SetCell(line, GuildColumns.ZoneName, _G.ZONE, GuildColSpans.ZoneName)
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -675,12 +686,12 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetCell(line, GuildColumns.Level, ColorPlayerLevel(player.Level), GuildColSpans.Level)
-					Tooltip:SetCell(line, GuildColumns.Name, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), GuildColSpans.Name)
+					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), GuildColSpans.ToonName)
 					Tooltip:SetCell(line, GuildColumns.Rank, player.Rank, GuildColSpans.Rank)
-					Tooltip:SetCell(line, GuildColumns.Zone, player.ZoneName or _G.UNKNOWN, GuildColSpans.Zone)
+					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
 
 					if _G.IsAddOnLoaded("Blizzard_GuildUI") then
-						Tooltip:SetCellScript(line, GuildColumns.Name, "OnMouseUp", ShowGuildMemberDropdown, player)
+						Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ShowGuildMemberDropdown, player)
 					end
 
 
@@ -707,6 +718,9 @@ do
 	end
 end -- do-block
 
+-------------------------------------------------------------------------------
+-- DataObject methods.
+-------------------------------------------------------------------------------
 function DataObject:OnClick(button)
 	if _G.IsAltKeyDown() then
 		_G.ToggleGuildFrame()
