@@ -113,9 +113,24 @@ TitleFont:SetFontObject("QuestTitleFont")
 
 local REQUEST_UPDATE_INTERVAL = 30
 
+local DB_DEFAULTS = {
+	global = {
+		DataObject = {
+			MinimapIcon = {
+				hide = false,
+			},
+		},
+		tooltip = {
+			Scale = 1,
+			HideDelay = 0.25,
+		},
+	}
+}
+
 -------------------------------------------------------------------------------
 -- Variables
 -------------------------------------------------------------------------------
+local DB
 local Tooltip
 
 -- Statistics: Populated and maintained in UpdateStatistics()
@@ -598,9 +613,13 @@ local function RequestUpdates()
 end
 
 function Frenemy:OnInitialize()
+	DB = LibStub("AceDB-3.0"):New(FOLDER_NAME .. "DB", DB_DEFAULTS, true).global
 end
 
 function Frenemy:OnEnable()
+	if LDBIcon then
+		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
+	end
 	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
 	self.RequestUpdater:Play()
 
