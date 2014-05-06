@@ -188,7 +188,8 @@ local function UpdateStatistics()
 	TotalFriendsCount, OnlineFriendsCount = _G.GetNumFriends()
 
 	if _G.IsInGuild() then
-		TotalGuildMembersCount, OnlineGuildMembersCount = _G.GetNumGuildMembers()
+		local _
+		TotalGuildMembersCount, _, OnlineGuildMembersCount = _G.GetNumGuildMembers()
 	end
 end
 
@@ -330,7 +331,7 @@ do
 			for index = 1, _G.GetNumGuildMembers() do
 				local toonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
-				if isOnline then
+				if isOnline or isMobile then
 					if isMobile then
 						status = STATUS_ICON_MOBILE
 						zoneName = _G.REMOTE_CHAT
