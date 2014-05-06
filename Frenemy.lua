@@ -96,7 +96,9 @@ local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoi
 
 local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK, STATUS_ICON_SIZE)
 local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND, STATUS_ICON_SIZE)
-local STATUS_ICON_MOBILE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]], STATUS_ICON_SIZE)
+local STATUS_ICON_MOBILE_AWAY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-AwayMobile]], STATUS_ICON_SIZE)
+local STATUS_ICON_MOBILE_BUSY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]], STATUS_ICON_SIZE)
+local STATUS_ICON_MOBILE_ONLINE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]], STATUS_ICON_SIZE)
 local STATUS_ICON_NOTE = CreateIcon(_G.FRIENDS_TEXTURE_OFFLINE, STATUS_ICON_SIZE)
 local STATUS_ICON_ONLINE = CreateIcon(_G.FRIENDS_TEXTURE_ONLINE, STATUS_ICON_SIZE)
 
@@ -332,15 +334,12 @@ do
 				local toonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
 				if isOnline or isMobile then
-					if isMobile then
-						status = STATUS_ICON_MOBILE
-						zoneName = _G.REMOTE_CHAT
-					elseif status == 0 then
-						status = STATUS_ICON_ONLINE
+					if status == 0 then
+						status = isMobile and STATUS_ICON_MOBILE_ONLINE or STATUS_ICON_ONLINE
 					elseif status == 1 then
-						status = STATUS_ICON_AFK
+						status = isMobile and STATUS_ICON_MOBILE_AWAY or STATUS_ICON_AFK
 					elseif status == 2 then
-						status = STATUS_ICON_DND
+						status = isMobile and STATUS_ICON_MOBILE_BUSY or STATUS_ICON_DND
 					end
 
 					table.insert(GuildList, {
@@ -351,8 +350,8 @@ do
 						OfficerNote = (officerNote and officerNote ~= "") and STATUS_ICON_NOTE .. _G.ORANGE_FONT_COLOR_CODE .. officerNote .. "|r" or nil,
 						Rank = rank,
 						StatusIcon = status,
-						ToonName = _G.Ambiguate(toonName, "none"),
-						ZoneName = zoneName,
+						ToonName = _G.Ambiguate(toonName, "guild"),
+						ZoneName = isMobile and _G.REMOTE_CHAT or zoneName,
 					})
 				end
 			end
