@@ -68,9 +68,6 @@ end -- do-blcok
 
 local BROADCAST_ICON = [[|TInterface\FriendsFrame\BroadcastIcon:0|t]]
 
-local FACTION_COLOR_HORDE = _G.RED_FONT_COLOR_CODE
-local FACTION_COLOR_ALLIANCE = "|cff 0bef3"
-
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
 
 local GROUP_CHECKMARK = [[|TInterface\Buttons\UI-CheckBox-Check:0|t]]
@@ -81,6 +78,14 @@ local PLAYER_REALM = _G.GetRealmName()
 local function CreateIcon(texture_path, icon_size)
 	return ("|T%s:%d|t"):format(texture_path, icon_size)
 end
+
+local FACTION_ICON_SIZE = 18
+
+local FACTION_ICON_ALLIANCE = CreateIcon([[Interface\COMMON\icon-alliance]], FACTION_ICON_SIZE)
+local FACTION_ICON_HORDE = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE)
+local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE)
+
+local PLAYER_FACTION_ICON = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
 local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], 12)
 
@@ -320,7 +325,7 @@ do
 						BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
 						Class = class,
 						Client = client,
-						FactionColor = faction and (faction == "Horde" and FACTION_COLOR_HORDE or FACTION_COLOR_ALLIANCE) or _G.GRAY_FONT_COLOR_CODE,
+						FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
 						GameText = gameText or "",
 						Level = level and tonumber(level) or 0,
 						Note = noteText and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. noteText .. "|r" or nil,
@@ -379,17 +384,17 @@ do
 						})
 					end
 
-					local factionColor = PLAYER_FACTION == "Horde" and FACTION_COLOR_HORDE or FACTION_COLOR_ALLIANCE
-
 					for index = 1, #FriendsList do
 						local player = FriendsList[index]
+						local groupIndicator = IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""
+						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
 						Tooltip:SetCell(line, WoWFriendsColumns.RealID, ("%s%s"):format(player.StatusIcon, _G.NOT_APPLICABLE), WoWFriendsColSpans.RealID)
-						Tooltip:SetCell(line, WoWFriendsColumns.Name, ("|cff%s%s|r%s"):format(CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR, player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), WoWFriendsColSpans.Name)
+						Tooltip:SetCell(line, WoWFriendsColumns.Name, ("%s|cff%s%s|r%s"):format(PLAYER_FACTION_ICON, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.Name)
 						Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
-						Tooltip:SetCell(line, WoWFriendsColumns.Realm, ("%s%s|r"):format(factionColor, PLAYER_REALM), WoWFriendsColSpans.Realm)
+						Tooltip:SetCell(line, WoWFriendsColumns.Realm, PLAYER_REALM, WoWFriendsColSpans.Realm)
 
 						if player.Note then
 							line = Tooltip:AddLine()
@@ -404,13 +409,15 @@ do
 				if #BattleNetWoWList > 0 then
 					for index = 1, #BattleNetWoWList do
 						local player = BattleNetWoWList[index]
+						local groupIndicator = IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""
+						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
 						Tooltip:SetCell(line, WoWFriendsColumns.RealID, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), WoWFriendsColSpans.RealID)
-						Tooltip:SetCell(line, WoWFriendsColumns.Name, ("|cff%s%s|r%s"):format(CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR, player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), WoWFriendsColSpans.Name)
+						Tooltip:SetCell(line, WoWFriendsColumns.Name, ("%s|cff%s%s|r%s"):format(player.FactionIcon, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.Name)
 						Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
-						Tooltip:SetCell(line, WoWFriendsColumns.Realm, ("%s%s|r"):format(player.FactionColor, player.RealmName), WoWFriendsColSpans.Realm)
+						Tooltip:SetCell(line, WoWFriendsColumns.Realm, player.RealmName, WoWFriendsColSpans.Realm)
 
 						if player.Note then
 							line = Tooltip:AddLine()
