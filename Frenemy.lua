@@ -261,40 +261,6 @@ do
 		end
 	end
 
-	local function RenderBattleNetLines(sourceList, headerLine)
-		Tooltip:SetCell(headerLine, BattleNetColumns.RealID, _G.BATTLENET_FRIEND, BattleNetColSpans.RealID)
-		Tooltip:SetCell(headerLine, BattleNetColumns.Name, _G.NAME, BattleNetColSpans.Name)
-		Tooltip:SetCell(headerLine, BattleNetColumns.Info, _G.INFO, BattleNetColSpans.Info)
-
-		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
-
-		for index = 1, #sourceList do
-			local player = sourceList[index]
-			local line = Tooltip:AddLine()
-			Tooltip:SetCell(line, BattleNetColumns.Game, CLIENT_ICON_TEXTURE_CODES[player.Client], BattleNetColSpans.Game)
-			Tooltip:SetCell(line, BattleNetColumns.RealID, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), BattleNetColSpans.RealID)
-			Tooltip:SetCell(line, BattleNetColumns.Name, ("%s%s|r"):format(_G.FRIENDS_OTHER_NAME_COLOR_CODE, player.ToonName), BattleNetColSpans.Name)
-			Tooltip:SetCell(line, BattleNetColumns.Info, player.GameText, BattleNetColSpans.Info)
-
-			if player.Note then
-				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Game, player.Note, "GameTooltipTextSmall", 0)
-			end
-
-			if player.BroadcastText then
-				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Game, player.BroadcastText, "GameTooltipTextSmall", 0)
-			end
-		end
-
-		Tooltip:AddLine(" ")
-	end
-
-	local function Tooltip_OnRelease(self)
-		Tooltip = nil
-		TooltipAnchor = nil
-	end
-
 	local function GenerateTooltipData()
 		if OnlineFriendsCount > 0 then
 			table.wipe(FriendsList)
@@ -339,6 +305,7 @@ do
 					GameText = gameText or "",
 					Level = level and tonumber(level) or 0,
 					Note = noteText and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. noteText .. "|r" or nil,
+					PresenceID = presenceID,
 					PresenceName = presenceName or _G.UNKNOWN,
 					RealmName = realmName or "",
 					StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
@@ -378,6 +345,7 @@ do
 
 					table.insert(GuildList, {
 						Class = class,
+						IsMobile = isMobile,
 						Level = level,
 						Note = (note and note ~= "") and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
 						OfficerNote = (officerNote and officerNote ~= "") and STATUS_ICON_NOTE .. _G.ORANGE_FONT_COLOR_CODE .. officerNote .. "|r" or nil,
@@ -394,6 +362,78 @@ do
 	local function ToggleSectionVisibility(tooltipCell, sectionName)
 		DB.Tooltip.CollapsedSections[sectionName] = not DB.Tooltip.CollapsedSections[sectionName]
 		DrawTooltip(TooltipAnchor)
+	end
+
+	local function ShowBattleNetFriendDropdownMenu(tooltipCell, playerEntry, button)
+		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+
+		if button == "LeftButton" then
+			-- TODO
+		elseif button == "RightButton" then
+			Tooltip:SetFrameStrata("DIALOG")
+			_G.FriendsFrame_ShowBNDropdown(playerEntry.PresenceName, true, nil, nil, nil, true, playerEntry.PresenceID)
+		end
+	end
+
+	local function ShowGuildMemberDropdown(tooltipCell, playerEntry, button)
+		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+
+		if button == "LeftButton" then
+			-- TODO
+		elseif button == "RightButton" then
+			Tooltip:SetFrameStrata("DIALOG")
+			_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
+		end
+	end
+
+	local function ShowWoWFriendDropdownMenu(tooltipCell, playerEntry, button)
+		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+
+		if button == "LeftButton" then
+			-- TODO
+		elseif button == "RightButton" then
+			Tooltip:SetFrameStrata("DIALOG")
+			_G.FriendsFrame_ShowDropdown(playerEntry.ToonName, true, nil, nil, nil, true)
+		end
+	end
+
+	local function RenderBattleNetLines(sourceList, headerLine)
+		Tooltip:SetCell(headerLine, BattleNetColumns.RealID, _G.BATTLENET_FRIEND, BattleNetColSpans.RealID)
+		Tooltip:SetCell(headerLine, BattleNetColumns.Name, _G.NAME, BattleNetColSpans.Name)
+		Tooltip:SetCell(headerLine, BattleNetColumns.Info, _G.INFO, BattleNetColSpans.Info)
+
+		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
+		for index = 1, #sourceList do
+			local player = sourceList[index]
+			local line = Tooltip:AddLine()
+			Tooltip:SetCell(line, BattleNetColumns.Game, CLIENT_ICON_TEXTURE_CODES[player.Client], BattleNetColSpans.Game)
+			Tooltip:SetCell(line, BattleNetColumns.RealID, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), BattleNetColSpans.RealID)
+			Tooltip:SetCell(line, BattleNetColumns.Name, ("%s%s|r"):format(_G.FRIENDS_OTHER_NAME_COLOR_CODE, player.ToonName), BattleNetColSpans.Name)
+			Tooltip:SetCell(line, BattleNetColumns.Info, player.GameText, BattleNetColSpans.Info)
+
+			Tooltip:SetCellScript(line, BattleNetColumns.RealID, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+
+			if player.Note then
+				line = Tooltip:AddLine()
+				Tooltip:SetCell(line, BattleNetColumns.Game, player.Note, "GameTooltipTextSmall", 0)
+			end
+
+			if player.BroadcastText then
+				line = Tooltip:AddLine()
+				Tooltip:SetCell(line, BattleNetColumns.Game, player.BroadcastText, "GameTooltipTextSmall", 0)
+			end
+		end
+
+		Tooltip:AddLine(" ")
+	end
+
+	local function Tooltip_OnRelease(self)
+		_G.HideDropDownMenu(1)
+
+		Tooltip:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
+		Tooltip = nil
+		TooltipAnchor = nil
 	end
 
 	function DrawTooltip(anchor_frame)
@@ -458,6 +498,8 @@ do
 							Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
 							Tooltip:SetCell(line, WoWFriendsColumns.Realm, PLAYER_REALM, WoWFriendsColSpans.Realm)
 
+							Tooltip:SetCellScript(line, WoWFriendsColumns.Name, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
+
 							if player.Note then
 								line = Tooltip:AddLine()
 								Tooltip:SetCell(line, WoWFriendsColumns.Level, player.Note, "GameTooltipTextSmall", 0)
@@ -480,6 +522,12 @@ do
 							Tooltip:SetCell(line, WoWFriendsColumns.Name, ("%s|cff%s%s|r%s"):format(player.FactionIcon, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.Name)
 							Tooltip:SetCell(line, WoWFriendsColumns.Zone, player.ZoneName, WoWFriendsColSpans.Zone)
 							Tooltip:SetCell(line, WoWFriendsColumns.Realm, player.RealmName, WoWFriendsColSpans.Realm)
+
+							Tooltip:SetCellScript(line, WoWFriendsColumns.RealID, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+
+							if player.RealmName == PLAYER_REALM then
+								Tooltip:SetCellScript(line, WoWFriendsColumns.Name, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
+							end
 
 							if player.Note then
 								line = Tooltip:AddLine()
@@ -576,6 +624,11 @@ do
 					Tooltip:SetCell(line, GuildColumns.Name, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), GuildColSpans.Name)
 					Tooltip:SetCell(line, GuildColumns.Rank, player.Rank, GuildColSpans.Rank)
 					Tooltip:SetCell(line, GuildColumns.Zone, player.ZoneName or _G.UNKNOWN, GuildColSpans.Zone)
+
+					if _G.IsAddOnLoaded("Blizzard_GuildUI") then
+						Tooltip:SetCellScript(line, GuildColumns.Name, "OnMouseUp", ShowGuildMemberDropdown, player)
+					end
+
 
 					if player.Note then
 						line = Tooltip:AddLine()
