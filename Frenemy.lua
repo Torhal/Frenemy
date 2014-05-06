@@ -262,8 +262,13 @@ do
 	end
 
 	local function GenerateTooltipData()
+		table.wipe(BattleNetAppList)
+		table.wipe(BattleNetPlayingList)
+		table.wipe(BattleNetWoWList)
+		table.wipe(FriendsList)
+		table.wipe(GuildList)
+
 		if OnlineFriendsCount > 0 then
-			table.wipe(FriendsList)
 
 			for friend_index = 1, OnlineFriendsCount do
 				local toonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
@@ -280,10 +285,6 @@ do
 		end
 
 		if OnlineBattleNetCount > 0 then
-			table.wipe(BattleNetAppList)
-			table.wipe(BattleNetPlayingList)
-			table.wipe(BattleNetWoWList)
-
 			for battleNetIndex = 1, OnlineBattleNetCount do
 				local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, _, _, isAFK, isDND, broadcastText, noteText, isRIDFriend, broadcastTime = _G.BNGetFriendInfo(battleNetIndex)
 				local _, realmName, faction, class, zoneName, level, gameText
@@ -326,8 +327,6 @@ do
 		end
 
 		if _G.IsInGuild() then
-			table.wipe(GuildList)
-
 			for index = 1, _G.GetNumGuildMembers() do
 				local toonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
@@ -440,6 +439,7 @@ do
 		if not anchor_frame then
 			return
 		end
+
 		TooltipAnchor = anchor_frame
 		GenerateTooltipData()
 
@@ -452,6 +452,7 @@ do
 
 			Tooltip.OnRelease = Tooltip_OnRelease
 		end
+
 		Tooltip:Clear()
 		Tooltip:SetCellMarginH(0)
 		Tooltip:SetCellMarginV(1)
@@ -676,6 +677,7 @@ function DataObject:UpdateDisplay()
 	if _G.IsInGuild() then
 		output = ("%s, %s%s: %d|r"):format(output, _G.GREEN_FONT_COLOR_CODE, _G.GUILD, OnlineGuildMembersCount)
 	end
+
 	self.text = output
 end
 
