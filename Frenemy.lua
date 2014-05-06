@@ -90,6 +90,9 @@ local COLUMN_ICON_SIZE = 16
 local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], COLUMN_ICON_SIZE)
 local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], COLUMN_ICON_SIZE)
 
+local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]], 0)
+local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]], 0)
+
 local STATUS_ICON_SIZE = 12
 
 local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], STATUS_ICON_SIZE)
@@ -520,10 +523,20 @@ do
 	-------------------------------------------------------------------------------
 	-- Display rendering
 	-------------------------------------------------------------------------------
+	local function ColumnLabel(label, data)
+		local sectionName, fieldName = (":"):split(data)
+
+		if DB.Tooltip.Sorting[sectionName].Field == SortFieldIDs[sectionName][fieldName] then
+			return  (DB.Tooltip.Sorting[sectionName].Order == SORT_ORDER_ASCENDING and SORT_ICON_ASCENDING or SORT_ICON_DESCENDING) .. label
+		end
+
+		return label
+	end
+
 	local function RenderBattleNetLines(sourceListName, headerLine)
-		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, _G.BATTLENET_FRIEND, BattleNetColSpans.PresenceName)
-		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, _G.NAME, BattleNetColSpans.ToonName)
-		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, _G.INFO, BattleNetColSpans.GameText)
+		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, sourceListName .. ":PresenceName"), BattleNetColSpans.PresenceName)
+		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, ColumnLabel(_G.NAME, sourceListName .. ":ToonName"), BattleNetColSpans.ToonName)
+		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, ColumnLabel(_G.INFO, sourceListName .. ":GameText"), BattleNetColSpans.GameText)
 
 		Tooltip:SetCellScript(headerLine, BattleNetColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":PresenceName")
 		Tooltip:SetCellScript(headerLine, BattleNetColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":ToonName")
@@ -604,11 +617,11 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-					Tooltip:SetCell(line, WoWFriendsColumns.Level, COLUMN_ICON_LEVEL, WoWFriendsColSpans.Level)
-					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, _G.BATTLENET_FRIEND, WoWFriendsColSpans.PresenceName)
-					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, _G.NAME, WoWFriendsColSpans.ToonName)
-					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, _G.ZONE, WoWFriendsColSpans.ZoneName)
-					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, _G.FRIENDS_LIST_REALM, WoWFriendsColSpans.RealmName)
+					Tooltip:SetCell(line, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
+					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME,"WoWFriends:ToonName" ), WoWFriendsColSpans.ToonName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
+					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, ColumnLabel(_G.FRIENDS_LIST_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
 
 					Tooltip:SetCellScript(line, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 					Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
@@ -669,7 +682,8 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-					Tooltip:SetCell(line, BattleNetColumns.Client, COLUMN_ICON_GAME)
+					Tooltip:SetCell(line, BattleNetColumns.Client, ColumnLabel(COLUMN_ICON_GAME, "BattleNetGames:ClientIndex"))
+
 					Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
 
 					RenderBattleNetLines("BattleNetGames", line)
@@ -717,10 +731,10 @@ do
 				line = Tooltip:AddLine()
 				Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
-				Tooltip:SetCell(line, GuildColumns.Level, COLUMN_ICON_LEVEL, GuildColSpans.ToonName)
-				Tooltip:SetCell(line, GuildColumns.ToonName, _G.NAME, GuildColSpans.ToonName)
-				Tooltip:SetCell(line, GuildColumns.Rank, _G.RANK, GuildColSpans.Rank)
-				Tooltip:SetCell(line, GuildColumns.ZoneName, _G.ZONE, GuildColSpans.ZoneName)
+				Tooltip:SetCell(line, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL,"Guild:Level" ), GuildColSpans.ToonName)
+				Tooltip:SetCell(line, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
+				Tooltip:SetCell(line, GuildColumns.Rank, ColumnLabel(_G.RANK, "Guild:RankIndex"), GuildColSpans.Rank)
+				Tooltip:SetCell(line, GuildColumns.ZoneName, ColumnLabel(_G.ZONE, "Guild:ZoneName"), GuildColSpans.ZoneName)
 
 				Tooltip:SetCellScript(line, GuildColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
 				Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
