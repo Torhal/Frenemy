@@ -87,9 +87,14 @@ local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FAC
 
 local PLAYER_FACTION_ICON = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
-local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], 12)
+local COLUMN_ICON_SIZE = 16
+
+local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], COLUMN_ICON_SIZE)
+local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], COLUMN_ICON_SIZE)
 
 local STATUS_ICON_SIZE = 12
+
+local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], STATUS_ICON_SIZE)
 
 local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK, STATUS_ICON_SIZE)
 local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND, STATUS_ICON_SIZE)
@@ -238,13 +243,17 @@ do
 		end
 	end
 
-	local function RenderBattleNetLines(sourceList, headerLabel)
+	local function RenderBattleNetLines(sourceList, headerLabel, showGameColumnIcon)
 		local line = Tooltip:AddLine()
 		Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, headerLabel, SECTION_ICON_BULLET), _G.GameFontNormal, "CENTER", 0)
 		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
 		line = Tooltip:AddLine()
 		Tooltip:SetLineColor(line, 0, 0, 0, 1)
+
+		if showGameColumnIcon then
+			Tooltip:SetCell(line, BattleNetColumns.Game, COLUMN_ICON_GAME)
+		end
 
 		Tooltip:SetCell(line, BattleNetColumns.RealID, _G.BATTLENET_FRIEND, BattleNetColSpans.RealID)
 		Tooltip:SetCell(line, BattleNetColumns.Name, _G.NAME, BattleNetColSpans.Name)
@@ -357,6 +366,7 @@ do
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
+					Tooltip:SetCell(line, WoWFriendsColumns.Level, COLUMN_ICON_LEVEL, WoWFriendsColSpans.Level)
 					Tooltip:SetCell(line, WoWFriendsColumns.RealID, _G.BATTLENET_FRIEND, WoWFriendsColSpans.RealID)
 					Tooltip:SetCell(line, WoWFriendsColumns.Name, _G.NAME, WoWFriendsColSpans.Name)
 					Tooltip:SetCell(line, WoWFriendsColumns.Zone, _G.ZONE, WoWFriendsColSpans.Zone)
@@ -439,14 +449,14 @@ do
 				-- BattleNet In-Game Friends
 				-------------------------------------------------------------------------------
 				if #BattleNetPlayingList > 0 then
-					RenderBattleNetLines(BattleNetPlayingList, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)))
+					RenderBattleNetLines(BattleNetPlayingList, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), true)
 				end
 
 				-------------------------------------------------------------------------------
 				-- BattleNet Friends
 				-------------------------------------------------------------------------------
 				if #BattleNetAppList > 0 then
-					RenderBattleNetLines(BattleNetAppList, _G.BATTLENET_OPTIONS_LABEL)
+					RenderBattleNetLines(BattleNetAppList, _G.BATTLENET_OPTIONS_LABEL, false)
 				end
 			end
 		end
@@ -493,6 +503,7 @@ do
 			line = Tooltip:AddLine()
 			Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
+			Tooltip:SetCell(line, GuildColumns.Level, COLUMN_ICON_LEVEL, GuildColSpans.Name)
 			Tooltip:SetCell(line, GuildColumns.Name, _G.NAME, GuildColSpans.Name)
 			Tooltip:SetCell(line, GuildColumns.Rank, _G.RANK, GuildColSpans.Rank)
 			Tooltip:SetCell(line, GuildColumns.Zone, _G.ZONE, GuildColSpans.Zone)
