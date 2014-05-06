@@ -371,6 +371,7 @@ do
 					Class = class,
 					Level = level,
 					Note = note and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
+					PresenceName = _G.NOT_APPLICABLE,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
 					ZoneName = zoneName,
@@ -635,7 +636,7 @@ do
 						local player = PlayerLists.WoWFriends[index]
 						local groupIndicator = IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""
 						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
-						local presenceName = player.PresenceName and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or _G.NOT_APPLICABLE
+						local presenceName = player.PresenceName ~= _G.NOT_APPLICABLE and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or player.PresenceName
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
