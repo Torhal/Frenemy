@@ -16,20 +16,18 @@ local tonumber = _G.tonumber
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
-local LibQTip = LibStub('LibQTip-1.0')
+local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
-local Frenemy = _G.CreateFrame("Frame")
-Frenemy:SetScript("OnEvent", function(self, eventName, ...)
-	if self[eventName] then
-		return self[eventName](self, eventName, ...)
-	end
-end)
+local LibQTip = LibStub('LibQTip-1.0')
+local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
 	icon = [[Interface\Calendar\MeetingIcon]],
 	text = " ",
 	type = "data source",
 })
+
+local RequestUpdater = _G.CreateFrame("Frame")
 
 -------------------------------------------------------------------------------
 -- Constants
@@ -113,7 +111,6 @@ local TitleFont = _G.CreateFont("FrenemyTitleFont")
 TitleFont:SetTextColor(0.510, 0.773, 1.0)
 TitleFont:SetFontObject("QuestTitleFont")
 
-local DISPLAY_UPDATER_INTERVAL = 15
 local REQUEST_UPDATE_INTERVAL = 30
 
 -------------------------------------------------------------------------------
@@ -565,6 +562,24 @@ end
 -------------------------------------------------------------------------------
 -- Events.
 -------------------------------------------------------------------------------
+local function UpdateAndDisplay()
+	UpdateStatistics()
+	DataObject:UpdateDisplay()
+
+	if Tooltip and Tooltip:IsShown() then
+		DrawTooltip(DataObject)
+	end
+end
+
+Frenemy.BN_TOON_NAME_UPDATED = UpdateAndDisplay
+Frenemy.BN_FRIEND_INFO_CHANGED = UpdateAndDisplay
+Frenemy.FRIENDLIST_UPDATE = UpdateAndDisplay
+Frenemy.GUILD_RANKS_UPDATE = UpdateAndDisplay
+Frenemy.GUILD_ROSTER_UPDATE = UpdateAndDisplay
+
+-------------------------------------------------------------------------------
+-- Framework.
+-------------------------------------------------------------------------------
 local function CreateUpdater(parent_frame, interval, loop_func)
 	local updater = parent_frame:CreateAnimationGroup()
 	updater:CreateAnimation("Animation"):SetDuration(interval)
@@ -582,30 +597,16 @@ local function RequestUpdates()
 	end
 end
 
-local function UpdateAndDisplay()
-	UpdateStatistics()
-	DataObject:UpdateDisplay()
-
-	if Tooltip and Tooltip:IsShown() then
-		DrawTooltip(DataObject)
-	end
+function Frenemy:OnInitialize()
 end
 
-Frenemy.BN_TOON_NAME_UPDATED = UpdateAndDisplay
-Frenemy.BN_FRIEND_INFO_CHANGED = UpdateAndDisplay
-Frenemy.FRIENDLIST_UPDATE = UpdateAndDisplay
-Frenemy.GUILD_RANKS_UPDATE = UpdateAndDisplay
-Frenemy.GUILD_ROSTER_UPDATE = UpdateAndDisplay
+function Frenemy:OnEnable()
+	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
+	self.RequestUpdater:Play()
 
-function Frenemy:PLAYER_LOGIN()
-	Frenemy.RequestUpdater = CreateUpdater(Frenemy, REQUEST_UPDATE_INTERVAL, RequestUpdates)
-	Frenemy.RequestUpdater:Play()
+	self:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+	self:RegisterEvent("BN_TOON_NAME_UPDATED")
+	self:RegisterEvent("FRIENDLIST_UPDATE")
+	self:RegisterEvent("GUILD_RANKS_UPDATE")
+	self:RegisterEvent("GUILD_ROSTER_UPDATE")
 end
-
-Frenemy:RegisterEvent("BN_FRIEND_INFO_CHANGED")
-Frenemy:RegisterEvent("BN_TOON_NAME_UPDATED")
-Frenemy:RegisterEvent("FRIENDLIST_UPDATE")
-Frenemy:RegisterEvent("GUILD_RANKS_UPDATE")
-Frenemy:RegisterEvent("GUILD_ROSTER_UPDATE")
-
-Frenemy:RegisterEvent("PLAYER_LOGIN")
