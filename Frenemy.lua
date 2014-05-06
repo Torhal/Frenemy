@@ -118,6 +118,11 @@ local REQUEST_UPDATE_INTERVAL = 30
 local SORT_ORDER_ASCENDING = 1
 local SORT_ORDER_DESCENDING = 2
 
+local SORT_ORDER_NAMES = {
+	[SORT_ORDER_ASCENDING] = "Ascending",
+	[SORT_ORDER_DESCENDING] = "Descending",
+}
+
 -------------------------------------------------------------------------------
 -- Variables
 -------------------------------------------------------------------------------
@@ -135,35 +140,34 @@ local OnlineGuildMembersCount
 local TotalGuildMembersCount
 
 -------------------------------------------------------------------------------
--- Enumerations.
+-- Enumerations and data for sorting.
 -------------------------------------------------------------------------------
-local BattleNetAppSortFieldNames = {
-	"GameText",
-	"PresenceName",
-	"ToonName",
-}
-
-local BattleNetGamesSortFieldNames = {
-	"Client",
-}
-
-for index = 1, #BattleNetAppSortFieldNames do
-	BattleNetGamesSortFieldNames[#BattleNetGamesSortFieldNames + 1] = BattleNetAppSortFieldNames[index]
-end
-
-local GuildSortFieldNames = {
-	"Level",
-	"RankIndex",
-	"ToonName",
-	"ZoneName",
-}
-
-local WoWFriendsSortFieldNames = {
-	"Level",
-	"PresenceName",
-	"RealmName",
-	"ToonName",
-	"ZoneName",
+-- Changing the order will cause SavedVariables to no longer map appropriately.
+local SortFields = {
+	BattleNetApp = {
+		"GameText",
+		"PresenceName",
+		"ToonName",
+	},
+	BattleNetGames = {
+		"ClientIndex",
+		"GameText",
+		"PresenceName",
+		"ToonName",
+	},
+	Guild = {
+		"Level",
+		"RankIndex",
+		"ToonName",
+		"ZoneName",
+	},
+	WoWFriends = {
+		"Level",
+		"PresenceName",
+		"RealmName",
+		"ToonName",
+		"ZoneName",
+	},
 }
 
 local function EnumerateSortFieldNames(sortFieldNames)
@@ -176,12 +180,31 @@ local function EnumerateSortFieldNames(sortFieldNames)
 	return enumeration
 end
 
-local SortFields = {
-	BattleNetApp = EnumerateSortFieldNames(BattleNetAppSortFieldNames),
-	BattleNetGames = EnumerateSortFieldNames(BattleNetGamesSortFieldNames),
-	Guild = EnumerateSortFieldNames(GuildSortFieldNames),
-	WoWFriends = EnumerateSortFieldNames(WoWFriendsSortFieldNames),
-}
+local SortFieldIDs = {}
+local SortFieldNames = {}
+local SortFunctions = {}
+
+for sectionName, fieldNameList in pairs(SortFields) do
+	local IDList = {}
+	SortFieldIDs[sectionName] = IDList
+
+	local nameList = {}
+	SortFieldNames[sectionName] = nameList
+
+	for index = 1, #fieldNameList do
+		IDList[fieldNameList[index]] = index
+		nameList[index] = fieldNameList[index]
+
+		local sortFuncName = sectionName .. fieldNameList[index]
+		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_ASCENDING]] = function(a, b)
+			return a[fieldNameList[index]] < b[fieldNameList[index]]
+		end
+
+		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_DESCENDING]] = function(a, b)
+			return a[fieldNameList[index]] > b[fieldNameList[index]]
+		end
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Default settings
@@ -202,6 +225,24 @@ local DB_DEFAULTS = {
 			},
 			HideDelay = 0.25,
 			Scale = 1,
+			Sorting = {
+				BattleNetApp = {
+					Field = SortFieldIDs.BattleNetApp.PresenceName,
+					Order = SORT_ORDER_ASCENDING,
+				},
+				BattleNetGames = {
+					Field = SortFieldIDs.BattleNetGames.PresenceName,
+					Order = SORT_ORDER_ASCENDING,
+				},
+				Guild = {
+					Field = SortFieldIDs.Guild.ToonName,
+					Order = SORT_ORDER_ASCENDING,
+				},
+				WoWFriends = {
+					Field = SortFieldIDs.WoWFriends.ToonName,
+					Order = SORT_ORDER_ASCENDING,
+				},
+			},
 		},
 	}
 }
@@ -299,40 +340,31 @@ do
 		RealmName = 1,
 	}
 
-	local BattleNetAppList = {}
-	local BattleNetGamesList = {}
-	local GuildList = {}
-	local WoWFriendsList = {}
+	local PlayerLists = {
+		BattleNetApp = {},
+		BattleNetGames = {},
+		Guild = {},
+		WoWFriends = {},
+	}
 
 	local NUM_TOOLTIP_COLUMNS = 8
 
 	local TooltipAnchor
 
-	local function ClientSort(a, b)
-		if CLIENT_SORT_ORDERS[a.Client] < CLIENT_SORT_ORDERS[b.Client] then
-			return true
-		elseif CLIENT_SORT_ORDERS[a.Client] > CLIENT_SORT_ORDERS[b.Client] then
-			return false
-		else
-			return a.ToonName < b.ToonName
-		end
-	end
-
 	-------------------------------------------------------------------------------
 	-- Data compilation.
 	-------------------------------------------------------------------------------
 	local function GenerateTooltipData()
-		table.wipe(BattleNetAppList)
-		table.wipe(BattleNetGamesList)
-		table.wipe(GuildList)
-		table.wipe(WoWFriendsList)
+		for name, data in pairs(PlayerLists) do
+			table.wipe(data)
+		end
 
 		if OnlineFriendsCount > 0 then
 
 			for friend_index = 1, OnlineFriendsCount do
 				local toonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
 
-				table.insert(WoWFriendsList, {
+				table.insert(PlayerLists.WoWFriends, {
 					Class = class,
 					Level = level,
 					Note = note and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
@@ -361,6 +393,7 @@ do
 					BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
 					Class = class,
 					Client = client,
+					ClientIndex = CLIENT_SORT_ORDERS[client],
 					FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
 					GameText = gameText or "",
 					Level = level and tonumber(level) or 0,
@@ -374,15 +407,13 @@ do
 				}
 
 				if client == _G.BNET_CLIENT_WOW then
-					table.insert(WoWFriendsList, entry)
+					table.insert(PlayerLists.WoWFriends, entry)
 				elseif client == BNET_CLIENT_APP then
-					table.insert(BattleNetAppList, entry)
+					table.insert(PlayerLists.BattleNetApp, entry)
 				elseif toonID then
-					table.insert(BattleNetGamesList, entry)
+					table.insert(PlayerLists.BattleNetGames, entry)
 				end
 			end
-
-			table.sort(BattleNetGamesList, ClientSort)
 		end
 
 		if _G.IsInGuild() then
@@ -398,7 +429,7 @@ do
 						status = isMobile and STATUS_ICON_MOBILE_BUSY or STATUS_ICON_DND
 					end
 
-					table.insert(GuildList, {
+					table.insert(PlayerLists.Guild, {
 						Class = class,
 						IsMobile = isMobile,
 						Level = level,
@@ -412,6 +443,11 @@ do
 					})
 				end
 			end
+		end
+
+		for listName, list in pairs(PlayerLists) do
+			local savedSortField = DB.Tooltip.Sorting[listName]
+			table.sort(list, SortFunctions[listName .. SortFieldNames[listName][savedSortField.Field] .. SORT_ORDER_NAMES[savedSortField.Order]])
 		end
 	end
 
@@ -451,6 +487,31 @@ do
 		end
 	end
 
+	local ToggleColumnSortMethod
+	do
+		function ToggleColumnSortMethod(tooltipCell, sortFieldData)
+			local sectionName, fieldName = (":"):split(sortFieldData)
+
+			if not sectionName or not fieldName then
+				return
+			end
+
+			local savedSortField = DB.Tooltip.Sorting[sectionName]
+			local columnSortFieldID = SortFieldIDs[sectionName][fieldName]
+
+			if savedSortField.Field == columnSortFieldID then
+				savedSortField.Order = savedSortField.Order == SORT_ORDER_ASCENDING and SORT_ORDER_DESCENDING or SORT_ORDER_ASCENDING
+			else
+				savedSortField = DB.Tooltip.Sorting[sectionName]
+				savedSortField.Field = columnSortFieldID
+				savedSortField.Order = SORT_ORDER_ASCENDING
+			end
+
+			table.sort(PlayerLists[sectionName], SortFunctions[sectionName .. fieldName .. SORT_ORDER_NAMES[savedSortField.Order]])
+			DrawTooltip(TooltipAnchor)
+		end
+	end
+
 	local function ToggleSectionVisibility(tooltipCell, sectionName)
 		DB.Tooltip.CollapsedSections[sectionName] = not DB.Tooltip.CollapsedSections[sectionName]
 		DrawTooltip(TooltipAnchor)
@@ -459,15 +520,19 @@ do
 	-------------------------------------------------------------------------------
 	-- Display rendering
 	-------------------------------------------------------------------------------
-	local function RenderBattleNetLines(sourceList, headerLine)
+	local function RenderBattleNetLines(sourceListName, headerLine)
 		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, _G.BATTLENET_FRIEND, BattleNetColSpans.PresenceName)
 		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, _G.NAME, BattleNetColSpans.ToonName)
 		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, _G.INFO, BattleNetColSpans.GameText)
 
+		Tooltip:SetCellScript(headerLine, BattleNetColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":PresenceName")
+		Tooltip:SetCellScript(headerLine, BattleNetColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":ToonName")
+		Tooltip:SetCellScript(headerLine, BattleNetColumns.GameText, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":GameText")
+
 		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-		for index = 1, #sourceList do
-			local player = sourceList[index]
+		for index = 1, #PlayerLists[sourceListName] do
+			local player = PlayerLists[sourceListName][index]
 			local line = Tooltip:AddLine()
 			Tooltip:SetCell(line, BattleNetColumns.Client, CLIENT_ICON_TEXTURE_CODES[player.Client], BattleNetColSpans.Client)
 			Tooltip:SetCell(line, BattleNetColumns.PresenceName, ("%s%s%s|r"):format(player.StatusIcon, _G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName), BattleNetColSpans.PresenceName)
@@ -498,20 +563,20 @@ do
 		TooltipAnchor = nil
 	end
 
-	function DrawTooltip(anchor_frame)
-		if not anchor_frame then
+	function DrawTooltip(anchorFrame)
+		if not anchorFrame then
 			return
 		end
 
-		TooltipAnchor = anchor_frame
+		TooltipAnchor = anchorFrame
 		GenerateTooltipData()
 
 		if not Tooltip then
 			Tooltip = LibQTip:Acquire(FOLDER_NAME, NUM_TOOLTIP_COLUMNS)
-			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchor_frame)
+			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
 			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
 			Tooltip:SetScale(DB.Tooltip.Scale)
-			Tooltip:SmartAnchorTo(anchor_frame)
+			Tooltip:SmartAnchorTo(anchorFrame)
 
 			Tooltip.OnRelease = Tooltip_OnRelease
 		end
@@ -528,7 +593,7 @@ do
 			-------------------------------------------------------------------------------
 			-- WoW Friends
 			-------------------------------------------------------------------------------
-			if #WoWFriendsList > 0 then
+			if #PlayerLists.WoWFriends > 0 then
 				line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.WoWFriends then
@@ -545,10 +610,16 @@ do
 					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, _G.ZONE, WoWFriendsColSpans.ZoneName)
 					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, _G.FRIENDS_LIST_REALM, WoWFriendsColSpans.RealmName)
 
+					Tooltip:SetCellScript(line, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
+					Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
+					Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
+					Tooltip:SetCellScript(line, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
+					Tooltip:SetCellScript(line, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
+
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					for index = 1, #WoWFriendsList do
-						local player = WoWFriendsList[index]
+					for index = 1, #PlayerLists.WoWFriends do
+						local player = PlayerLists.WoWFriends[index]
 						local groupIndicator = IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""
 						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
 						local presenceName = player.PresenceName and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or _G.NOT_APPLICABLE
@@ -587,7 +658,7 @@ do
 			-------------------------------------------------------------------------------
 			-- BattleNet In-Game Friends
 			-------------------------------------------------------------------------------
-			if #BattleNetGamesList > 0 then
+			if #PlayerLists.BattleNetGames > 0 then
 				line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.BattleNetGames then
@@ -599,8 +670,9 @@ do
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 					Tooltip:SetCell(line, BattleNetColumns.Client, COLUMN_ICON_GAME)
+					Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
 
-					RenderBattleNetLines(BattleNetGamesList, line)
+					RenderBattleNetLines("BattleNetGames", line)
 				else
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_BULLET), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
@@ -610,7 +682,7 @@ do
 			-------------------------------------------------------------------------------
 			-- BattleNet Friends
 			-------------------------------------------------------------------------------
-			if #BattleNetAppList > 0 then
+			if #PlayerLists.BattleNetApp > 0 then
 				local line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.BattleNetApp then
@@ -622,7 +694,7 @@ do
 					line = Tooltip:AddLine()
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
-					RenderBattleNetLines(BattleNetAppList, line)
+					RenderBattleNetLines("BattleNetApp", line)
 				else
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_BULLET), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
@@ -633,7 +705,7 @@ do
 		-------------------------------------------------------------------------------
 		-- Guild
 		-------------------------------------------------------------------------------
-		if #GuildList > 0 then
+		if #PlayerLists.Guild > 0 then
 			line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.Guild then
@@ -650,10 +722,15 @@ do
 				Tooltip:SetCell(line, GuildColumns.Rank, _G.RANK, GuildColSpans.Rank)
 				Tooltip:SetCell(line, GuildColumns.ZoneName, _G.ZONE, GuildColSpans.ZoneName)
 
+				Tooltip:SetCellScript(line, GuildColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
+				Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
+				Tooltip:SetCellScript(line, GuildColumns.Rank, "OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
+				Tooltip:SetCellScript(line, GuildColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
+
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-				for index = 1, #GuildList do
-					local player = GuildList[index]
+				for index = 1, #PlayerLists.Guild do
+					local player = PlayerLists.Guild[index]
 
 					line = Tooltip:AddLine()
 					Tooltip:SetCell(line, GuildColumns.Level, ColorPlayerLevel(player.Level), GuildColSpans.Level)
