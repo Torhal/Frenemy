@@ -115,6 +115,59 @@ TitleFont:SetFontObject("QuestTitleFont")
 
 local REQUEST_UPDATE_INTERVAL = 30
 
+local SORT_ORDER_ASCENDING = 1
+local SORT_ORDER_DESCENDING = 2
+
+-------------------------------------------------------------------------------
+-- Enumerations.
+-------------------------------------------------------------------------------
+local function EnumerateSortFieldNames(sortFieldNames)
+	local enumeration = {}
+
+	for index = 1, #sortFieldNames do
+		enumeration[sortFieldNames[index]] = index
+	end
+
+	return enumeration
+end
+
+local BattleNetAppSortFieldNames = {
+	"GameText",
+	"PresenceName",
+	"ToonName",
+}
+
+local BattleNetGamesSortFieldNames = {
+	"Client",
+}
+
+for index = 1, #BattleNetAppSortFieldNames do
+	BattleNetGamesSortFieldNames[#BattleNetGamesSortFieldNames + 1] = BattleNetAppSortFieldNames[index]
+end
+
+local GuildSortFieldNames = {
+	"Level",
+	"RankIndex",
+	"ToonName",
+	"ZoneName",
+}
+
+local WoWFriendsSortFieldNames = {
+	"Level",
+	"PresenceName",
+	"RealmName",
+	"ToonName",
+	"ZoneName",
+}
+
+local BattleNetAppSortFields = EnumerateSortFieldNames(BattleNetAppSortFieldNames)
+local BattleNetGamesSortFields = EnumerateSortFieldNames(BattleNetGamesSortFieldNames)
+local GuildSortFields = EnumerateSortFieldNames(GuildSortFieldNames)
+local WoWFriendsSortFields = EnumerateSortFieldNames(WoWFriendsSortFieldNames)
+
+-------------------------------------------------------------------------------
+-- Default settings
+-------------------------------------------------------------------------------
 local DB_DEFAULTS = {
 	global = {
 		DataObject = {
