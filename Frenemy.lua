@@ -87,7 +87,8 @@ local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FAC
 local PLAYER_ICON_GROUP = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
 local PLAYER_ICON_FACTION = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
-local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], 0)
+local SECTION_ICON_DISABLED = CreateIcon([[Interface\COMMON\Indicator-Red]], 0)
+local SECTION_ICON_ENABLED = CreateIcon([[Interface\COMMON\Indicator-Green]], 0)
 
 local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]], 0)
 local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]], 0)
@@ -607,7 +608,7 @@ do
 				line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.WoWFriends then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.FRIENDS, SECTION_ICON_BULLET), _G.GameFontNormal, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.FRIENDS, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -660,7 +661,7 @@ do
 
 					Tooltip:AddLine(" ")
 				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.FRIENDS, SECTION_ICON_BULLET), _G.GameFontDisable, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.FRIENDS, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
 				end
 			end
@@ -672,7 +673,7 @@ do
 				line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.BattleNetGames then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_BULLET), _G.GameFontNormal, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -685,7 +686,7 @@ do
 
 					RenderBattleNetLines("BattleNetGames", line)
 				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_BULLET), _G.GameFontDisable, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
 				end
 			end
@@ -697,7 +698,7 @@ do
 				local line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.BattleNetApp then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_BULLET), _G.GameFontNormal, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -707,7 +708,7 @@ do
 
 					RenderBattleNetLines("BattleNetApp", line)
 				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_BULLET), _G.GameFontDisable, "CENTER", 0)
+					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
 				end
 			end
@@ -720,7 +721,7 @@ do
 			line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.Guild then
-				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.GetGuildInfo("player"), SECTION_ICON_BULLET), "GameFontNormal", "CENTER", 0)
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.GetGuildInfo("player"), SECTION_ICON_ENABLED), "GameFontNormal", "CENTER", 0)
 				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -767,7 +768,7 @@ do
 
 				Tooltip:AddLine(" ")
 			else
-				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_BULLET, _G.GetGuildInfo("player"), SECTION_ICON_BULLET), "GameFontDisable", "CENTER", 0)
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
 				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
 			end
 		end
