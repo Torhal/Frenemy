@@ -68,8 +68,6 @@ local BROADCAST_ICON = [[|TInterface\FriendsFrame\BroadcastIcon:0|t]]
 
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
 
-local GROUP_CHECKMARK = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
-
 local PLAYER_FACTION = _G.UnitFactionGroup("player")
 local PLAYER_REALM = _G.GetRealmName()
 
@@ -77,33 +75,30 @@ local function CreateIcon(texture_path, icon_size)
 	return ("|T%s:%d|t"):format(texture_path, icon_size)
 end
 
+local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], 0)
+local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], 0)
+
 local FACTION_ICON_SIZE = 18
 
 local FACTION_ICON_ALLIANCE = CreateIcon([[Interface\COMMON\icon-alliance]], FACTION_ICON_SIZE)
 local FACTION_ICON_HORDE = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE)
 local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE)
 
-local PLAYER_FACTION_ICON = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
+local PLAYER_ICON_GROUP = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
+local PLAYER_ICON_FACTION = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
-local COLUMN_ICON_SIZE = 16
-
-local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], 0)
-local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], 0)
+local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], 0)
 
 local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]], 0)
 local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]], 0)
 
-local STATUS_ICON_SIZE = 12
-
-local SECTION_ICON_BULLET = CreateIcon([[Interface\QUESTFRAME\UI-Quest-BulletPoint]], STATUS_ICON_SIZE)
-
-local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK, STATUS_ICON_SIZE)
-local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND, STATUS_ICON_SIZE)
-local STATUS_ICON_MOBILE_AWAY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-AwayMobile]], STATUS_ICON_SIZE)
-local STATUS_ICON_MOBILE_BUSY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]], STATUS_ICON_SIZE)
-local STATUS_ICON_MOBILE_ONLINE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]], STATUS_ICON_SIZE)
-local STATUS_ICON_NOTE = CreateIcon(_G.FRIENDS_TEXTURE_OFFLINE, STATUS_ICON_SIZE)
-local STATUS_ICON_ONLINE = CreateIcon(_G.FRIENDS_TEXTURE_ONLINE, STATUS_ICON_SIZE)
+local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK, 0)
+local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND, 0)
+local STATUS_ICON_MOBILE_AWAY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-AwayMobile]], 0)
+local STATUS_ICON_MOBILE_BUSY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]], 0)
+local STATUS_ICON_MOBILE_ONLINE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]], 0)
+local STATUS_ICON_NOTE = CreateIcon(_G.FRIENDS_TEXTURE_OFFLINE, 0)
+local STATUS_ICON_ONLINE = CreateIcon(_G.FRIENDS_TEXTURE_ONLINE, 0)
 
 local TAB_TOGGLES = {
 	FRIENDS = 1,
@@ -634,14 +629,14 @@ do
 
 					for index = 1, #PlayerLists.WoWFriends do
 						local player = PlayerLists.WoWFriends[index]
-						local groupIndicator = IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""
+						local groupIndicator = IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""
 						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
 						local presenceName = player.PresenceName ~= _G.NOT_APPLICABLE and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or player.PresenceName
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
 						Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
-						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_FACTION_ICON, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
+						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
 						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName or PLAYER_REALM, WoWFriendsColSpans.RealmName)
 
@@ -749,7 +744,7 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetCell(line, GuildColumns.Level, ColorPlayerLevel(player.Level), GuildColSpans.Level)
-					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and GROUP_CHECKMARK or ""), GuildColSpans.ToonName)
+					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""), GuildColSpans.ToonName)
 					Tooltip:SetCell(line, GuildColumns.Rank, player.Rank, GuildColSpans.Rank)
 					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
 
