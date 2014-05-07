@@ -642,7 +642,7 @@ do
 						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
 						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
-						if player.Realm and player.RealmName ~= PLAYER_REALM then
+						if player.PresenceID then
 							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
 						else
 							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
