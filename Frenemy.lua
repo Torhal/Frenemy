@@ -367,6 +367,7 @@ do
 					Level = level,
 					Note = note and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
 					PresenceName = _G.NOT_APPLICABLE,
+					RealmName = PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
 					ZoneName = zoneName,
@@ -638,7 +639,7 @@ do
 						Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
-						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName or PLAYER_REALM, WoWFriendsColSpans.RealmName)
+						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
 						if player.Realm and player.RealmName ~= PLAYER_REALM then
 							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
