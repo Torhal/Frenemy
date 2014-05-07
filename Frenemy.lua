@@ -725,6 +725,8 @@ do
 		-------------------------------------------------------------------------------
 		-- Guild
 		-------------------------------------------------------------------------------
+		local guildMOTD
+
 		if #PlayerLists.Guild > 0 then
 			line = Tooltip:AddLine()
 
@@ -775,14 +777,21 @@ do
 				end
 
 				Tooltip:AddLine(" ")
+
+				guildMOTD = _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. _G.GetGuildRosterMOTD() .. "|r")
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
 				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
 			end
 		end
 
-		Tooltip:UpdateScrolling()
 		Tooltip:Show()
+
+		if guildMOTD and guildMOTD ~= "" then
+			Tooltip:SetCell(Tooltip:AddLine(), 1, guildMOTD, 0, 0, 0, Tooltip:GetWidth() - 20)
+		end
+
+		Tooltip:UpdateScrolling()
 	end
 end -- do-block
 
