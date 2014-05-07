@@ -862,12 +862,14 @@ function Frenemy:OnEnable()
 	if LDBIcon then
 		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
 	end
-	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
-	self.RequestUpdater:Play()
 
 	self:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 	self:RegisterEvent("BN_TOON_NAME_UPDATED")
 	self:RegisterEvent("FRIENDLIST_UPDATE")
 	self:RegisterEvent("GUILD_RANKS_UPDATE")
 	self:RegisterEvent("GUILD_ROSTER_UPDATE")
+
+	RequestUpdates()
+	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
+	self.RequestUpdater:Play()
 end
