@@ -87,8 +87,8 @@ local PLAYER_FACTION_ICON = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or 
 
 local COLUMN_ICON_SIZE = 16
 
-local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], COLUMN_ICON_SIZE)
-local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], COLUMN_ICON_SIZE)
+local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], 0)
+local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], 0)
 
 local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]], 0)
 local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]], 0)
