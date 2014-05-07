@@ -776,13 +776,13 @@ do
 					end
 				end
 
-				Tooltip:AddLine(" ")
-
 				guildMOTD = _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. _G.GetGuildRosterMOTD() .. "|r")
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
 				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
 			end
+
+			Tooltip:AddLine(" ")
 		end
 
 		Tooltip:Show()
