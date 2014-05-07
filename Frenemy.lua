@@ -528,7 +528,7 @@ do
 		local sectionName, fieldName = (":"):split(data)
 
 		if DB.Tooltip.Sorting[sectionName].Field == SortFieldIDs[sectionName][fieldName] then
-			return  (DB.Tooltip.Sorting[sectionName].Order == SORT_ORDER_ASCENDING and SORT_ICON_ASCENDING or SORT_ICON_DESCENDING) .. label
+			return (DB.Tooltip.Sorting[sectionName].Order == SORT_ORDER_ASCENDING and SORT_ICON_ASCENDING or SORT_ICON_DESCENDING) .. label
 		end
 
 		return label
@@ -620,7 +620,7 @@ do
 					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 					Tooltip:SetCell(line, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
 					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
-					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME,"WoWFriends:ToonName" ), WoWFriendsColSpans.ToonName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME, "WoWFriends:ToonName"), WoWFriendsColSpans.ToonName)
 					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
 					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, ColumnLabel(_G.FRIENDS_LIST_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
 
@@ -732,7 +732,7 @@ do
 				line = Tooltip:AddLine()
 				Tooltip:SetLineColor(line, 0, 0, 0, 1)
 
-				Tooltip:SetCell(line, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL,"Guild:Level" ), GuildColSpans.ToonName)
+				Tooltip:SetCell(line, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.ToonName)
 				Tooltip:SetCell(line, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
 				Tooltip:SetCell(line, GuildColumns.Rank, ColumnLabel(_G.RANK, "Guild:RankIndex"), GuildColSpans.Rank)
 				Tooltip:SetCell(line, GuildColumns.ZoneName, ColumnLabel(_G.ZONE, "Guild:ZoneName"), GuildColSpans.ZoneName)
