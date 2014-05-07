@@ -196,10 +196,18 @@ for sectionName, fieldNameList in pairs(SortFields) do
 
 		local sortFuncName = sectionName .. fieldNameList[index]
 		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_ASCENDING]] = function(a, b)
+			if a[fieldNameList[index]] == b[fieldNameList[index]] then
+				return a.ToonName < b.ToonName
+			end
+
 			return a[fieldNameList[index]] < b[fieldNameList[index]]
 		end
 
 		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_DESCENDING]] = function(a, b)
+			if a[fieldNameList[index]] == b[fieldNameList[index]] then
+				return a.ToonName > b.ToonName
+			end
+
 			return a[fieldNameList[index]] > b[fieldNameList[index]]
 		end
 	end
