@@ -1,10 +1,15 @@
 ## Interface: 50400
 ## Title: Frenemy
-## Version: @project-version@
 ## Notes: A customizable view of friends and guildmates.
 ## Author: Torhal
-## SavedVariables: FrenemyDB
+## Version: @project-version@
+## X-Date: @project-date-iso@
+## X-Email: jcallahan@curse.com
 ## OptionalDeps: Ace3, CallbackHandler-1.0, LibQTip-1.0, LibStub
+## SavedVariables: FrenemyDB
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: Delayed
 
 #@no-lib-strip@
 embeds.xml
