@@ -540,6 +540,7 @@ do
 	end
 
 	local function RenderBattleNetLines(sourceListName, headerLine)
+		Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
 		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, sourceListName .. ":PresenceName"), BattleNetColSpans.PresenceName)
 		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, ColumnLabel(_G.NAME, sourceListName .. ":ToonName"), BattleNetColSpans.ToonName)
 		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, ColumnLabel(_G.INFO, sourceListName .. ":GameText"), BattleNetColSpans.GameText)
@@ -687,7 +688,6 @@ do
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
 					line = Tooltip:AddLine()
-					Tooltip:SetLineColor(line, 0, 0, 0, 1)
 					Tooltip:SetCell(line, BattleNetColumns.Client, ColumnLabel(COLUMN_ICON_GAME, "BattleNetGames:ClientIndex"))
 
 					Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
@@ -711,10 +711,7 @@ do
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					line = Tooltip:AddLine()
-					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-
-					RenderBattleNetLines("BattleNetApp", line)
+					RenderBattleNetLines("BattleNetApp", Tooltip:AddLine())
 				else
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
