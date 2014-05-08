@@ -367,7 +367,6 @@ do
 		end
 
 		if OnlineFriendsCount > 0 then
-
 			for friend_index = 1, OnlineFriendsCount do
 				local toonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
 
@@ -562,13 +561,11 @@ do
 			Tooltip:SetCellScript(line, BattleNetColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
 
 			if player.Note then
-				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Client, player.Note, "GameTooltipTextSmall", 0)
+				Tooltip:SetCell(Tooltip:AddLine(), BattleNetColumns.Client, player.Note, "GameTooltipTextSmall", 0)
 			end
 
 			if player.BroadcastText then
-				line = Tooltip:AddLine()
-				Tooltip:SetCell(line, BattleNetColumns.Client, player.BroadcastText, "GameTooltipTextSmall", 0)
+				Tooltip:SetCell(Tooltip:AddLine(), BattleNetColumns.Client, player.BroadcastText, "GameTooltipTextSmall", 0)
 			end
 		end
 
@@ -605,8 +602,7 @@ do
 		Tooltip:SetCellMarginH(0)
 		Tooltip:SetCellMarginV(1)
 
-		local line = Tooltip:AddLine()
-		Tooltip:SetCell(line, 1, FOLDER_NAME, TitleFont, "CENTER", 0)
+		Tooltip:SetCell(Tooltip:AddLine(), 1, FOLDER_NAME, TitleFont, "CENTER", 0)
 		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
 		if OnlineBattleNetCount > 0 or OnlineFriendsCount > 0 then
@@ -614,7 +610,7 @@ do
 			-- WoW Friends
 			-------------------------------------------------------------------------------
 			if #PlayerLists.WoWFriends > 0 then
-				line = Tooltip:AddLine()
+				local line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.WoWFriends then
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.FRIENDS, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
@@ -679,7 +675,7 @@ do
 			-- BattleNet In-Game Friends
 			-------------------------------------------------------------------------------
 			if #PlayerLists.BattleNetGames > 0 then
-				line = Tooltip:AddLine()
+				local line = Tooltip:AddLine()
 
 				if not DB.Tooltip.CollapsedSections.BattleNetGames then
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
@@ -725,7 +721,7 @@ do
 		local guildMOTD
 
 		if #PlayerLists.Guild > 0 then
-			line = Tooltip:AddLine()
+			local line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.Guild then
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.GetGuildInfo("player"), SECTION_ICON_ENABLED), "GameFontNormal", "CENTER", 0)
@@ -735,7 +731,6 @@ do
 
 				line = Tooltip:AddLine()
 				Tooltip:SetLineColor(line, 0, 0, 0, 1)
-
 				Tooltip:SetCell(line, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.ToonName)
 				Tooltip:SetCell(line, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
 				Tooltip:SetCell(line, GuildColumns.Rank, ColumnLabel(_G.RANK, "Guild:RankIndex"), GuildColSpans.Rank)
@@ -761,15 +756,12 @@ do
 						Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ShowGuildMemberDropdown, player)
 					end
 
-
 					if player.Note then
-						line = Tooltip:AddLine()
-						Tooltip:SetCell(line, GuildColumns.Level, player.Note, "GameTooltipTextSmall", 0)
+						Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, player.Note, "GameTooltipTextSmall", 0)
 					end
 
 					if player.OfficerNote then
-						line = Tooltip:AddLine()
-						Tooltip:SetCell(line, GuildColumns.Level, player.OfficerNote, "GameTooltipTextSmall", 0)
+						Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, player.OfficerNote, "GameTooltipTextSmall", 0)
 					end
 				end
 
@@ -799,6 +791,7 @@ do
 
 		if guildMOTD and guildMOTD ~= "" then
 			Tooltip:SetCell(Tooltip:AddLine(), 1, guildMOTD, 0, 0, 0, Tooltip:GetWidth() - 20)
+			Tooltip:AddLine(" ")
 		end
 
 		Tooltip:UpdateScrolling()
