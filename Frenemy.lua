@@ -462,7 +462,7 @@ do
 	-------------------------------------------------------------------------------
 	-- Controls
 	-------------------------------------------------------------------------------
-	local function ShowBattleNetFriendDropdownMenu(tooltipCell, playerEntry, button)
+	local function BattleNetFriend_OnMouseUp(tooltipCell, playerEntry, button)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
@@ -473,7 +473,7 @@ do
 		end
 	end
 
-	local function ShowGuildMemberDropdown(tooltipCell, playerEntry, button)
+	local function GuildMember_OnMouseUp(tooltipCell, playerEntry, button)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
@@ -484,7 +484,7 @@ do
 		end
 	end
 
-	local function ShowWoWFriendDropdownMenu(tooltipCell, playerEntry, button)
+	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, button)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
@@ -558,7 +558,7 @@ do
 			Tooltip:SetCell(line, BattleNetColumns.ToonName, ("%s%s|r"):format(_G.FRIENDS_OTHER_NAME_COLOR_CODE, player.ToonName), BattleNetColSpans.ToonName)
 			Tooltip:SetCell(line, BattleNetColumns.GameText, player.GameText, BattleNetColSpans.GameText)
 
-			Tooltip:SetCellScript(line, BattleNetColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+			Tooltip:SetCellScript(line, BattleNetColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
 
 			if player.Note then
 				Tooltip:SetCell(Tooltip:AddLine(), BattleNetColumns.Client, player.Note, "GameTooltipTextSmall", 0)
@@ -648,9 +648,9 @@ do
 						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
 						if player.PresenceID then
-							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ShowBattleNetFriendDropdownMenu, player)
+							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
 						else
-							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ShowWoWFriendDropdownMenu, player)
+							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", WoWFriend_OnMouseUp, player)
 						end
 
 						if player.Note then
@@ -753,7 +753,7 @@ do
 					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
 
 					if _G.IsAddOnLoaded("Blizzard_GuildUI") then
-						Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ShowGuildMemberDropdown, player)
+						Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", GuildMember_OnMouseUp, player)
 					end
 
 					if player.Note then
@@ -885,3 +885,4 @@ function Frenemy:OnEnable()
 	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
 	self.RequestUpdater:Play()
 end
+
