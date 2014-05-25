@@ -466,7 +466,9 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			-- TODO
+			if not _G.BNIsSelf(playerEntry.PresenceID) then
+				_G.ChatFrame_SendSmartTell(playerEntry.PresenceName)
+			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.FriendsFrame_ShowBNDropdown(playerEntry.PresenceName, true, nil, nil, nil, true, playerEntry.PresenceID)
@@ -477,7 +479,7 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			-- TODO
+			_G.ChatFrame_SendTell(playerEntry.ToonName)
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
@@ -488,7 +490,7 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			-- TODO
+			_G.ChatFrame_SendTell(playerEntry.ToonName)
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.FriendsFrame_ShowDropdown(playerEntry.ToonName, true, nil, nil, nil, true)
