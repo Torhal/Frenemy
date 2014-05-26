@@ -9,6 +9,7 @@ local table = _G.table
 
 local pairs = _G.pairs
 local tonumber = _G.tonumber
+local type = _G.type
 
 -------------------------------------------------------------------------------
 -- AddOn namespace.
