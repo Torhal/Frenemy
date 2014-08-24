@@ -501,29 +501,26 @@ do
 		end
 	end
 
-	local ToggleColumnSortMethod
-	do
-		function ToggleColumnSortMethod(tooltipCell, sortFieldData)
-			local sectionName, fieldName = (":"):split(sortFieldData)
+	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)
+		local sectionName, fieldName = (":"):split(sortFieldData)
 
-			if not sectionName or not fieldName then
-				return
-			end
-
-			local savedSortField = DB.Tooltip.Sorting[sectionName]
-			local columnSortFieldID = SortFieldIDs[sectionName][fieldName]
-
-			if savedSortField.Field == columnSortFieldID then
-				savedSortField.Order = savedSortField.Order == SORT_ORDER_ASCENDING and SORT_ORDER_DESCENDING or SORT_ORDER_ASCENDING
-			else
-				savedSortField = DB.Tooltip.Sorting[sectionName]
-				savedSortField.Field = columnSortFieldID
-				savedSortField.Order = SORT_ORDER_ASCENDING
-			end
-
-			table.sort(PlayerLists[sectionName], SortFunctions[sectionName .. fieldName .. SORT_ORDER_NAMES[savedSortField.Order]])
-			DrawTooltip(TooltipAnchor)
+		if not sectionName or not fieldName then
+			return
 		end
+
+		local savedSortField = DB.Tooltip.Sorting[sectionName]
+		local columnSortFieldID = SortFieldIDs[sectionName][fieldName]
+
+		if savedSortField.Field == columnSortFieldID then
+			savedSortField.Order = savedSortField.Order == SORT_ORDER_ASCENDING and SORT_ORDER_DESCENDING or SORT_ORDER_ASCENDING
+		else
+			savedSortField = DB.Tooltip.Sorting[sectionName]
+			savedSortField.Field = columnSortFieldID
+			savedSortField.Order = SORT_ORDER_ASCENDING
+		end
+
+		table.sort(PlayerLists[sectionName], SortFunctions[sectionName .. fieldName .. SORT_ORDER_NAMES[savedSortField.Order]])
+		DrawTooltip(TooltipAnchor)
 	end
 
 	local function ToggleSectionVisibility(tooltipCell, sectionName)
