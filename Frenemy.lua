@@ -472,6 +472,7 @@ do
 			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
+			_G.CloseDropDownMenus()
 			_G.FriendsFrame_ShowBNDropdown(playerEntry.PresenceName, true, nil, nil, nil, true, playerEntry.PresenceID)
 		end
 	end
@@ -483,6 +484,7 @@ do
 			_G.ChatFrame_SendTell(playerEntry.ToonName)
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
+			_G.CloseDropDownMenus()
 			_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
 		end
 	end
@@ -494,6 +496,7 @@ do
 			_G.ChatFrame_SendTell(playerEntry.ToonName)
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
+			_G.CloseDropDownMenus()
 			_G.FriendsFrame_ShowDropdown(playerEntry.ToonName, true, nil, nil, nil, true)
 		end
 	end
