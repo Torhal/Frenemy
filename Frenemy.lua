@@ -20,7 +20,6 @@ local LibStub = _G.LibStub
 local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
 local LibQTip = LibStub('LibQTip-1.0')
-local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
 	icon = [[Interface\Calendar\MeetingIcon]],
@@ -805,10 +804,14 @@ end -- do-block
 -- DataObject methods.
 -------------------------------------------------------------------------------
 function DataObject:OnClick(button)
-	if _G.IsAltKeyDown() then
-		_G.ToggleGuildFrame()
+	if button == "LeftButton" then
+		if _G.IsAltKeyDown() then
+			_G.ToggleGuildFrame()
+		else
+			_G.ToggleFriendsFrame(TAB_TOGGLES.FRIENDS)
+		end
 	else
-		_G.ToggleFriendsFrame(TAB_TOGGLES.FRIENDS)
+		_G.InterfaceOptionsFrame_OpenToCategory(Frenemy.optionsFrame)
 	end
 end
 
@@ -871,13 +874,16 @@ end
 
 function Frenemy:OnInitialize()
 	DB = LibStub("AceDB-3.0"):New(FOLDER_NAME .. "DB", DB_DEFAULTS, true).global
-end
+	private.DB = DB
 
-function Frenemy:OnEnable()
+	local LDBIcon = LibStub("LibDBIcon-1.0")
 	if LDBIcon then
 		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
 	end
+	private.SetupOptions()
+end
 
+function Frenemy:OnEnable()
 	self:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 	self:RegisterEvent("BN_TOON_NAME_UPDATED")
 	self:RegisterEvent("FRIENDLIST_UPDATE")

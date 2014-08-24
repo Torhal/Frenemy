@@ -18,4 +18,7 @@ embeds.xml
 # Special snowflake.
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
+locale.xml
+
 Frenemy.lua
+Config.lua
