@@ -19,6 +19,7 @@ local FOLDER_NAME, private = ...
 local LibStub = _G.LibStub
 local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
+local L = LibStub("AceLocale-3.0"):GetLocale(FOLDER_NAME)
 local LibQTip = LibStub('LibQTip-1.0')
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
@@ -671,7 +672,7 @@ do
 					Tooltip:SetCell(headerLine, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
 					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.RealmName, ColumnLabel(_G.FRIENDS_LIST_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.RealmName, ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
 					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
 
 					local addedNoteColumn

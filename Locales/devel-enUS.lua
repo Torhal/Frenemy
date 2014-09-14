@@ -9,3 +9,4 @@ L.TOOLTIP_HIDEDELAY_DESC = "Length of time the tooltip will continue to be shown
 L.TOOLTIP_SCALE_LABEL = "Tooltip Scale"
 L.NOTES_ARRANGEMENT_COLUMN = "Column"
 L.NOTES_ARRANGEMENT_ROW = "Row"
+L.COLUMN_LABEL_REALM = "Realm"
