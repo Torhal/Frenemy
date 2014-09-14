@@ -169,16 +169,6 @@ local SortFields = {
 	},
 }
 
-local function EnumerateSortFieldNames(sortFieldNames)
-	local enumeration = {}
-
-	for index = 1, #sortFieldNames do
-		enumeration[sortFieldNames[index]] = index
-	end
-
-	return enumeration
-end
-
 local SortFieldIDs = {}
 local SortFieldNames = {}
 local SortFunctions = {}
