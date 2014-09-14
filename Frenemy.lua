@@ -500,6 +500,10 @@ do
 	end
 
 	local function GuildMember_OnMouseUp(tooltipCell, playerEntry, button)
+		if not _G.IsAddOnLoaded("Blizzard_GuildUI") then
+			_G.LoadAddOn("Blizzard_GuildUI")
+		end
+
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
@@ -808,13 +812,12 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetCell(line, GuildColumns.Level, ColorPlayerLevel(player.Level), GuildColSpans.Level)
+
 					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""), GuildColSpans.ToonName)
+					Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", GuildMember_OnMouseUp, player)
+
 					Tooltip:SetCell(line, GuildColumns.Rank, player.Rank, GuildColSpans.Rank)
 					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
-
-					if _G.IsAddOnLoaded("Blizzard_GuildUI") then
-						Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", GuildMember_OnMouseUp, player)
-					end
 
 					if player.Note then
 						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
