@@ -147,18 +147,22 @@ local SortFields = {
 		"GameText",
 		"PresenceName",
 		"ToonName",
+		"Note",
 	},
 	BattleNetGames = {
 		"ClientIndex",
 		"GameText",
 		"PresenceName",
 		"ToonName",
+		"Note",
 	},
 	Guild = {
 		"Level",
 		"RankIndex",
 		"ToonName",
 		"ZoneName",
+		"PublicNote",
+		"OfficerNote",
 	},
 	WoWFriends = {
 		"Level",
@@ -166,6 +170,7 @@ local SortFields = {
 		"RealmName",
 		"ToonName",
 		"ZoneName",
+		"Note",
 	},
 }
 
@@ -233,6 +238,13 @@ local DB_DEFAULTS = {
 				WoWFriends = false,
 			},
 			HideDelay = 0.25,
+			NotesArrangement = {
+				BattleNetApp = private.NotesArrangementType.Row,
+				BattleNetGames = private.NotesArrangementType.Row,
+				Guild = private.NotesArrangementType.Row,
+				GuildOfficer = private.NotesArrangementType.Row,
+				WoWFriends = private.NotesArrangementType.Row,
+			},
 			Scale = 1,
 			Sorting = {
 				BattleNetApp = {
@@ -310,6 +322,7 @@ do
 		PresenceName = 2,
 		ToonName = 3,
 		GameText = 4,
+		Note = 6,
 	}
 
 	local BattleNetColSpans = {
@@ -317,6 +330,7 @@ do
 		PresenceName = 1,
 		ToonName = 1,
 		GameText = 2,
+		Note = 2,
 	}
 
 	local GuildColumns = {
@@ -324,6 +338,8 @@ do
 		ToonName = 2,
 		Rank = 3,
 		ZoneName = 4,
+		PublicNote = 5,
+		OfficerNote = 7,
 	}
 
 	local GuildColSpans = {
@@ -331,6 +347,8 @@ do
 		ToonName = 1,
 		Rank = 1,
 		ZoneName = 1,
+		PublicNote = 2,
+		OfficerNote = 2,
 	}
 
 	local WoWFriendsColumns = {
@@ -339,6 +357,7 @@ do
 		ToonName = 3,
 		ZoneName = 4,
 		RealmName = 5,
+		Note = 6,
 	}
 
 	local WoWFriendsColSpans = {
@@ -347,6 +366,7 @@ do
 		ToonName = 1,
 		ZoneName = 1,
 		RealmName = 1,
+		Note = 2,
 	}
 
 	local PlayerLists = {
@@ -356,7 +376,7 @@ do
 		WoWFriends = {},
 	}
 
-	local NUM_TOOLTIP_COLUMNS = 8
+	local NUM_TOOLTIP_COLUMNS = 9
 
 	local TooltipAnchor
 
@@ -375,7 +395,7 @@ do
 				table.insert(PlayerLists.WoWFriends, {
 					Class = class,
 					Level = level,
-					Note = note and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
+					Note = note,
 					PresenceName = _G.NOT_APPLICABLE,
 					RealmName = PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
@@ -407,7 +427,7 @@ do
 					FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
 					GameText = gameText or "",
 					Level = level and tonumber(level) or 0,
-					Note = noteText and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. noteText .. "|r" or nil,
+					Note = noteText,
 					PresenceID = presenceID,
 					PresenceName = presenceName or _G.UNKNOWN,
 					RealmName = realmName or "",
@@ -443,8 +463,8 @@ do
 						Class = class,
 						IsMobile = isMobile,
 						Level = level,
-						Note = (note and note ~= "") and STATUS_ICON_NOTE .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. note .. "|r" or nil,
-						OfficerNote = (officerNote and officerNote ~= "") and STATUS_ICON_NOTE .. _G.ORANGE_FONT_COLOR_CODE .. officerNote .. "|r" or nil,
+						Note = (note and note ~= "") and note or nil,
+						OfficerNote = (officerNote and officerNote ~= "") and officerNote or nil,
 						Rank = rank,
 						RankIndex = rankIndex,
 						StatusIcon = status,
@@ -542,15 +562,18 @@ do
 		return label
 	end
 
-	local function RenderBattleNetLines(sourceListName, headerLine)
+	local function RenderBattleNetLines(sourceListName, headerLine, noteArrangement)
 		Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
 		Tooltip:SetCell(headerLine, BattleNetColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, sourceListName .. ":PresenceName"), BattleNetColSpans.PresenceName)
-		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, ColumnLabel(_G.NAME, sourceListName .. ":ToonName"), BattleNetColSpans.ToonName)
-		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, ColumnLabel(_G.INFO, sourceListName .. ":GameText"), BattleNetColSpans.GameText)
-
 		Tooltip:SetCellScript(headerLine, BattleNetColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":PresenceName")
+
+		Tooltip:SetCell(headerLine, BattleNetColumns.ToonName, ColumnLabel(_G.NAME, sourceListName .. ":ToonName"), BattleNetColSpans.ToonName)
 		Tooltip:SetCellScript(headerLine, BattleNetColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":ToonName")
+
+		Tooltip:SetCell(headerLine, BattleNetColumns.GameText, ColumnLabel(_G.INFO, sourceListName .. ":GameText"), BattleNetColSpans.GameText)
 		Tooltip:SetCellScript(headerLine, BattleNetColumns.GameText, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":GameText")
+
+		local addedNoteColumn
 
 		Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -565,7 +588,19 @@ do
 			Tooltip:SetCellScript(line, BattleNetColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
 
 			if player.Note then
-				Tooltip:SetCell(Tooltip:AddLine(), BattleNetColumns.Client, player.Note, "GameTooltipTextSmall", 0)
+				local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+
+				if noteArrangement == private.NotesArrangementType.Column then
+					if not addedNoteColumn then
+						Tooltip:SetCell(headerLine, BattleNetColumns.Note, ColumnLabel(_G.LABEL_NOTE, sourceListName .. ":Note"), BattleNetColSpans.Note)
+						Tooltip:SetCellScript(headerLine, BattleNetColumns.Note, "OnMouseUp", ToggleColumnSortMethod, sourceListName .. ":Note")
+
+						addedNoteColumn = true
+					end
+					Tooltip:SetCell(line, BattleNetColumns.Note, noteText, BattleNetColSpans.Note)
+				else
+					Tooltip:SetCell(Tooltip:AddLine(), BattleNetColumns.Client, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
+				end
 			end
 
 			if player.BroadcastText then
@@ -622,19 +657,24 @@ do
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					line = Tooltip:AddLine()
-					Tooltip:SetLineColor(line, 0, 0, 0, 1)
-					Tooltip:SetCell(line, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
-					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
-					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME, "WoWFriends:ToonName"), WoWFriendsColSpans.ToonName)
-					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
-					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, ColumnLabel(_G.FRIENDS_LIST_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
+					local headerLine = Tooltip:AddLine()
+					Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
-					Tooltip:SetCellScript(line, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
-					Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
-					Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
-					Tooltip:SetCellScript(line, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
-					Tooltip:SetCellScript(line, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
+
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME, "WoWFriends:ToonName"), WoWFriendsColSpans.ToonName)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
+
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
+
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.RealmName, ColumnLabel(_G.FRIENDS_LIST_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
+
+					local addedNoteColumn
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -658,13 +698,23 @@ do
 						end
 
 						if player.Note then
-							line = Tooltip:AddLine()
-							Tooltip:SetCell(line, WoWFriendsColumns.Level, player.Note, "GameTooltipTextSmall", 0)
+							local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+
+							if DB.Tooltip.NotesArrangement.WoWFriends == private.NotesArrangementType.Column then
+								if not addedNoteColumn then
+									Tooltip:SetCell(headerLine, WoWFriendsColumns.Note, ColumnLabel(_G.LABEL_NOTE, "WoWFriends:Note"), WoWFriendsColSpans.Note)
+									Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Note, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Note")
+
+									addedNoteColumn = true
+								end
+								Tooltip:SetCell(line, WoWFriendsColumns.Note, noteText, WoWFriendsColSpans.Note)
+							else
+								Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
+							end
 						end
 
 						if player.BroadcastText then
-							line = Tooltip:AddLine()
-							Tooltip:SetCell(line, WoWFriendsColumns.Level, player.BroadcastText, "GameTooltipTextSmall", 0)
+							Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, player.BroadcastText, "GameTooltipTextSmall", 0)
 						end
 					end
 
@@ -692,7 +742,7 @@ do
 
 					Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
 
-					RenderBattleNetLines("BattleNetGames", line)
+					RenderBattleNetLines("BattleNetGames", line, DB.Tooltip.NotesArrangement.BattleNetGames)
 				else
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
@@ -711,7 +761,7 @@ do
 
 					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					RenderBattleNetLines("BattleNetApp", Tooltip:AddLine())
+					RenderBattleNetLines("BattleNetApp", Tooltip:AddLine(), DB.Tooltip.NotesArrangement.BattleNetApp)
 				else
 					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
 					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
@@ -733,17 +783,22 @@ do
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-				line = Tooltip:AddLine()
-				Tooltip:SetLineColor(line, 0, 0, 0, 1)
-				Tooltip:SetCell(line, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.ToonName)
-				Tooltip:SetCell(line, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
-				Tooltip:SetCell(line, GuildColumns.Rank, ColumnLabel(_G.RANK, "Guild:RankIndex"), GuildColSpans.Rank)
-				Tooltip:SetCell(line, GuildColumns.ZoneName, ColumnLabel(_G.ZONE, "Guild:ZoneName"), GuildColSpans.ZoneName)
+				local headerLine = Tooltip:AddLine()
+				Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
+				Tooltip:SetCell(headerLine, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.ToonName)
+				Tooltip:SetCellScript(headerLine, GuildColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
 
-				Tooltip:SetCellScript(line, GuildColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
-				Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
-				Tooltip:SetCellScript(line, GuildColumns.Rank, "OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
-				Tooltip:SetCellScript(line, GuildColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
+				Tooltip:SetCell(headerLine, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
+				Tooltip:SetCellScript(headerLine, GuildColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
+
+				Tooltip:SetCell(headerLine, GuildColumns.Rank, ColumnLabel(_G.RANK, "Guild:RankIndex"), GuildColSpans.Rank)
+				Tooltip:SetCellScript(headerLine, GuildColumns.Rank, "OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
+
+				Tooltip:SetCell(headerLine, GuildColumns.ZoneName, ColumnLabel(_G.ZONE, "Guild:ZoneName"), GuildColSpans.ZoneName)
+				Tooltip:SetCellScript(headerLine, GuildColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
+
+				local addedPublicNoteColumn
+				local addedOfficerNoteColumn
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -761,11 +816,35 @@ do
 					end
 
 					if player.Note then
-						Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, player.Note, "GameTooltipTextSmall", 0)
+						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+
+						if DB.Tooltip.NotesArrangement.Guild == private.NotesArrangementType.Column then
+							if not addedPublicNoteColumn then
+								Tooltip:SetCell(headerLine, GuildColumns.PublicNote, ColumnLabel(_G.NOTE, "Guild:PublicNote"), GuildColSpans.PublicNote)
+								Tooltip:SetCellScript(headerLine, GuildColumns.PublicNote, "OnMouseUp", ToggleColumnSortMethod, "Guild:PublicNote")
+
+								addedPublicNoteColumn = true
+							end
+							Tooltip:SetCell(line, GuildColumns.PublicNote, noteText, GuildColSpans.PublicNote)
+						else
+							Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
+						end
 					end
 
 					if player.OfficerNote then
-						Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, player.OfficerNote, "GameTooltipTextSmall", 0)
+						local noteText = _G.ORANGE_FONT_COLOR_CODE .. player.OfficerNote .. "|r"
+
+						if DB.Tooltip.NotesArrangement.GuildOfficer == private.NotesArrangementType.Column then
+							if not addedOfficerNoteColumn then
+								Tooltip:SetCell(headerLine, GuildColumns.OfficerNote, ColumnLabel(_G.GUILD_OFFICERNOTES_LABEL, "Guild:OfficerNote"), GuildColSpans.OfficerNote)
+								Tooltip:SetCellScript(headerLine, GuildColumns.OfficerNote, "OnMouseUp", ToggleColumnSortMethod, "Guild:OfficerNote")
+
+								addedOfficerNoteColumn = true
+							end
+							Tooltip:SetCell(line, GuildColumns.OfficerNote, noteText, GuildColSpans.OfficerNote)
+						else
+							Tooltip:SetCell(Tooltip:AddLine(), GuildColumns.Level, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
+						end
 					end
 				end
 

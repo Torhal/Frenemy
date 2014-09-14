@@ -20,5 +20,6 @@ Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 locale.xml
 
+Shared.lua
 Frenemy.lua
 Config.lua

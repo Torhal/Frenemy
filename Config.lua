@@ -35,8 +35,7 @@ local function GetDataObjectOptions()
 			order = 1,
 			name = _G.INFO,
 			type = "group",
-			args = {
-			}
+			args = {}
 		}
 
 		if LDBIcon then
@@ -54,9 +53,29 @@ local function GetDataObjectOptions()
 				end
 			}
 		end
-
 	end
 	return dataObjectOptions
+end
+
+local NOTES_ARRANGEMENT_VALUES = {
+	[private.NotesArrangementType.Column] = L.NOTES_ARRANGEMENT_COLUMN,
+	[private.NotesArrangementType.Row] = L.NOTES_ARRANGEMENT_ROW,
+}
+
+local function BuildNotesEntry(optionsTable, entryName, label, order)
+	optionsTable["notesArrangement" ..entryName] = {
+		order = order,
+		type = "select",
+		style = "radio",
+		name = label,
+		values = NOTES_ARRANGEMENT_VALUES,
+		get = function(info)
+			return DB.Tooltip.NotesArrangement[entryName]
+		end,
+		set = function(info, value)
+			DB.Tooltip.NotesArrangement[entryName] = value
+		end,
+	}
 end
 
 local function GetTooltipOptions()
@@ -97,8 +116,20 @@ local function GetTooltipOptions()
 						DB.Tooltip.Scale = value
 					end,
 				},
+				notesArrangementHeader = {
+					name = _G.LABEL_NOTE,
+					order = 3,
+					type = "header",
+					width = "full",
+				},
 			}
 		}
+
+		BuildNotesEntry(tooltipOptions.args, "BattleNetApp", _G.BATTLENET_OPTIONS_LABEL, 4)
+		BuildNotesEntry(tooltipOptions.args, "BattleNetGames", ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), 5)
+		BuildNotesEntry(tooltipOptions.args, "Guild", _G.GetGuildInfo("player") or _G.GUILD, 6)
+		BuildNotesEntry(tooltipOptions.args, "GuildOfficer", ("%s %s"):format(_G.GetGuildInfo("player") or _G.GUILD, _G.PARENS_TEMPLATE:format(_G.OFFICER)), 7)
+		BuildNotesEntry(tooltipOptions.args, "WoWFriends", _G.FRIENDS, 8)
 	end
 	return tooltipOptions
 end
