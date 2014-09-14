@@ -782,7 +782,7 @@ do
 					Tooltip:SetCell(Tooltip:AddLine(), 1, ("|cff%02x%02x%02x%d/%d (%d%%)|r"):format(r * 255, g * 255, b * 255, currentXP, nextLevelXP, percentage), "GameFontDisableSmall", "CENTER", 0)
 				end
 
-				guildMOTD = _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. _G.GetGuildRosterMOTD() .. "|r")
+				guildMOTD = _G.GetGuildRosterMOTD()
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
 				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
@@ -794,7 +794,7 @@ do
 		Tooltip:Show()
 
 		if guildMOTD and guildMOTD ~= "" then
-			Tooltip:SetCell(Tooltip:AddLine(), 1, guildMOTD, 0, 0, 0, Tooltip:GetWidth() - 20)
+			Tooltip:SetCell(Tooltip:AddLine(), 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. guildMOTD .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
 			Tooltip:AddLine(" ")
 		end
 
