@@ -186,19 +186,31 @@ for sectionName, fieldNameList in pairs(SortFields) do
 
 		local sortFuncName = sectionName .. fieldNameList[index]
 		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_ASCENDING]] = function(a, b)
-			if a[fieldNameList[index]] == b[fieldNameList[index]] then
-				return a.ToonName < b.ToonName
+			local aField = a[fieldNameList[index]] or ""
+			aField = type(aField) == "string" and aField:lower() or aField
+
+			local bField = b[fieldNameList[index]] or ""
+			bField = type(bField) == "string" and bField:lower() or bField
+
+			if aField == bField then
+				return a.ToonName:lower() < b.ToonName:lower()
 			end
 
-			return a[fieldNameList[index]] < b[fieldNameList[index]]
+			return aField < bField
 		end
 
 		SortFunctions[sortFuncName .. SORT_ORDER_NAMES[SORT_ORDER_DESCENDING]] = function(a, b)
-			if a[fieldNameList[index]] == b[fieldNameList[index]] then
-				return a.ToonName > b.ToonName
+			local aField = a[fieldNameList[index]] or ""
+			aField = type(aField) == "string" and aField:lower() or aField
+
+			local bField = b[fieldNameList[index]] or ""
+			bField = type(bField) == "string" and bField:lower() or bField
+
+			if aField == bField then
+				return a.ToonName:lower() > b.ToonName:lower()
 			end
 
-			return a[fieldNameList[index]] > b[fieldNameList[index]]
+			return aField > bField
 		end
 	end
 end
