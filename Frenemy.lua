@@ -807,6 +807,8 @@ do
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
+				local numGuildRanks = _G.GuildControlGetNumRanks()
+
 				for index = 1, #PlayerLists.Guild do
 					local player = PlayerLists.Guild[index]
 
@@ -816,7 +818,9 @@ do
 					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""), GuildColSpans.ToonName)
 					Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", GuildMember_OnMouseUp, player)
 
-					Tooltip:SetCell(line, GuildColumns.Rank, player.Rank, GuildColSpans.Rank)
+					-- The higher the rank index, the lower the priviledge; guild leader is rank 1, so we always pass it as the highest for the percentage gradient.
+					local r, g, b = PercentColorGradient(numGuildRanks - player.RankIndex - 1, numGuildRanks)
+					Tooltip:SetCell(line, GuildColumns.Rank, ("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, player.Rank), GuildColSpans.Rank)
 					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
 
 					if player.Note then
