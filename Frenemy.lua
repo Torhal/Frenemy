@@ -70,6 +70,7 @@ local BROADCAST_ICON = [[|TInterface\FriendsFrame\BroadcastIcon:0|t]]
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
 
 local PLAYER_FACTION = _G.UnitFactionGroup("player")
+local PLAYER_NAME = _G.UnitName("player")
 local PLAYER_REALM = _G.GetRealmName()
 
 local function CreateIcon(texture_path, icon_size)
@@ -138,6 +139,10 @@ local TotalFriendsCount
 
 local OnlineGuildMembersCount
 local TotalGuildMembersCount
+
+-- Zone data
+local currentZoneID
+local ZoneColorsByName = {} -- Populated from SavedVariables and during travel.
 
 -- ----------------------------------------------------------------------------
 -- Enumerations and data for sorting.
@@ -266,6 +271,7 @@ local DB_DEFAULTS = {
 				},
 			},
 		},
+		ZoneData = {}, -- Populated during travel.
 	}
 }
 
@@ -301,6 +307,11 @@ local function ColorPlayerLevel(level)
 	end
 	local r, g, b = PercentColorGradient(level, _G.MAX_PLAYER_LEVEL)
 	return ("|cff%02x%02x%02x%d|r"):format(r * 255, g * 255, b * 255, level)
+end
+
+local function ColorZoneName(zoneName)
+	local color = ZoneColorsByName[zoneName] or _G.GRAY_FONT_COLOR
+	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName)
 end
 
 local function UpdateStatistics()
@@ -454,12 +465,20 @@ do
 				local toonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
 				if isOnline or isMobile then
+					local ambiguatedToonName = _G.Ambiguate(toonName, "guild")
+
 					if status == 0 then
 						status = isMobile and STATUS_ICON_MOBILE_ONLINE or STATUS_ICON_ONLINE
 					elseif status == 1 then
 						status = isMobile and STATUS_ICON_MOBILE_AWAY or STATUS_ICON_AFK
 					elseif status == 2 then
 						status = isMobile and STATUS_ICON_MOBILE_BUSY or STATUS_ICON_DND
+					end
+
+					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
+					-- traveling with the tooltip showing.
+					if not isMobile and ambiguatedToonName == PLAYER_NAME then
+						zoneName = _G.GetMapNameByID(currentZoneID)
 					end
 
 					table.insert(PlayerLists.Guild, {
@@ -471,7 +490,7 @@ do
 						Rank = rank,
 						RankIndex = rankIndex,
 						StatusIcon = status,
-						ToonName = _G.Ambiguate(toonName, "guild"),
+						ToonName = ambiguatedToonName,
 						ZoneName = isMobile and _G.REMOTE_CHAT or zoneName,
 					})
 				end
@@ -695,7 +714,7 @@ do
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
 						Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
-						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, player.ZoneName, WoWFriendsColSpans.ZoneName)
+						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColorZoneName(player.ZoneName), WoWFriendsColSpans.ZoneName)
 						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
 						if player.PresenceID then
@@ -823,7 +842,7 @@ do
 					-- The higher the rank index, the lower the priviledge; guild leader is rank 1, so we always pass it as the highest for the percentage gradient.
 					local r, g, b = PercentColorGradient(numGuildRanks - player.RankIndex - 1, numGuildRanks)
 					Tooltip:SetCell(line, GuildColumns.Rank, ("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, player.Rank), GuildColSpans.Rank)
-					Tooltip:SetCell(line, GuildColumns.ZoneName, player.ZoneName or _G.UNKNOWN, GuildColSpans.ZoneName)
+					Tooltip:SetCell(line, GuildColumns.ZoneName, ColorZoneName(player.ZoneName) or _G.UNKNOWN, GuildColSpans.ZoneName)
 
 					if player.Note then
 						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
@@ -943,6 +962,78 @@ Frenemy.FRIENDLIST_UPDATE = UpdateAndDisplay
 Frenemy.GUILD_RANKS_UPDATE = UpdateAndDisplay
 Frenemy.GUILD_ROSTER_UPDATE = UpdateAndDisplay
 
+function Frenemy:PLAYER_REGEN_DISABLED(eventName)
+	private.inCombat = true
+end
+
+
+function Frenemy:PLAYER_REGEN_ENABLED(eventName)
+	private.inCombat = nil
+
+	if private.needsAreaID then
+		self:HandleZoneChange(eventName)
+		private.needsAreaID = nil
+	end
+end
+
+-- Contains a dirty hack due to Blizzard's strange handling of Micro Dungeons; GetMapInfo() will not return correct information
+-- unless the WorldMapFrame is shown.
+-- MapFileName = MapAreaID
+local MICRO_DUNGEON_IDS = {
+	ShrineofTwoMoons = 903,
+	ShrineofSevenStars = 905,
+}
+
+function Frenemy:HandleZoneChange(eventName)
+	local in_instance = _G.IsInInstance()
+
+	if private.inCombat then
+		private.needsAreaID = true
+		return
+	end
+	local mapZoneID = _G.GetCurrentMapAreaID()
+
+	local worldMapFrame = _G.WorldMapFrame
+	local mapIsVisible = worldMapFrame:IsVisible()
+	local SFXValue = tonumber(_G.GetCVar("Sound_EnableSFX"))
+
+	if not mapIsVisible then
+		_G.SetCVar("Sound_EnableSFX", 0)
+		worldMapFrame:Show()
+	end
+	local _, _, _, _, microDungeonMapName = _G.GetMapInfo()
+	local microDungeonID = MICRO_DUNGEON_IDS[microDungeonMapName]
+
+	_G.SetMapToCurrentZone()
+
+	local needDisplayUpdate = currentZoneID ~= mapZoneID
+	currentZoneID = microDungeonID or mapZoneID
+
+	if mapIsVisible then
+		_G.SetMapByID(mapZoneID)
+	else
+		worldMapFrame:Hide()
+		_G.SetCVar("Sound_EnableSFX", SFXValue)
+	end
+
+	local pvpType, _, factionName = _G.GetZonePVPInfo()
+
+	if pvpType == "hostile" or pvpType == "friendly" then
+		pvpType = factionName
+	elseif not pvpType then
+		pvpType = "normal"
+	end
+
+	local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
+	DB.ZoneData[currentZoneID] = zonePVPStatus
+	ZoneColorsByName[_G.GetMapNameByID(currentZoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
+
+	if needDisplayUpdate then
+		UpdateAndDisplay()
+	end
+end
+
+
 -- ----------------------------------------------------------------------------
 -- Framework.
 -- ----------------------------------------------------------------------------
@@ -972,6 +1063,10 @@ function Frenemy:OnInitialize()
 		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
 	end
 	private.SetupOptions()
+
+	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
+		ZoneColorsByName[_G.GetMapNameByID(zoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
+	end
 end
 
 function Frenemy:OnEnable()
@@ -980,6 +1075,9 @@ function Frenemy:OnEnable()
 	self:RegisterEvent("FRIENDLIST_UPDATE")
 	self:RegisterEvent("GUILD_RANKS_UPDATE")
 	self:RegisterEvent("GUILD_ROSTER_UPDATE")
+	self:RegisterEvent("ZONE_CHANGED", "HandleZoneChange")
+	self:RegisterEvent("ZONE_CHANGED_INDOORS", "HandleZoneChange")
+	self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "HandleZoneChange")
 
 	RequestUpdates()
 	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
