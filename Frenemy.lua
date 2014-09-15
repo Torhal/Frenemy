@@ -414,7 +414,7 @@ do
 					RealmName = realmName or PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
-					ZoneName = zoneName,
+					ZoneName = zoneName or _G.UNKNOWN,
 				})
 			end
 		end
@@ -447,7 +447,7 @@ do
 					RealmName = realmName or "",
 					StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = characterName,
-					ZoneName = zoneName or "",
+					ZoneName = zoneName or _G.UNKNOWN,
 				}
 
 				if client == _G.BNET_CLIENT_WOW then
@@ -478,7 +478,7 @@ do
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
 					-- traveling with the tooltip showing.
 					if not isMobile and ambiguatedToonName == PLAYER_NAME then
-						zoneName = _G.GetMapNameByID(currentZoneID)
+						zoneName = currentZoneID and _G.GetMapNameByID(currentZoneID) or _G.UNKNOWN
 					end
 
 					table.insert(PlayerLists.Guild, {
@@ -1018,18 +1018,20 @@ function Frenemy:HandleZoneChange(eventName)
 
 	local pvpType, _, factionName = _G.GetZonePVPInfo()
 
-	if pvpType == "hostile" or pvpType == "friendly" then
-		pvpType = factionName
-	elseif not pvpType then
-		pvpType = "normal"
-	end
+	if currentZoneID and currentZoneID >= 1 then
+		if pvpType == "hostile" or pvpType == "friendly" then
+			pvpType = factionName
+		elseif not pvpType or pvpType == "" then
+			pvpType = "normal"
+		end
 
-	local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
-	DB.ZoneData[currentZoneID] = zonePVPStatus
-	ZoneColorsByName[_G.GetMapNameByID(currentZoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
+		local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
+		DB.ZoneData[currentZoneID] = zonePVPStatus
+		ZoneColorsByName[_G.GetMapNameByID(currentZoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
 
-	if needDisplayUpdate then
-		UpdateAndDisplay()
+		if needDisplayUpdate then
+			UpdateAndDisplay()
+		end
 	end
 end
 
@@ -1078,6 +1080,8 @@ function Frenemy:OnEnable()
 	self:RegisterEvent("ZONE_CHANGED", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_INDOORS", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "HandleZoneChange")
+
+	self:HandleZoneChange("OnEnable")
 
 	RequestUpdates()
 	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
