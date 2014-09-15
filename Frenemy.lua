@@ -324,6 +324,15 @@ local function UpdateStatistics()
 	end
 end
 
+local function SetZoneNameColors(zoneID, zonePVPStatus)
+	local mapName = _G.GetMapNameByID(zoneID)
+	if not mapName then
+		DB.ZoneData[zoneID] = nil
+		return
+	end
+	ZoneColorsByName[mapName] = private.ZonePVPStatusRGB[zonePVPStatus]
+end
+
 -- ----------------------------------------------------------------------------
 -- Tooltip.
 -- ----------------------------------------------------------------------------
@@ -1027,7 +1036,7 @@ function Frenemy:HandleZoneChange(eventName)
 
 		local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
 		DB.ZoneData[currentZoneID] = zonePVPStatus
-		ZoneColorsByName[_G.GetMapNameByID(currentZoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
+		SetZoneNameColors(currentZoneID, zonePVPStatus)
 
 		if needDisplayUpdate then
 			UpdateAndDisplay()
@@ -1067,7 +1076,7 @@ function Frenemy:OnInitialize()
 	private.SetupOptions()
 
 	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
-		ZoneColorsByName[_G.GetMapNameByID(zoneID)] = private.ZonePVPStatusRGB[zonePVPStatus]
+		SetZoneNameColors(zoneID, zonePVPStatus)
 	end
 end
 
