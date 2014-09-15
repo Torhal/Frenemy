@@ -402,12 +402,12 @@ do
 
 		if OnlineFriendsCount > 0 then
 			for friend_index = 1, OnlineFriendsCount do
-				local toonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
-				local realmName
-				toonName, realmName = ("-"):split(toonName)
+				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
+				local toonName, realmName = ("-"):split(fullToonName)
 
 				table.insert(PlayerLists.WoWFriends, {
 					Class = class,
+					FullToonName = fullToonName,
 					Level = level,
 					Note = note,
 					PresenceName = _G.NOT_APPLICABLE,
@@ -544,7 +544,7 @@ do
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.CloseDropDownMenus()
-			_G.FriendsFrame_ShowDropdown(playerEntry.ToonName, true, nil, nil, nil, true)
+			_G.FriendsFrame_ShowDropdown(playerEntry.FullToonName, true, nil, nil, nil, true)
 		end
 	end
 
