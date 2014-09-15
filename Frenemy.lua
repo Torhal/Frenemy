@@ -392,13 +392,15 @@ do
 		if OnlineFriendsCount > 0 then
 			for friend_index = 1, OnlineFriendsCount do
 				local toonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
+				local realmName
+				toonName, realmName = ("-"):split(toonName)
 
 				table.insert(PlayerLists.WoWFriends, {
 					Class = class,
 					Level = level,
 					Note = note,
 					PresenceName = _G.NOT_APPLICABLE,
-					RealmName = PLAYER_REALM,
+					RealmName = realmName or PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
 					ZoneName = zoneName,
