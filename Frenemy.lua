@@ -537,7 +537,9 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			if not _G.BNIsSelf(playerEntry.PresenceID) then
+			if _G.IsAltKeyDown() and playerEntry.RealmName == PLAYER_REALM then
+				_G.InviteToGroup(playerEntry.ToonName)
+			elseif not _G.BNIsSelf(playerEntry.PresenceID) then
 				_G.ChatFrame_SendSmartTell(playerEntry.PresenceName)
 			end
 		elseif button == "RightButton" then
@@ -555,7 +557,11 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			_G.ChatFrame_SendTell(playerEntry.ToonName)
+			if _G.IsAltKeyDown() then
+				_G.InviteToGroup(playerEntry.ToonName)
+			else
+				_G.ChatFrame_SendTell(playerEntry.ToonName)
+			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.CloseDropDownMenus()
@@ -567,7 +573,11 @@ do
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		if button == "LeftButton" then
-			_G.ChatFrame_SendTell(playerEntry.ToonName)
+			if _G.IsAltKeyDown() then
+				_G.InviteToGroup(playerEntry.ToonName)
+			else
+				_G.ChatFrame_SendTell(playerEntry.ToonName)
+			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.CloseDropDownMenus()
