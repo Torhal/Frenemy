@@ -401,6 +401,9 @@ do
 
 	local TooltipAnchor
 
+	-- Used to handle duplication between in-game and RealID friends.
+	local OnlineFriendsByName = {}
+
 	-- ----------------------------------------------------------------------------
 	-- Data compilation.
 	-- ----------------------------------------------------------------------------
@@ -408,23 +411,27 @@ do
 		for name, data in pairs(PlayerLists) do
 			table.wipe(data)
 		end
+		table.wipe(OnlineFriendsByName)
 
 		if OnlineFriendsCount > 0 then
 			for friend_index = 1, OnlineFriendsCount do
 				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
 				local toonName, realmName = ("-"):split(fullToonName)
 
-				table.insert(PlayerLists.WoWFriends, {
+				local entry = {
 					Class = class,
 					FullToonName = fullToonName,
+					IsLocalFriend = true,
 					Level = level,
 					Note = note,
-					PresenceName = _G.NOT_APPLICABLE,
 					RealmName = realmName or PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
 					ZoneName = zoneName or _G.UNKNOWN,
-				})
+				}
+
+				OnlineFriendsByName[toonName] = entry
+				table.insert(PlayerLists.WoWFriends, entry)
 			end
 		end
 
@@ -460,7 +467,18 @@ do
 				}
 
 				if client == _G.BNET_CLIENT_WOW then
-					table.insert(PlayerLists.WoWFriends, entry)
+					local existingFriend = OnlineFriendsByName[toonName]
+
+					if realmName == PLAYER_REALM and existingFriend then
+						for key, value in pairs(entry) do
+							if not existingFriend[key] then
+								existingFriend[key] = value
+							end
+						end
+					else
+						table.insert(PlayerLists.WoWFriends, entry)
+					end
+
 				elseif client == BNET_CLIENT_APP then
 					table.insert(PlayerLists.BattleNetApp, entry)
 				elseif toonID then
@@ -717,7 +735,7 @@ do
 						local player = PlayerLists.WoWFriends[index]
 						local groupIndicator = IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""
 						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
-						local presenceName = player.PresenceName ~= _G.NOT_APPLICABLE and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or player.PresenceName
+						local presenceName = player.PresenceName and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or _G.NOT_APPLICABLE
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
@@ -728,7 +746,9 @@ do
 
 						if player.PresenceID then
 							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
-						else
+						end
+
+						if player.IsLocalFriend then
 							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", WoWFriend_OnMouseUp, player)
 						end
 
