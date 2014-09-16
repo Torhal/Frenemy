@@ -86,6 +86,8 @@ local FACTION_ICON_ALLIANCE = CreateIcon([[Interface\COMMON\icon-alliance]], FAC
 local FACTION_ICON_HORDE = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE)
 local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE)
 
+local HELP_ICON = CreateIcon([[Interface\COMMON\help-i]], 20)
+
 local PLAYER_ICON_GROUP = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
 local PLAYER_ICON_FACTION = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
@@ -585,6 +587,65 @@ do
 		end
 	end
 
+	local helpTip
+
+	local HelpTipData = {
+		[_G.DISPLAY] = {
+			[L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEFRIENDSTAB,
+			[L.ALT_KEY .. L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEGUILDTAB,
+		},
+		[_G.NAME] = {
+			[L.LEFT_CLICK] = _G.WHISPER,
+			[L.RIGHT_CLICK] = _G.ADVANCED_OPTIONS,
+			[L.ALT_KEY .. L.LEFT_CLICK] = _G.INVITE,
+		},
+	}
+
+	local function HideHelpTip(tooltipCell)
+		if helpTip then
+			helpTip:Hide()
+			helpTip:Release()
+			helpTip = nil
+		end
+		Tooltip:SetFrameStrata("TOOLTIP")
+	end
+
+	local function ShowHelpTip(tooltipCell)
+		local helpTip = LibQTip:Acquire(FOLDER_NAME .. "HelpTip", 2)
+		helpTip:SetAutoHideDelay(0.1, tooltipCell)
+		helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
+		helpTip:SetScale(DB.Tooltip.Scale)
+		helpTip:SmartAnchorTo(tooltipCell)
+		helpTip:SetScript("OnLeave", function(self) self:Release() helpTip = nil end)
+		helpTip:Clear()
+		helpTip:SetCellMarginH(0)
+		helpTip:SetCellMarginV(1)
+
+		local firstEntryType = true
+
+		for entryType, data in pairs(HelpTipData) do
+			local line
+
+			if not firstEntryType then
+				line = helpTip:AddLine(" ")
+			end
+			line = helpTip:AddLine()
+			helpTip:SetCell(line, 1, entryType, _G.GameFontNormal, "CENTER", 0)
+			helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
+
+			for keyStroke, description in pairs(data) do
+				line = helpTip:AddLine()
+				helpTip:SetCell(line, 1, keyStroke)
+				helpTip:SetCell(line, 2, description)
+			end
+			firstEntryType = false
+		end
+
+		_G.HideDropDownMenu(1)
+		Tooltip:SetFrameStrata("DIALOG")
+		helpTip:Show()
+	end
+
 	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)
 		local sectionName, fieldName = (":"):split(sortFieldData)
 
@@ -676,6 +737,11 @@ do
 
 	local function Tooltip_OnRelease(self)
 		_G.HideDropDownMenu(1)
+
+		if helpTip then
+			helpTip:Release()
+			helpTip = nil
+		end
 
 		Tooltip:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
 		Tooltip = nil
@@ -944,6 +1010,13 @@ do
 			Tooltip:SetCell(Tooltip:AddLine(), 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. guildMOTD .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
 			Tooltip:AddLine(" ")
 		end
+
+		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
+
+		local line = Tooltip:AddLine()
+		Tooltip:SetCell(line, NUM_TOOLTIP_COLUMNS, HELP_ICON, "RIGHT", 0)
+		Tooltip:SetCellScript(line, NUM_TOOLTIP_COLUMNS, "OnEnter", ShowHelpTip)
+		Tooltip:SetCellScript(line, NUM_TOOLTIP_COLUMNS, "OnLeave", HideHelpTip)
 
 		Tooltip:UpdateScrolling()
 	end
