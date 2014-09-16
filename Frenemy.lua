@@ -54,12 +54,12 @@ end
 
 local CLASS_COLORS = {}
 do
-	for classToken, localizedName in pairs(_G.FillLocalizedClassList({}, true)) do
+	for classToken, localizedName in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do
 		local color = _G.RAID_CLASS_COLORS[classToken]
 		CLASS_COLORS[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
 	end
 
-	for classToken, localizedName in pairs(_G.FillLocalizedClassList({}, false)) do
+	for classToken, localizedName in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do
 		local color = _G.RAID_CLASS_COLORS[classToken]
 		CLASS_COLORS[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
 	end
