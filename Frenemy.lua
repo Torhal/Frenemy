@@ -52,16 +52,65 @@ do
 	end
 end
 
+local CLASS_ICONS = {}
+
+do
+	local textureFormat = [[|TInterface\TargetingFrame\UI-CLASSES-CIRCLES:0:0:0:0:256:256:%d:%d:%d:%d|t]]
+	local textureSize = 256
+	local increment = 64
+	local left = 0
+	local right = increment
+	local top = 0
+	local bottom = increment
+
+	local CLASS_ICON_SORT_ORDER = {
+		"WARRIOR",
+		"MAGE",
+		"ROGUE",
+		"DRUID",
+		"HUNTER",
+		"SHAMAN",
+		"PRIEST",
+		"WARLOCK",
+		"PALADIN",
+		"DEATHKNIGHT",
+		"MONK",
+	}
+
+	for index = 1, #CLASS_ICON_SORT_ORDER do
+		local class_name = CLASS_ICON_SORT_ORDER[index]
+		CLASS_ICONS[class_name] = textureFormat:format(left, right, top, bottom)
+
+		if bottom == textureSize then
+			break
+		end
+
+		if right == textureSize then
+			left = 0
+			right = increment
+			top = top + increment
+			bottom = bottom + increment
+		else
+			left = left + increment
+			right = right + increment
+		end
+	end
+end
+
 local CLASS_COLORS = {}
+local CLASS_TOKEN_FROM_NAME_FEMALE = {}
+local CLASS_TOKEN_FROM_NAME_MALE = {}
 do
 	for classToken, localizedName in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do
 		local color = _G.RAID_CLASS_COLORS[classToken]
 		CLASS_COLORS[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
+		CLASS_TOKEN_FROM_NAME_FEMALE[localizedName] = classToken
 	end
 
 	for classToken, localizedName in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do
 		local color = _G.RAID_CLASS_COLORS[classToken]
 		CLASS_COLORS[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
+		CLASS_TOKEN_FROM_NAME_MALE[localizedName] = classToken
 	end
 end -- do-blcok
 
@@ -77,6 +126,7 @@ local function CreateIcon(texture_path, icon_size)
 	return ("|T%s:%d|t"):format(texture_path, icon_size)
 end
 
+local COLUMN_ICON_CLASS = CreateIcon([[Interface\GossipFrame\TrainerGossipIcon]], 0)
 local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], 0)
 local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], 0)
 
@@ -171,6 +221,7 @@ local SortFields = {
 		"ZoneName",
 		"PublicNote",
 		"OfficerNote",
+		"Class",
 	},
 	WoWFriends = {
 		"Level",
@@ -179,6 +230,7 @@ local SortFields = {
 		"ToonName",
 		"ZoneName",
 		"Note",
+		"Class",
 	},
 }
 
@@ -342,14 +394,14 @@ local DrawTooltip
 do
 	local BattleNetColumns = {
 		Client = 1,
-		PresenceName = 2,
-		ToonName = 3,
-		GameText = 4,
-		Note = 6,
+		PresenceName = 3,
+		ToonName = 4,
+		GameText = 5,
+		Note = 7,
 	}
 
 	local BattleNetColSpans = {
-		Client = 1,
+		Client = 2,
 		PresenceName = 1,
 		ToonName = 1,
 		GameText = 2,
@@ -358,15 +410,17 @@ do
 
 	local GuildColumns = {
 		Level = 1,
-		ToonName = 2,
-		Rank = 3,
-		ZoneName = 4,
-		PublicNote = 5,
-		OfficerNote = 7,
+		Class = 2,
+		ToonName = 3,
+		Rank = 4,
+		ZoneName = 5,
+		PublicNote = 6,
+		OfficerNote = 8,
 	}
 
 	local GuildColSpans = {
 		Level = 1,
+		Class = 1,
 		ToonName = 1,
 		Rank = 1,
 		ZoneName = 1,
@@ -376,15 +430,17 @@ do
 
 	local WoWFriendsColumns = {
 		Level = 1,
-		PresenceName = 2,
-		ToonName = 3,
-		ZoneName = 4,
-		RealmName = 5,
-		Note = 6,
+		Class = 2,
+		PresenceName = 3,
+		ToonName = 4,
+		ZoneName = 5,
+		RealmName = 6,
+		Note = 7,
 	}
 
 	local WoWFriendsColSpans = {
 		Level = 1,
+		Class = 1,
 		PresenceName = 1,
 		ToonName = 1,
 		ZoneName = 1,
@@ -399,7 +455,7 @@ do
 		WoWFriends = {},
 	}
 
-	local NUM_TOOLTIP_COLUMNS = 9
+	local NUM_TOOLTIP_COLUMNS = 10
 
 	local TooltipAnchor
 
@@ -791,6 +847,9 @@ do
 					Tooltip:SetCell(headerLine, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
 					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
+					Tooltip:SetCell(headerLine, WoWFriendsColumns.Class, ColumnLabel(COLUMN_ICON_CLASS, "WoWFriends:Class"), WoWFriendsColSpans.Class)
+					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Class, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
+
 					Tooltip:SetCell(headerLine, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
 					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
 
@@ -815,6 +874,7 @@ do
 
 						line = Tooltip:AddLine()
 						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
+						Tooltip:SetCell(line, WoWFriendsColumns.Class, CLASS_ICONS[CLASS_TOKEN_FROM_NAME_FEMALE[player.Class] or CLASS_TOKEN_FROM_NAME_MALE[player.Class]], WoWFriendsColSpans.Class)
 						Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
 						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColorZoneName(player.ZoneName), WoWFriendsColSpans.ZoneName)
@@ -916,8 +976,11 @@ do
 
 				local headerLine = Tooltip:AddLine()
 				Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
-				Tooltip:SetCell(headerLine, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.ToonName)
+				Tooltip:SetCell(headerLine, GuildColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "Guild:Level"), GuildColSpans.Level)
 				Tooltip:SetCellScript(headerLine, GuildColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
+
+				Tooltip:SetCell(headerLine, GuildColumns.Class, ColumnLabel(COLUMN_ICON_CLASS, "Guild:Class"), GuildColSpans.Class)
+				Tooltip:SetCellScript(headerLine, GuildColumns.Class, "OnMouseUp", ToggleColumnSortMethod, "Guild:Class")
 
 				Tooltip:SetCell(headerLine, GuildColumns.ToonName, ColumnLabel(_G.NAME, "Guild:ToonName"), GuildColSpans.ToonName)
 				Tooltip:SetCellScript(headerLine, GuildColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
@@ -940,6 +1003,7 @@ do
 
 					line = Tooltip:AddLine()
 					Tooltip:SetCell(line, GuildColumns.Level, ColorPlayerLevel(player.Level), GuildColSpans.Level)
+					Tooltip:SetCell(line, GuildColumns.Class, CLASS_ICONS[CLASS_TOKEN_FROM_NAME_FEMALE[player.Class] or CLASS_TOKEN_FROM_NAME_MALE[player.Class]], GuildColSpans.Class)
 
 					Tooltip:SetCell(line, GuildColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.StatusIcon, CLASS_COLORS[player.Class] or "ffffff", player.ToonName, IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""), GuildColSpans.ToonName)
 					Tooltip:SetCellScript(line, GuildColumns.ToonName, "OnMouseUp", GuildMember_OnMouseUp, player)
