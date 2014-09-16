@@ -302,11 +302,11 @@ local function PercentColorGradient(min, max)
 end
 
 local function ColorPlayerLevel(level)
-	if not level or level == "" or type(level) ~= "number" then
+	if type(level) ~= "number" then
 		return level
 	end
-	local r, g, b = PercentColorGradient(level, _G.MAX_PLAYER_LEVEL)
-	return ("|cff%02x%02x%02x%d|r"):format(r * 255, g * 255, b * 255, level)
+	local color = _G.GetRelativeDifficultyColor(_G.UnitLevel("player"), level)
+	return ("|cff%02x%02x%02x%d|r"):format(color.r * 255, color.g * 255, color.b * 255, level)
 end
 
 local function ColorZoneName(zoneName)
