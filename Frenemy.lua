@@ -394,15 +394,15 @@ local DrawTooltip
 do
 	local BattleNetColumns = {
 		Client = 1,
-		PresenceName = 3,
+		PresenceName = 2,
 		ToonName = 4,
 		GameText = 5,
 		Note = 7,
 	}
 
 	local BattleNetColSpans = {
-		Client = 2,
-		PresenceName = 1,
+		Client = 1,
+		PresenceName = 2,
 		ToonName = 1,
 		GameText = 2,
 		Note = 2,
