@@ -513,7 +513,7 @@ do
 					Client = client,
 					ClientIndex = CLIENT_SORT_ORDERS[client],
 					FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
-					GameText = gameText or "",
+					GameText = gameText ~= "" and gameText or _G.UNKNOWN,
 					Level = level and tonumber(level) or 0,
 					Note = noteText,
 					PresenceID = presenceID,
