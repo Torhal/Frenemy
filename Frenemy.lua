@@ -1046,19 +1046,6 @@ do
 					end
 				end
 
-				local guildLevel, maxGuildLevel = _G.GetGuildLevel()
-
-				if guildLevel ~= maxGuildLevel then
-					local currentXP, nextLevelXP = _G.UnitGetGuildXP("player")
-					local percentage = math.min((currentXP / nextLevelXP) * 100, 100)
-					local r, g, b = PercentColorGradient(percentage, 100)
-
-					Tooltip:AddLine(" ")
-
-					Tooltip:SetCell(Tooltip:AddLine(), 1, ("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, _G.GUILD_LEVEL:format(guildLevel)), "GameFontDisableSmall", "CENTER", 0)
-					Tooltip:SetCell(Tooltip:AddLine(), 1, ("|cff%02x%02x%02x%d/%d (%d%%)|r"):format(r * 255, g * 255, b * 255, currentXP, nextLevelXP, percentage), "GameFontDisableSmall", "CENTER", 0)
-				end
-
 				guildMOTD = _G.GetGuildRosterMOTD()
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
