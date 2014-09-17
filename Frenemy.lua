@@ -515,7 +515,7 @@ do
 					FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
 					GameText = gameText ~= "" and gameText or _G.UNKNOWN,
 					Level = level and tonumber(level) or 0,
-					Note = noteText,
+					Note = noteText ~= "" and noteText or nil,
 					PresenceID = presenceID,
 					PresenceName = presenceName or _G.UNKNOWN,
 					RealmName = realmName or "",
