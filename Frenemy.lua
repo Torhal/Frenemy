@@ -485,7 +485,7 @@ do
 					RealmName = realmName or PLAYER_REALM,
 					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 					ToonName = toonName,
-					ZoneName = zoneName or _G.UNKNOWN,
+					ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
 				}
 
 				OnlineFriendsByName[toonName] = entry
@@ -495,52 +495,53 @@ do
 
 		if OnlineBattleNetCount > 0 then
 			for battleNetIndex = 1, OnlineBattleNetCount do
-				local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, _, _, isAFK, isDND, broadcastText, noteText, isRIDFriend, broadcastTime = _G.BNGetFriendInfo(battleNetIndex)
-				local _, realmName, faction, class, zoneName, level, gameText
+				local presenceID, presenceName, battleTag, isBattleTagPresence, _, toonID, client, isOnline, _, isAFK, isDND, broadcastText, noteText, isRIDFriend, broadcastTime = _G.BNGetFriendInfo(battleNetIndex)
+				local numToons = _G.BNGetNumFriendToons(battleNetIndex)
 
-				if toonID then
-					_, _, _, realmName, _, faction, _, class, _, zoneName, level, gameText = _G.BNGetToonInfo(toonID)
-				end
+				for toonIndex = 1, numToons do
+					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendToonInfo(battleNetIndex, toonIndex)
 
-				local characterName = toonName or _G.UNKNOWN
-				if presenceName then
-					characterName = characterName or battleTag
-				end
-
-				local entry = {
-					BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
-					Class = class,
-					Client = client,
-					ClientIndex = CLIENT_SORT_ORDERS[client],
-					FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
-					GameText = gameText ~= "" and gameText or _G.UNKNOWN,
-					Level = level and tonumber(level) or 0,
-					Note = noteText ~= "" and noteText or nil,
-					PresenceID = presenceID,
-					PresenceName = presenceName or _G.UNKNOWN,
-					RealmName = realmName or "",
-					StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
-					ToonName = characterName,
-					ZoneName = zoneName or _G.UNKNOWN,
-				}
-
-				if client == _G.BNET_CLIENT_WOW then
-					local existingFriend = OnlineFriendsByName[toonName]
-
-					if realmName == PLAYER_REALM and existingFriend then
-						for key, value in pairs(entry) do
-							if not existingFriend[key] then
-								existingFriend[key] = value
-							end
-						end
-					else
-						table.insert(PlayerLists.WoWFriends, entry)
+					local characterName = toonName
+					if presenceName then
+						characterName = characterName or battleTag
 					end
+					characterName = characterName or _G.UNKNOWN
 
-				elseif client == BNET_CLIENT_APP then
-					table.insert(PlayerLists.BattleNetApp, entry)
-				elseif toonID then
-					table.insert(PlayerLists.BattleNetGames, entry)
+					local entry = {
+						BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
+						Class = class,
+						Client = client,
+						ClientIndex = CLIENT_SORT_ORDERS[client],
+						FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
+						GameText = gameText ~= "" and gameText or _G.UNKNOWN,
+						Level = level and tonumber(level) or 0,
+						Note = noteText ~= "" and noteText or nil,
+						PresenceID = presenceID,
+						PresenceName = presenceName or _G.UNKNOWN,
+						RealmName = realmName or "",
+						StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
+						ToonName = characterName,
+						ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
+					}
+
+					if client == _G.BNET_CLIENT_WOW then
+						local existingFriend = OnlineFriendsByName[toonName]
+
+						if realmName == PLAYER_REALM and existingFriend then
+							for key, value in pairs(entry) do
+								if not existingFriend[key] then
+									existingFriend[key] = value
+								end
+							end
+						else
+							table.insert(PlayerLists.WoWFriends, entry)
+						end
+
+					elseif client == BNET_CLIENT_APP then
+						table.insert(PlayerLists.BattleNetApp, entry)
+					elseif toonID then
+						table.insert(PlayerLists.BattleNetGames, entry)
+					end
 				end
 			end
 		end
