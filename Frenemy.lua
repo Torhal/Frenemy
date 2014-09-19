@@ -461,6 +461,8 @@ do
 
 	-- Used to handle duplication between in-game and RealID friends.
 	local OnlineFriendsByName = {}
+	local GuildMemberIndexByName = {}
+	local WoWFriendIndexByName = {}
 
 	-- ----------------------------------------------------------------------------
 	-- Data compilation.
@@ -470,11 +472,15 @@ do
 			table.wipe(data)
 		end
 		table.wipe(OnlineFriendsByName)
+		table.wipe(GuildMemberIndexByName)
+		table.wipe(WoWFriendIndexByName)
 
 		if OnlineFriendsCount > 0 then
-			for friend_index = 1, OnlineFriendsCount do
-				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friend_index)
+			for friendIndex = 1, OnlineFriendsCount do
+				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friendIndex)
 				local toonName, realmName = ("-"):split(fullToonName)
+
+				WoWFriendIndexByName[toonName] = friendIndex
 
 				local entry = {
 					Class = class,
@@ -567,6 +573,8 @@ do
 						zoneName = currentZoneID and _G.GetMapNameByID(currentZoneID) or _G.UNKNOWN
 					end
 
+					GuildMemberIndexByName[toonName] = index
+
 					table.insert(PlayerLists.Guild, {
 						Class = class,
 						IsMobile = isMobile,
@@ -598,6 +606,9 @@ do
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() and playerEntry.RealmName == PLAYER_REALM then
 				_G.InviteToGroup(playerEntry.ToonName)
+			elseif _G.IsControlKeyDown() then
+				_G.FriendsFrame.NotesID = playerEntry.PresenceID
+				_G.StaticPopup_Show("SET_BNFRIENDNOTE", playerEntry.PresenceName)
 			elseif not _G.BNIsSelf(playerEntry.PresenceID) then
 				_G.ChatFrame_SendSmartTell(playerEntry.PresenceName)
 			end
@@ -618,6 +629,9 @@ do
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() then
 				_G.InviteToGroup(playerEntry.ToonName)
+			elseif _G.IsControlKeyDown() and _G.CanEditPublicNote() then
+				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerEntry.ToonName])
+				_G.StaticPopup_Show("SET_GUILDPLAYERNOTE")
 			else
 				_G.ChatFrame_SendTell(playerEntry.ToonName)
 			end
@@ -634,6 +648,9 @@ do
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() then
 				_G.InviteToGroup(playerEntry.ToonName)
+			elseif _G.IsControlKeyDown() then
+				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerEntry.ToonName]
+				_G.StaticPopup_Show("SET_FRIENDNOTE", playerEntry.ToonName)
 			else
 				_G.ChatFrame_SendTell(playerEntry.ToonName)
 			end
@@ -656,6 +673,7 @@ do
 			[L.LEFT_CLICK] = _G.WHISPER,
 			[L.RIGHT_CLICK] = _G.ADVANCED_OPTIONS,
 			[L.ALT_KEY .. L.LEFT_CLICK] = _G.INVITE,
+			[L.CONTROL_KEY .. L.LEFT_CLICK] = _G.SET_NOTE,
 		},
 	}
 
