@@ -579,8 +579,8 @@ do
 						Class = class,
 						IsMobile = isMobile,
 						Level = level,
-						Note = (note and note ~= "") and note or nil,
 						OfficerNote = (officerNote and officerNote ~= "") and officerNote or nil,
+						PublicNote = (note and note ~= "") and note or nil,
 						Rank = rank,
 						RankIndex = rankIndex,
 						StatusIcon = status,
@@ -1033,8 +1033,8 @@ do
 					Tooltip:SetCell(line, GuildColumns.Rank, ("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, player.Rank), GuildColSpans.Rank)
 					Tooltip:SetCell(line, GuildColumns.ZoneName, ColorZoneName(player.ZoneName) or _G.UNKNOWN, GuildColSpans.ZoneName)
 
-					if player.Note then
-						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+					if player.PublicNote then
+						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.PublicNote .. "|r"
 
 						if DB.Tooltip.NotesArrangement.Guild == private.NotesArrangementType.Column then
 							if not addedPublicNoteColumn then
