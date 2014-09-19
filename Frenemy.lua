@@ -573,7 +573,7 @@ do
 						zoneName = currentZoneID and _G.GetMapNameByID(currentZoneID) or _G.UNKNOWN
 					end
 
-					GuildMemberIndexByName[toonName] = index
+					GuildMemberIndexByName[ambiguatedToonName] = index
 
 					table.insert(PlayerLists.Guild, {
 						Class = class,
