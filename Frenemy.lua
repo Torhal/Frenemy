@@ -636,9 +636,14 @@ do
 				_G.ChatFrame_SendTell(playerEntry.ToonName)
 			end
 		elseif button == "RightButton" then
-			Tooltip:SetFrameStrata("DIALOG")
-			_G.CloseDropDownMenus()
-			_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
+			if _G.IsControlKeyDown() and _G.CanEditOfficerNote() then
+				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerEntry.ToonName])
+				_G.StaticPopup_Show("SET_GUILDOFFICERNOTE")
+			else
+				Tooltip:SetFrameStrata("DIALOG")
+				_G.CloseDropDownMenus()
+				_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
+			end
 		end
 	end
 
@@ -674,6 +679,7 @@ do
 			[L.RIGHT_CLICK] = _G.ADVANCED_OPTIONS,
 			[L.ALT_KEY .. L.LEFT_CLICK] = _G.INVITE,
 			[L.CONTROL_KEY .. L.LEFT_CLICK] = _G.SET_NOTE,
+			[L.CONTROL_KEY .. L.RIGHT_CLICK] = _G.GUILD_OFFICER_NOTE,
 		},
 	}
 
