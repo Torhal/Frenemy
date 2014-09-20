@@ -43,6 +43,53 @@ local CLIENT_SORT_ORDERS = {
 	[BNET_CLIENT_APP] = 5,
 }
 
+local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
+
+local FRIENDS_FRAME_TAB_TOGGLES = {
+	FRIENDS = 1,
+	WHO = 2,
+	CHAT = 3,
+	RAID = 4,
+}
+
+local HELP_TIP_DEFINITIONS = {
+	[_G.DISPLAY] = {
+		[L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEFRIENDSTAB,
+		[L.ALT_KEY .. L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEGUILDTAB,
+		[L.RIGHT_CLICK] = _G.INTERFACE_OPTIONS,
+	},
+	[_G.NAME] = {
+		[L.LEFT_CLICK] = _G.WHISPER,
+		[L.RIGHT_CLICK] = _G.ADVANCED_OPTIONS,
+		[L.ALT_KEY .. L.LEFT_CLICK] = _G.INVITE,
+		[L.CONTROL_KEY .. L.LEFT_CLICK] = _G.SET_NOTE,
+		[L.CONTROL_KEY .. L.RIGHT_CLICK] = _G.GUILD_OFFICER_NOTE,
+	},
+}
+
+local PLAYER_FACTION = _G.UnitFactionGroup("player")
+local PLAYER_NAME = _G.UnitName("player")
+local PLAYER_REALM = _G.GetRealmName()
+
+local REQUEST_UPDATE_INTERVAL = 30
+
+local SORT_ORDER_ASCENDING = 1
+local SORT_ORDER_DESCENDING = 2
+
+local SORT_ORDER_NAMES = {
+	[SORT_ORDER_ASCENDING] = "Ascending",
+	[SORT_ORDER_DESCENDING] = "Descending",
+}
+
+-- ----------------------------------------------------------------------------
+-- Icons
+-- ----------------------------------------------------------------------------
+local function CreateIcon(texture_path, icon_size)
+	return ("|T%s:%d|t"):format(texture_path, icon_size or 0)
+end
+
+local BROADCAST_ICON = CreateIcon([[Interface\FriendsFrame\BroadcastIcon]])
+
 local CLIENT_ICON_TEXTURE_CODES = {}
 do
 	local CLIENT_ICON_SIZE = 18
@@ -53,7 +100,6 @@ do
 end
 
 local CLASS_ICONS = {}
-
 do
 	local textureFormat = [[|TInterface\TargetingFrame\UI-CLASSES-CIRCLES:0:0:0:0:256:256:%d:%d:%d:%d|t]]
 	local textureSize = 256
@@ -63,6 +109,7 @@ do
 	local top = 0
 	local bottom = increment
 
+	-- This is the order in which the icons appear in the UI-CLASSES-CIRCLES image.
 	local CLASS_ICON_SORT_ORDER = {
 		"WARRIOR",
 		"MAGE",
@@ -114,24 +161,11 @@ do
 	end
 end -- do-blcok
 
-local BROADCAST_ICON = [[|TInterface\FriendsFrame\BroadcastIcon:0|t]]
-
-local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
-
-local PLAYER_FACTION = _G.UnitFactionGroup("player")
-local PLAYER_NAME = _G.UnitName("player")
-local PLAYER_REALM = _G.GetRealmName()
-
-local function CreateIcon(texture_path, icon_size)
-	return ("|T%s:%d|t"):format(texture_path, icon_size)
-end
-
-local COLUMN_ICON_CLASS = CreateIcon([[Interface\GossipFrame\TrainerGossipIcon]], 0)
-local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]], 0)
-local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]], 0)
+local COLUMN_ICON_CLASS = CreateIcon([[Interface\GossipFrame\TrainerGossipIcon]])
+local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]])
+local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]])
 
 local FACTION_ICON_SIZE = 18
-
 local FACTION_ICON_ALLIANCE = CreateIcon([[Interface\COMMON\icon-alliance]], FACTION_ICON_SIZE)
 local FACTION_ICON_HORDE = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE)
 local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE)
@@ -141,59 +175,38 @@ local HELP_ICON = CreateIcon([[Interface\COMMON\help-i]], 20)
 local PLAYER_ICON_GROUP = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
 local PLAYER_ICON_FACTION = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
 
-local SECTION_ICON_DISABLED = CreateIcon([[Interface\COMMON\Indicator-Red]], 0)
-local SECTION_ICON_ENABLED = CreateIcon([[Interface\COMMON\Indicator-Green]], 0)
+local SECTION_ICON_DISABLED = CreateIcon([[Interface\COMMON\Indicator-Red]])
+local SECTION_ICON_ENABLED = CreateIcon([[Interface\COMMON\Indicator-Green]])
 
-local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]], 0)
-local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]], 0)
+local SORT_ICON_ASCENDING = CreateIcon([[Interface\Buttons\Arrow-Up-Up]])
+local SORT_ICON_DESCENDING = CreateIcon([[Interface\Buttons\Arrow-Down-Up]])
 
-local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK, 0)
-local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND, 0)
-local STATUS_ICON_MOBILE_AWAY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-AwayMobile]], 0)
-local STATUS_ICON_MOBILE_BUSY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]], 0)
-local STATUS_ICON_MOBILE_ONLINE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]], 0)
-local STATUS_ICON_NOTE = CreateIcon(_G.FRIENDS_TEXTURE_OFFLINE, 0)
-local STATUS_ICON_ONLINE = CreateIcon(_G.FRIENDS_TEXTURE_ONLINE, 0)
-
-local TAB_TOGGLES = {
-	FRIENDS = 1,
-	WHO = 2,
-	CHAT = 3,
-	RAID = 4,
-}
-
-local TitleFont = _G.CreateFont("FrenemyTitleFont")
-TitleFont:SetTextColor(0.510, 0.773, 1.0)
-TitleFont:SetFontObject("QuestTitleFont")
-
-local REQUEST_UPDATE_INTERVAL = 30
-
-local SORT_ORDER_ASCENDING = 1
-local SORT_ORDER_DESCENDING = 2
-
-local SORT_ORDER_NAMES = {
-	[SORT_ORDER_ASCENDING] = "Ascending",
-	[SORT_ORDER_DESCENDING] = "Descending",
-}
+local STATUS_ICON_AFK = CreateIcon(_G.FRIENDS_TEXTURE_AFK)
+local STATUS_ICON_DND = CreateIcon(_G.FRIENDS_TEXTURE_DND)
+local STATUS_ICON_MOBILE_AWAY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-AwayMobile]])
+local STATUS_ICON_MOBILE_BUSY = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]])
+local STATUS_ICON_MOBILE_ONLINE = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]])
+local STATUS_ICON_NOTE = CreateIcon(_G.FRIENDS_TEXTURE_OFFLINE)
+local STATUS_ICON_ONLINE = CreateIcon(_G.FRIENDS_TEXTURE_ONLINE)
 
 -- ----------------------------------------------------------------------------
 -- Variables
 -- ----------------------------------------------------------------------------
 local DB
+local HelpTip
 local Tooltip
 
 -- Statistics: Populated and maintained in UpdateStatistics()
 local OnlineBattleNetCount
-local TotalBattleNetCount
-
 local OnlineFriendsCount
-local TotalFriendsCount
-
 local OnlineGuildMembersCount
+
+local TotalBattleNetCount
+local TotalFriendsCount
 local TotalGuildMembersCount
 
 -- Zone data
-local currentZoneID
+local CurrentZoneID
 local ZoneColorsByName = {} -- Populated from SavedVariables and during travel.
 
 -- ----------------------------------------------------------------------------
@@ -332,6 +345,19 @@ local DB_DEFAULTS = {
 -- ----------------------------------------------------------------------------
 -- Helpers
 -- ----------------------------------------------------------------------------
+local function ColorPlayerLevel(level)
+	if type(level) ~= "number" then
+		return level
+	end
+	local color = _G.GetRelativeDifficultyColor(_G.UnitLevel("player"), level)
+	return ("|cff%02x%02x%02x%d|r"):format(color.r * 255, color.g * 255, color.b * 255, level)
+end
+
+local function ColorZoneName(zoneName)
+	local color = ZoneColorsByName[zoneName] or _G.GRAY_FONT_COLOR
+	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName)
+end
+
 local function IsGrouped(name)
 	return (_G.GetNumSubgroupMembers() > 0 and _G.UnitInParty(name)) or (_G.GetNumGroupMembers() > 0 and _G.UnitInRaid(name))
 end
@@ -355,17 +381,13 @@ local function PercentColorGradient(min, max)
 	return red_low + (red_mid - red_low) * fractional, green_low + (green_mid - green_low) * fractional, blue_low + (blue_mid - blue_low) * fractional
 end
 
-local function ColorPlayerLevel(level)
-	if type(level) ~= "number" then
-		return level
+local function SetZoneNameColors(zoneID, zonePVPStatus)
+	local mapName = _G.GetMapNameByID(zoneID)
+	if not mapName then
+		DB.ZoneData[zoneID] = nil
+		return
 	end
-	local color = _G.GetRelativeDifficultyColor(_G.UnitLevel("player"), level)
-	return ("|cff%02x%02x%02x%d|r"):format(color.r * 255, color.g * 255, color.b * 255, level)
-end
-
-local function ColorZoneName(zoneName)
-	local color = ZoneColorsByName[zoneName] or _G.GRAY_FONT_COLOR
-	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName)
+	ZoneColorsByName[mapName] = private.ZonePVPStatusRGB[zonePVPStatus]
 end
 
 local function UpdateStatistics()
@@ -376,15 +398,6 @@ local function UpdateStatistics()
 		local _
 		TotalGuildMembersCount, _, OnlineGuildMembersCount = _G.GetNumGuildMembers()
 	end
-end
-
-local function SetZoneNameColors(zoneID, zonePVPStatus)
-	local mapName = _G.GetMapNameByID(zoneID)
-	if not mapName then
-		DB.ZoneData[zoneID] = nil
-		return
-	end
-	ZoneColorsByName[mapName] = private.ZonePVPStatusRGB[zonePVPStatus]
 end
 
 -- ----------------------------------------------------------------------------
@@ -570,7 +583,7 @@ do
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
 					-- traveling with the tooltip showing.
 					if not isMobile and ambiguatedToonName == PLAYER_NAME then
-						zoneName = currentZoneID and _G.GetMapNameByID(currentZoneID) or _G.UNKNOWN
+						zoneName = CurrentZoneID and _G.GetMapNameByID(CurrentZoneID) or _G.UNKNOWN
 					end
 
 					GuildMemberIndexByName[ambiguatedToonName] = index
@@ -647,87 +660,6 @@ do
 		end
 	end
 
-	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, button)
-		_G.PlaySound("igMainMenuOptionCheckBoxOn")
-
-		if button == "LeftButton" then
-			if _G.IsAltKeyDown() then
-				_G.InviteToGroup(playerEntry.ToonName)
-			elseif _G.IsControlKeyDown() then
-				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerEntry.ToonName]
-				_G.StaticPopup_Show("SET_FRIENDNOTE", playerEntry.ToonName)
-			else
-				_G.ChatFrame_SendTell(playerEntry.ToonName)
-			end
-		elseif button == "RightButton" then
-			Tooltip:SetFrameStrata("DIALOG")
-			_G.CloseDropDownMenus()
-			_G.FriendsFrame_ShowDropdown(playerEntry.FullToonName, true, nil, nil, nil, true)
-		end
-	end
-
-	local helpTip
-
-	local HelpTipData = {
-		[_G.DISPLAY] = {
-			[L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEFRIENDSTAB,
-			[L.ALT_KEY .. L.LEFT_CLICK] = _G.BINDING_NAME_TOGGLEGUILDTAB,
-			[L.RIGHT_CLICK] = _G.INTERFACE_OPTIONS,
-		},
-		[_G.NAME] = {
-			[L.LEFT_CLICK] = _G.WHISPER,
-			[L.RIGHT_CLICK] = _G.ADVANCED_OPTIONS,
-			[L.ALT_KEY .. L.LEFT_CLICK] = _G.INVITE,
-			[L.CONTROL_KEY .. L.LEFT_CLICK] = _G.SET_NOTE,
-			[L.CONTROL_KEY .. L.RIGHT_CLICK] = _G.GUILD_OFFICER_NOTE,
-		},
-	}
-
-	local function HideHelpTip(tooltipCell)
-		if helpTip then
-			helpTip:Hide()
-			helpTip:Release()
-			helpTip = nil
-		end
-		Tooltip:SetFrameStrata("TOOLTIP")
-	end
-
-	local function ShowHelpTip(tooltipCell)
-		local helpTip = LibQTip:Acquire(FOLDER_NAME .. "HelpTip", 2)
-		helpTip:SetAutoHideDelay(0.1, tooltipCell)
-		helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
-		helpTip:SetScale(DB.Tooltip.Scale)
-		helpTip:SmartAnchorTo(tooltipCell)
-		helpTip:SetScript("OnLeave", function(self) self:Release() helpTip = nil end)
-		helpTip:Clear()
-		helpTip:SetCellMarginH(0)
-		helpTip:SetCellMarginV(1)
-
-		local firstEntryType = true
-
-		for entryType, data in pairs(HelpTipData) do
-			local line
-
-			if not firstEntryType then
-				line = helpTip:AddLine(" ")
-			end
-			line = helpTip:AddLine()
-			helpTip:SetCell(line, 1, entryType, _G.GameFontNormal, "CENTER", 0)
-			helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
-
-			for keyStroke, description in pairs(data) do
-				line = helpTip:AddLine()
-				helpTip:SetCell(line, 1, keyStroke)
-				helpTip:SetCell(line, 2, description)
-			end
-			firstEntryType = false
-		end
-
-		_G.HideDropDownMenu(1)
-		Tooltip:SetFrameStrata("DIALOG")
-		helpTip:Show()
-	end
-
 	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)
 		local sectionName, fieldName = (":"):split(sortFieldData)
 
@@ -755,6 +687,25 @@ do
 		DrawTooltip(TooltipAnchor)
 	end
 
+	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, button)
+		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+
+		if button == "LeftButton" then
+			if _G.IsAltKeyDown() then
+				_G.InviteToGroup(playerEntry.ToonName)
+			elseif _G.IsControlKeyDown() then
+				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerEntry.ToonName]
+				_G.StaticPopup_Show("SET_FRIENDNOTE", playerEntry.ToonName)
+			else
+				_G.ChatFrame_SendTell(playerEntry.ToonName)
+			end
+		elseif button == "RightButton" then
+			Tooltip:SetFrameStrata("DIALOG")
+			_G.CloseDropDownMenus()
+			_G.FriendsFrame_ShowDropdown(playerEntry.FullToonName, true, nil, nil, nil, true)
+		end
+	end
+
 	-- ----------------------------------------------------------------------------
 	-- Display rendering
 	-- ----------------------------------------------------------------------------
@@ -766,6 +717,51 @@ do
 		end
 
 		return label
+	end
+
+	local function HideHelpTip(tooltipCell)
+		if HelpTip then
+			HelpTip:Hide()
+			HelpTip:Release()
+			HelpTip = nil
+		end
+		Tooltip:SetFrameStrata("TOOLTIP")
+	end
+
+	local function ShowHelpTip(tooltipCell)
+		local helpTip = LibQTip:Acquire(FOLDER_NAME .. "HelpTip", 2)
+		helpTip:SetAutoHideDelay(0.1, tooltipCell)
+		helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
+		helpTip:SetScale(DB.Tooltip.Scale)
+		helpTip:SmartAnchorTo(tooltipCell)
+		helpTip:SetScript("OnLeave", function(self) self:Release() helpTip = nil end)
+		helpTip:Clear()
+		helpTip:SetCellMarginH(0)
+		helpTip:SetCellMarginV(1)
+
+		local firstEntryType = true
+
+		for entryType, data in pairs(HELP_TIP_DEFINITIONS) do
+			local line
+
+			if not firstEntryType then
+				line = helpTip:AddLine(" ")
+			end
+			line = helpTip:AddLine()
+			helpTip:SetCell(line, 1, entryType, _G.GameFontNormal, "CENTER", 0)
+			helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
+
+			for keyStroke, description in pairs(data) do
+				line = helpTip:AddLine()
+				helpTip:SetCell(line, 1, keyStroke)
+				helpTip:SetCell(line, 2, description)
+			end
+			firstEntryType = false
+		end
+
+		_G.HideDropDownMenu(1)
+		Tooltip:SetFrameStrata("DIALOG")
+		helpTip:Show()
 	end
 
 	local function RenderBattleNetLines(sourceListName, headerLine, noteArrangement)
@@ -820,15 +816,19 @@ do
 	local function Tooltip_OnRelease(self)
 		_G.HideDropDownMenu(1)
 
-		if helpTip then
-			helpTip:Release()
-			helpTip = nil
+		if HelpTip then
+			HelpTip:Release()
+			HelpTip = nil
 		end
 
 		Tooltip:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
 		Tooltip = nil
 		TooltipAnchor = nil
 	end
+
+	local TitleFont = _G.CreateFont("FrenemyTitleFont")
+	TitleFont:SetTextColor(0.510, 0.773, 1.0)
+	TitleFont:SetFontObject("QuestTitleFont")
 
 	function DrawTooltip(anchorFrame)
 		if not anchorFrame then
@@ -1107,7 +1107,7 @@ function DataObject:OnClick(button)
 		if _G.IsAltKeyDown() then
 			_G.ToggleGuildFrame()
 		else
-			_G.ToggleFriendsFrame(TAB_TOGGLES.FRIENDS)
+			_G.ToggleFriendsFrame(FRIENDS_FRAME_TAB_TOGGLES.FRIENDS)
 		end
 	else
 		_G.InterfaceOptionsFrame_OpenToCategory(Frenemy.optionsFrame)
@@ -1195,8 +1195,8 @@ function Frenemy:HandleZoneChange(eventName)
 
 	_G.SetMapToCurrentZone()
 
-	local needDisplayUpdate = currentZoneID ~= mapZoneID
-	currentZoneID = microDungeonID or mapZoneID
+	local needDisplayUpdate = CurrentZoneID ~= mapZoneID
+	CurrentZoneID = microDungeonID or mapZoneID
 
 	if mapIsVisible then
 		_G.SetMapByID(mapZoneID)
@@ -1207,7 +1207,7 @@ function Frenemy:HandleZoneChange(eventName)
 
 	local pvpType, _, factionName = _G.GetZonePVPInfo()
 
-	if currentZoneID and currentZoneID >= 1 then
+	if CurrentZoneID and CurrentZoneID >= 1 then
 		if pvpType == "hostile" or pvpType == "friendly" then
 			pvpType = factionName
 		elseif not pvpType or pvpType == "" then
@@ -1215,15 +1215,14 @@ function Frenemy:HandleZoneChange(eventName)
 		end
 
 		local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
-		DB.ZoneData[currentZoneID] = zonePVPStatus
-		SetZoneNameColors(currentZoneID, zonePVPStatus)
+		DB.ZoneData[CurrentZoneID] = zonePVPStatus
+		SetZoneNameColors(CurrentZoneID, zonePVPStatus)
 
 		if needDisplayUpdate then
 			UpdateAndDisplay()
 		end
 	end
 end
-
 
 -- ----------------------------------------------------------------------------
 -- Framework.
@@ -1245,21 +1244,6 @@ local function RequestUpdates()
 	end
 end
 
-function Frenemy:OnInitialize()
-	DB = LibStub("AceDB-3.0"):New(FOLDER_NAME .. "DB", DB_DEFAULTS, true).global
-	private.DB = DB
-
-	local LDBIcon = LibStub("LibDBIcon-1.0")
-	if LDBIcon then
-		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
-	end
-	private.SetupOptions()
-
-	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
-		SetZoneNameColors(zoneID, zonePVPStatus)
-	end
-end
-
 function Frenemy:OnEnable()
 	self:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 	self:RegisterEvent("BN_TOON_NAME_UPDATED")
@@ -1277,3 +1261,17 @@ function Frenemy:OnEnable()
 	self.RequestUpdater:Play()
 end
 
+function Frenemy:OnInitialize()
+	DB = LibStub("AceDB-3.0"):New(FOLDER_NAME .. "DB", DB_DEFAULTS, true).global
+	private.DB = DB
+
+	local LDBIcon = LibStub("LibDBIcon-1.0")
+	if LDBIcon then
+		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
+	end
+	private.SetupOptions()
+
+	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
+		SetZoneNameColors(zoneID, zonePVPStatus)
+	end
+end
