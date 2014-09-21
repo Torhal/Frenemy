@@ -20,6 +20,7 @@ local LibStub = _G.LibStub
 local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale(FOLDER_NAME)
+local Dialog = LibStub("LibDialog-1.0")
 local LibQTip = LibStub('LibQTip-1.0')
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
@@ -343,6 +344,39 @@ local DB_DEFAULTS = {
 }
 
 -- ----------------------------------------------------------------------------
+-- Dialogs
+-- ----------------------------------------------------------------------------
+Dialog:Register("FrenemySetGuildMOTD", {
+	editboxes = {
+		{
+			on_enter_pressed = function(self)
+				_G.GuildSetMOTD(self:GetText())
+				Dialog:Dismiss("FrenemySetGuildMOTD")
+			end,
+			on_escape_pressed = function(self)
+				Dialog:Dismiss("FrenemySetGuildMOTD")
+			end,
+			on_show = function(self)
+				self:SetText(_G.GetGuildRosterMOTD())
+			end,
+			auto_focus = true,
+			label = _G.GREEN_FONT_COLOR_CODE .._G.GUILDCONTROL_OPTION9 .. "|r",
+			max_bytes = 128,
+			max_letters = 128,
+			text = _G.GetGuildRosterMOTD(),
+			width = 200,
+		},
+	},
+	show_while_dead = true,
+	hide_on_escape = true,
+	icon = [[Interface\Calendar\MeetingIcon]],
+	width = 400,
+	on_show = function(self, text)
+		self.text:SetFormattedText("%s%s|r", _G.BATTLENET_FONT_COLOR_CODE, FOLDER_NAME)
+	end
+})
+
+-- ----------------------------------------------------------------------------
 -- Helpers
 -- ----------------------------------------------------------------------------
 local function ColorPlayerLevel(level)
@@ -661,10 +695,7 @@ do
 	end
 
 	local function GuildMOTD_OnMouseUp(tooltipCell)
-		if not _G.IsAddOnLoaded("Blizzard_GuildUI") then
-			_G.LoadAddOn("Blizzard_GuildUI")
-		end
-		_G.GuildTextEditFrame_Show("motd")
+		Dialog:Spawn("FrenemySetGuildMOTD")
 	end
 
 	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)

@@ -13,6 +13,7 @@
     <Include file="Libs\AceConfig-3.0\AceConfig-3.0.xml"/>
 
     <!--Libraries-->
+    <Include file="Libs\LibDialog-1.0\lib.xml"/>
     <Include file="Libs\LibQTip-1.0\lib.xml"/>
     <Script file="Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
 
