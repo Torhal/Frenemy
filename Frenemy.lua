@@ -661,6 +661,9 @@ do
 	end
 
 	local function GuildMOTD_OnMouseUp(tooltipCell)
+		if not _G.IsAddOnLoaded("Blizzard_GuildUI") then
+			_G.LoadAddOn("Blizzard_GuildUI")
+		end
 		_G.GuildTextEditFrame_Show("motd")
 	end
 
