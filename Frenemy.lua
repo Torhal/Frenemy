@@ -526,6 +526,7 @@ do
 				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friendIndex)
 				local toonName, realmName = ("-"):split(fullToonName)
 
+				WoWFriendIndexByName[fullToonName] = friendIndex
 				WoWFriendIndexByName[toonName] = friendIndex
 
 				local entry = {
@@ -600,10 +601,10 @@ do
 
 		if _G.IsInGuild() then
 			for index = 1, _G.GetNumGuildMembers() do
-				local toonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
+				local fullToonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
 				if isOnline or isMobile then
-					local ambiguatedToonName = _G.Ambiguate(toonName, "guild")
+					local toonName, realmName = ("-"):split(fullToonName)
 
 					if status == 0 then
 						status = isMobile and STATUS_ICON_MOBILE_ONLINE or STATUS_ICON_ONLINE
@@ -615,22 +616,25 @@ do
 
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
 					-- traveling with the tooltip showing.
-					if not isMobile and ambiguatedToonName == PLAYER_NAME then
+					if not isMobile and toonName == PLAYER_NAME then
 						zoneName = CurrentZoneID and _G.GetMapNameByID(CurrentZoneID) or _G.UNKNOWN
 					end
 
-					GuildMemberIndexByName[ambiguatedToonName] = index
+					GuildMemberIndexByName[fullToonName] = index
+					GuildMemberIndexByName[toonName] = index
 
 					table.insert(PlayerLists.Guild, {
 						Class = class,
+						FullToonName = fullToonName,
 						IsMobile = isMobile,
 						Level = level,
 						OfficerNote = officerNote ~= "" and officerNote or nil,
 						PublicNote = note ~= "" and note or nil,
 						Rank = rank,
 						RankIndex = rankIndex,
+						RealmName = realmName or PLAYER_REALM,
 						StatusIcon = status,
-						ToonName = ambiguatedToonName,
+						ToonName = toonName,
 						ZoneName = isMobile and _G.REMOTE_CHAT or zoneName,
 					})
 				end
@@ -672,23 +676,25 @@ do
 
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
+		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
+
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() then
-				_G.InviteToGroup(playerEntry.ToonName)
+				_G.InviteToGroup(playerName)
 			elseif _G.IsControlKeyDown() and _G.CanEditPublicNote() then
-				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerEntry.ToonName])
+				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerName])
 				_G.StaticPopup_Show("SET_GUILDPLAYERNOTE")
 			else
-				_G.ChatFrame_SendTell(playerEntry.ToonName)
+				_G.ChatFrame_SendTell(playerName)
 			end
 		elseif button == "RightButton" then
 			if _G.IsControlKeyDown() and _G.CanEditOfficerNote() then
-				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerEntry.ToonName])
+				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerName])
 				_G.StaticPopup_Show("SET_GUILDOFFICERNOTE")
 			else
 				Tooltip:SetFrameStrata("DIALOG")
 				_G.CloseDropDownMenus()
-				_G.GuildRoster_ShowMemberDropDown(playerEntry.ToonName, true, playerEntry.IsMobile)
+				_G.GuildRoster_ShowMemberDropDown(playerName, true, playerEntry.IsMobile)
 			end
 		end
 	end
@@ -727,14 +733,16 @@ do
 	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, button)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
+		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
+
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() then
-				_G.InviteToGroup(playerEntry.ToonName)
+				_G.InviteToGroup(playerName)
 			elseif _G.IsControlKeyDown() then
-				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerEntry.ToonName]
-				_G.StaticPopup_Show("SET_FRIENDNOTE", playerEntry.ToonName)
+				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerName]
+				_G.StaticPopup_Show("SET_FRIENDNOTE", playerName)
 			else
-				_G.ChatFrame_SendTell(playerEntry.ToonName)
+				_G.ChatFrame_SendTell(playerName)
 			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
