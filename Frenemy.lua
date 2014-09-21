@@ -660,6 +660,10 @@ do
 		end
 	end
 
+	local function GuildMOTD_OnMouseUp(tooltipCell)
+		_G.GuildTextEditFrame_Show("motd")
+	end
+
 	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)
 		local sectionName, fieldName = (":"):split(sortFieldData)
 
@@ -1084,7 +1088,13 @@ do
 		Tooltip:Show()
 
 		if guildMOTD and guildMOTD ~= "" then
-			Tooltip:SetCell(Tooltip:AddLine(), 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. guildMOTD .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
+			local line = Tooltip:AddLine()
+			Tooltip:SetCell(line, 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. guildMOTD .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
+
+			if _G.CanEditMOTD() then
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", GuildMOTD_OnMouseUp)
+			end
+
 			Tooltip:AddLine(" ")
 		end
 
