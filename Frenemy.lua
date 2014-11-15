@@ -388,7 +388,7 @@ end
 
 local function ColorZoneName(zoneName)
 	local color = ZoneColorsByName[zoneName] or _G.GRAY_FONT_COLOR
-	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName)
+	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName or _G.UNKNOWN)
 end
 
 local function IsGrouped(name)
@@ -1082,7 +1082,7 @@ do
 					-- The higher the rank index, the lower the priviledge; guild leader is rank 1.
 					local r, g, b = PercentColorGradient(player.RankIndex, numGuildRanks)
 					Tooltip:SetCell(line, GuildColumns.Rank, ("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, player.Rank), GuildColSpans.Rank)
-					Tooltip:SetCell(line, GuildColumns.ZoneName, ColorZoneName(player.ZoneName) or _G.UNKNOWN, GuildColSpans.ZoneName)
+					Tooltip:SetCell(line, GuildColumns.ZoneName, ColorZoneName(player.ZoneName), GuildColSpans.ZoneName)
 
 					if player.PublicNote then
 						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.PublicNote .. "|r"
