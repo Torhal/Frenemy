@@ -208,7 +208,11 @@ local TotalGuildMembersCount
 
 -- Zone data
 local CurrentZoneID
-local ZoneColorsByName = {} -- Populated from SavedVariables and during travel.
+
+-- Populated from SavedVariables and during travel.
+local ZoneColorsByName = {
+	[_G.GARRISON_LOCATION_TOOLTIP] = private.ZonePVPStatusRGB[private.ZonePVPStatus.Normal]
+}
 
 -- ----------------------------------------------------------------------------
 -- Enumerations and data for sorting.
