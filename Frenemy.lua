@@ -892,6 +892,8 @@ do
 			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
 			Tooltip:SetScale(DB.Tooltip.Scale)
 			Tooltip:SmartAnchorTo(anchorFrame)
+			Tooltip:SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
+			Tooltip:SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
 
 			Tooltip.OnRelease = Tooltip_OnRelease
 		end
