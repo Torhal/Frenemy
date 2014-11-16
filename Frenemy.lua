@@ -34,14 +34,14 @@ local RequestUpdater = _G.CreateFrame("Frame")
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
-local BNET_CLIENT_APP = "App" -- Battle.net Application - doesn't have a constant.
-
 local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_WOW] = 1,
-	[_G.BNET_CLIENT_D3] = 2,
-	[_G.BNET_CLIENT_SC2] = 3,
+	[_G.BNET_CLIENT_SC2] = 2,
+	[_G.BNET_CLIENT_D3] = 3,
 	[_G.BNET_CLIENT_WTCG] = 4,
-	[BNET_CLIENT_APP] = 5,
+	[_G.BNET_CLIENT_HEROES] = 5,
+	[_G.BNET_CLIENT_CLNT] = 6,
+	[_G.BNET_CLIENT_APP] = 7,
 }
 
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
@@ -589,8 +589,7 @@ do
 						else
 							table.insert(PlayerLists.WoWFriends, entry)
 						end
-
-					elseif client == BNET_CLIENT_APP then
+					elseif client == _G.BNET_CLIENT_APP or client == _G.BNET_CLIENT_CLNT then
 						table.insert(PlayerLists.BattleNetApp, entry)
 					elseif toonID then
 						table.insert(PlayerLists.BattleNetGames, entry)
