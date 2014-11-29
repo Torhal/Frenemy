@@ -905,134 +905,132 @@ do
 		Tooltip:SetCell(Tooltip:AddLine(), 1, FOLDER_NAME, TitleFont, "CENTER", 0)
 		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
-		if OnlineBattleNetCount > 0 or OnlineFriendsCount > 0 then
-			-- ----------------------------------------------------------------------------
-			-- WoW Friends
-			-- ----------------------------------------------------------------------------
-			if #PlayerLists.WoWFriends > 0 then
-				local line = Tooltip:AddLine()
+		-- ----------------------------------------------------------------------------
+		-- WoW Friends
+		-- ----------------------------------------------------------------------------
+		if #PlayerLists.WoWFriends > 0 then
+			local line = Tooltip:AddLine()
 
-				if not DB.Tooltip.CollapsedSections.WoWFriends then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.FRIENDS, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
+			if not DB.Tooltip.CollapsedSections.WoWFriends then
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.FRIENDS, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
 
-					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					local headerLine = Tooltip:AddLine()
-					Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
+				local headerLine = Tooltip:AddLine()
+				Tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.Level, ColumnLabel(COLUMN_ICON_LEVEL, "WoWFriends:Level"), WoWFriendsColSpans.Level)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.Class, ColumnLabel(COLUMN_ICON_CLASS, "WoWFriends:Class"), WoWFriendsColSpans.Class)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Class, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.Class, ColumnLabel(COLUMN_ICON_CLASS, "WoWFriends:Class"), WoWFriendsColSpans.Class)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Class, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.PresenceName, ColumnLabel(_G.BATTLENET_FRIEND, "WoWFriends:PresenceName"), WoWFriendsColSpans.PresenceName)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.PresenceName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME, "WoWFriends:ToonName"), WoWFriendsColSpans.ToonName)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.ToonName, ColumnLabel(_G.NAME, "WoWFriends:ToonName"), WoWFriendsColSpans.ToonName)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ToonName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.ZoneName, ColumnLabel(_G.ZONE, "WoWFriends:ZoneName"), WoWFriendsColSpans.ZoneName)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
 
-					Tooltip:SetCell(headerLine, WoWFriendsColumns.RealmName, ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
-					Tooltip:SetCellScript(headerLine, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
+				Tooltip:SetCell(headerLine, WoWFriendsColumns.RealmName, ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"), WoWFriendsColSpans.RealmName)
+				Tooltip:SetCellScript(headerLine, WoWFriendsColumns.RealmName, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
 
-					local addedNoteColumn
+				local addedNoteColumn
 
-					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					for index = 1, #PlayerLists.WoWFriends do
-						local player = PlayerLists.WoWFriends[index]
-						local groupIndicator = IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""
-						local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
-						local presenceName = player.PresenceName and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or _G.NOT_APPLICABLE
+				for index = 1, #PlayerLists.WoWFriends do
+					local player = PlayerLists.WoWFriends[index]
+					local groupIndicator = IsGrouped(player.ToonName) and PLAYER_ICON_GROUP or ""
+					local nameColor = CLASS_COLORS[player.Class] or FRIENDS_WOW_NAME_COLOR
+					local presenceName = player.PresenceName and ("%s%s|r"):format(_G.FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName) or _G.NOT_APPLICABLE
 
-						line = Tooltip:AddLine()
-						Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
-						Tooltip:SetCell(line, WoWFriendsColumns.Class, CLASS_ICONS[CLASS_TOKEN_FROM_NAME_FEMALE[player.Class] or CLASS_TOKEN_FROM_NAME_MALE[player.Class]], WoWFriendsColSpans.Class)
-						Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
-						Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
-						Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColorZoneName(player.ZoneName), WoWFriendsColSpans.ZoneName)
-						Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
+					line = Tooltip:AddLine()
+					Tooltip:SetCell(line, WoWFriendsColumns.Level, ColorPlayerLevel(player.Level), WoWFriendsColSpans.Level)
+					Tooltip:SetCell(line, WoWFriendsColumns.Class, CLASS_ICONS[CLASS_TOKEN_FROM_NAME_FEMALE[player.Class] or CLASS_TOKEN_FROM_NAME_MALE[player.Class]], WoWFriendsColSpans.Class)
+					Tooltip:SetCell(line, WoWFriendsColumns.PresenceName, ("%s%s"):format(player.StatusIcon, presenceName), WoWFriendsColSpans.PresenceName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ToonName, ("%s|cff%s%s|r%s"):format(player.FactionIcon or PLAYER_ICON_FACTION, nameColor, player.ToonName, groupIndicator), WoWFriendsColSpans.ToonName)
+					Tooltip:SetCell(line, WoWFriendsColumns.ZoneName, ColorZoneName(player.ZoneName), WoWFriendsColSpans.ZoneName)
+					Tooltip:SetCell(line, WoWFriendsColumns.RealmName, player.RealmName, WoWFriendsColSpans.RealmName)
 
-						if player.PresenceID then
-							Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
-						end
+					if player.PresenceID then
+						Tooltip:SetCellScript(line, WoWFriendsColumns.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
+					end
 
-						if player.IsLocalFriend then
-							Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", WoWFriend_OnMouseUp, player)
-						end
+					if player.IsLocalFriend then
+						Tooltip:SetCellScript(line, WoWFriendsColumns.ToonName, "OnMouseUp", WoWFriend_OnMouseUp, player)
+					end
 
-						if player.Note then
-							local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+					if player.Note then
+						local noteText = _G.FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
 
-							if DB.Tooltip.NotesArrangement.WoWFriends == private.NotesArrangementType.Column then
-								if not addedNoteColumn then
-									Tooltip:SetCell(headerLine, WoWFriendsColumns.Note, ColumnLabel(_G.LABEL_NOTE, "WoWFriends:Note"), WoWFriendsColSpans.Note)
-									Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Note, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Note")
+						if DB.Tooltip.NotesArrangement.WoWFriends == private.NotesArrangementType.Column then
+							if not addedNoteColumn then
+								Tooltip:SetCell(headerLine, WoWFriendsColumns.Note, ColumnLabel(_G.LABEL_NOTE, "WoWFriends:Note"), WoWFriendsColSpans.Note)
+								Tooltip:SetCellScript(headerLine, WoWFriendsColumns.Note, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Note")
 
-									addedNoteColumn = true
-								end
-								Tooltip:SetCell(line, WoWFriendsColumns.Note, noteText, WoWFriendsColSpans.Note)
-							else
-								Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
+								addedNoteColumn = true
 							end
-						end
-
-						if player.BroadcastText then
-							Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, player.BroadcastText, "GameTooltipTextSmall", 0)
+							Tooltip:SetCell(line, WoWFriendsColumns.Note, noteText, WoWFriendsColSpans.Note)
+						else
+							Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, STATUS_ICON_NOTE .. noteText, "GameTooltipTextSmall", 0)
 						end
 					end
 
-					Tooltip:AddLine(" ")
-				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.FRIENDS, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
+					if player.BroadcastText then
+						Tooltip:SetCell(Tooltip:AddLine(), WoWFriendsColumns.Level, player.BroadcastText, "GameTooltipTextSmall", 0)
+					end
 				end
+
+				Tooltip:AddLine(" ")
+			else
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.FRIENDS, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
 			end
+		end
 
-			-- ----------------------------------------------------------------------------
-			-- BattleNet In-Game Friends
-			-- ----------------------------------------------------------------------------
-			if #PlayerLists.BattleNetGames > 0 then
-				local line = Tooltip:AddLine()
+		-- ----------------------------------------------------------------------------
+		-- BattleNet In-Game Friends
+		-- ----------------------------------------------------------------------------
+		if #PlayerLists.BattleNetGames > 0 then
+			local line = Tooltip:AddLine()
 
-				if not DB.Tooltip.CollapsedSections.BattleNetGames then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
+			if not DB.Tooltip.CollapsedSections.BattleNetGames then
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
 
-					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					line = Tooltip:AddLine()
-					Tooltip:SetCell(line, BattleNetColumns.Client, ColumnLabel(COLUMN_ICON_GAME, "BattleNetGames:ClientIndex"))
+				line = Tooltip:AddLine()
+				Tooltip:SetCell(line, BattleNetColumns.Client, ColumnLabel(COLUMN_ICON_GAME, "BattleNetGames:ClientIndex"))
 
-					Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
+				Tooltip:SetCellScript(line, BattleNetColumns.Client, "OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
 
-					RenderBattleNetLines("BattleNetGames", line, DB.Tooltip.NotesArrangement.BattleNetGames)
-				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
-				end
+				RenderBattleNetLines("BattleNetGames", line, DB.Tooltip.NotesArrangement.BattleNetGames)
+			else
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
 			end
+		end
 
-			-- ----------------------------------------------------------------------------
-			-- BattleNet Friends
-			-- ----------------------------------------------------------------------------
-			if #PlayerLists.BattleNetApp > 0 then
-				local line = Tooltip:AddLine()
+		-- ----------------------------------------------------------------------------
+		-- BattleNet Friends
+		-- ----------------------------------------------------------------------------
+		if #PlayerLists.BattleNetApp > 0 then
+			local line = Tooltip:AddLine()
 
-				if not DB.Tooltip.CollapsedSections.BattleNetApp then
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
+			if not DB.Tooltip.CollapsedSections.BattleNetApp then
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
 
-					Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-					RenderBattleNetLines("BattleNetApp", Tooltip:AddLine(), DB.Tooltip.NotesArrangement.BattleNetApp)
-				else
-					Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-					Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
-				end
+				RenderBattleNetLines("BattleNetApp", Tooltip:AddLine(), DB.Tooltip.NotesArrangement.BattleNetApp)
+			else
+				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
 			end
 		end
 
