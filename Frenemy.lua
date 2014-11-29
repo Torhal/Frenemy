@@ -364,7 +364,7 @@ Dialog:Register("FrenemySetGuildMOTD", {
 				self:SetText(_G.GetGuildRosterMOTD())
 			end,
 			auto_focus = true,
-			label = _G.GREEN_FONT_COLOR_CODE .._G.GUILDCONTROL_OPTION9 .. "|r",
+			label = _G.GREEN_FONT_COLOR_CODE .. _G.GUILDCONTROL_OPTION9 .. "|r",
 			max_letters = 128,
 			text = _G.GetGuildRosterMOTD(),
 			width = 200,
