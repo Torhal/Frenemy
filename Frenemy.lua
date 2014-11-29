@@ -323,6 +323,12 @@ local DB_DEFAULTS = {
 				GuildOfficer = private.NotesArrangementType.Row,
 				WoWFriends = private.NotesArrangementType.Row,
 			},
+			SectionDisplayOrders = {
+				"WoWFriends",
+				"BattleNetGames",
+				"BattleNetApp",
+				"Guild",
+			},
 			Scale = 1,
 			Sorting = {
 				BattleNetApp = {
@@ -728,17 +734,102 @@ do
 		DrawTooltip(TooltipAnchor)
 	end
 
-	local function ToggleSectionVisibility(tooltipCell, sectionName)
+	local SectionDropDown = _G.CreateFrame("Frame", FOLDER_NAME .. "SectionDropDown", _G.UIParent, "UIDropDownMenuTemplate")
+	SectionDropDown.displayMode = "MENU"
+	SectionDropDown.info = {}
+	SectionDropDown.levelAdjust = 0
+
+	local function ChangeSectionOrder(self, currentPosition, direction)
+		local sectionEntries = DB.Tooltip.SectionDisplayOrders
+		local newPosition
+
+		currentPosition = tonumber(currentPosition)
+
+		if direction == "up" then
+			newPosition = currentPosition - 1
+		elseif direction == "down" then
+			newPosition = currentPosition + 1
+		end
+
+		if not newPosition then
+			return
+		end
+
+		local evictedEntry = sectionEntries[newPosition]
+		sectionEntries[newPosition] = sectionEntries[currentPosition]
+		sectionEntries[currentPosition] = evictedEntry
+		DrawTooltip(TooltipAnchor)
+	end
+
+	local function ToggleSectionVisibility(self, sectionName)
 		DB.Tooltip.CollapsedSections[sectionName] = not DB.Tooltip.CollapsedSections[sectionName]
 		DrawTooltip(TooltipAnchor)
 	end
 
-	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, button)
+	local function InitializeSectionDropDown(self, level)
+		if not level then
+			return
+		end
+		local info = SectionDropDown.info
+		table.wipe(info)
+
+		if level == 1 then
+			local sectionName = _G.UIDROPDOWNMENU_MENU_VALUE
+
+			info.arg1 = sectionName
+			info.func  = ToggleSectionVisibility
+			info.notCheckable = true
+			info.text = DB.Tooltip.CollapsedSections[sectionName] and L.EXPAND_SECTION or L.COLLAPSE_SECTION
+			_G.UIDropDownMenu_AddButton(info, level)
+
+			local currentPosition
+
+			for index = 1, #DB.Tooltip.SectionDisplayOrders do
+				if DB.Tooltip.SectionDisplayOrders[index] == sectionName then
+					currentPosition = index
+					break
+				end
+			end
+
+			if not currentPosition then
+				return
+			end
+
+			info.arg1 = currentPosition
+			info.func = ChangeSectionOrder
+
+			if currentPosition ~= 1 then
+				info.arg2 = "up"
+				info.text = L.MOVE_SECTION_UP
+				_G.UIDropDownMenu_AddButton(info, level)
+			end
+
+			if currentPosition ~= #DB.Tooltip.SectionDisplayOrders then
+				info.arg2 = "down"
+				info.text = L.MOVE_SECTION_DOWN
+				_G.UIDropDownMenu_AddButton(info, level)
+			end
+		end
+	end
+	SectionDropDown.initialize = InitializeSectionDropDown
+
+	local function SectionTitle_OnMouseUp(tooltipCell, sectionName, mouseButton)
+		if mouseButton == "RightButton" then
+			Tooltip:SetFrameStrata("DIALOG")
+			_G.CloseDropDownMenus()
+			_G.ToggleDropDownMenu(1, sectionName, SectionDropDown, "cursor")
+			return
+		end
+
+		ToggleSectionVisibility(nil, sectionName)
+	end
+
+	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, mouseButton)
 		_G.PlaySound("igMainMenuOptionCheckBoxOn")
 
 		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
 
-		if button == "LeftButton" then
+		if mouseButton == "LeftButton" then
 			if _G.IsAltKeyDown() then
 				_G.InviteToGroup(playerName)
 			elseif _G.IsControlKeyDown() then
@@ -747,7 +838,7 @@ do
 			else
 				_G.ChatFrame_SendTell(playerName)
 			end
-		elseif button == "RightButton" then
+		elseif mouseButton == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.CloseDropDownMenus()
 			_G.FriendsFrame_ShowDropdown(playerEntry.FullToonName, true, nil, nil, nil, true)
@@ -878,42 +969,16 @@ do
 	TitleFont:SetTextColor(0.510, 0.773, 1.0)
 	TitleFont:SetFontObject("QuestTitleFont")
 
-	function DrawTooltip(anchorFrame)
-		if not anchorFrame then
-			return
-		end
-
-		TooltipAnchor = anchorFrame
-		GenerateTooltipData()
-
-		if not Tooltip then
-			Tooltip = LibQTip:Acquire(FOLDER_NAME, NUM_TOOLTIP_COLUMNS)
-			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
-			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
-			Tooltip:SetScale(DB.Tooltip.Scale)
-			Tooltip:SmartAnchorTo(anchorFrame)
-			Tooltip:SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
-			Tooltip:SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
-
-			Tooltip.OnRelease = Tooltip_OnRelease
-		end
-
-		Tooltip:Clear()
-		Tooltip:SetCellMarginH(0)
-		Tooltip:SetCellMarginV(1)
-
-		Tooltip:SetCell(Tooltip:AddLine(), 1, FOLDER_NAME, TitleFont, "CENTER", 0)
-		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
-
-		-- ----------------------------------------------------------------------------
-		-- WoW Friends
-		-- ----------------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
+	-- WoW Friends
+	-- ----------------------------------------------------------------------------
+	local function DisplaySectionWoWFriends()
 		if #PlayerLists.WoWFriends > 0 then
 			local line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.WoWFriends then
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.FRIENDS, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "WoWFriends")
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -987,19 +1052,21 @@ do
 				Tooltip:AddLine(" ")
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.FRIENDS, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "WoWFriends")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "WoWFriends")
 			end
 		end
+	end
 
-		-- ----------------------------------------------------------------------------
-		-- BattleNet In-Game Friends
-		-- ----------------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
+	-- BattleNet In-Game Friends
+	-- ----------------------------------------------------------------------------
+	local function DisplaySectionBattleNetGames()
 		if #PlayerLists.BattleNetGames > 0 then
 			local line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.BattleNetGames then
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "BattleNetGames")
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -1011,40 +1078,45 @@ do
 				RenderBattleNetLines("BattleNetGames", line, DB.Tooltip.NotesArrangement.BattleNetGames)
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, ("%s %s"):format(_G.BATTLENET_OPTIONS_LABEL, _G.PARENS_TEMPLATE:format(_G.GAME)), SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetGames")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "BattleNetGames")
 			end
 		end
+	end
 
-		-- ----------------------------------------------------------------------------
-		-- BattleNet Friends
-		-- ----------------------------------------------------------------------------
+	-- ----------------------------------------------------------------------------
+	-- BattleNet Friends
+	-- ----------------------------------------------------------------------------
+	local function DisplaySectionBattleNetApp()
 		if #PlayerLists.BattleNetApp > 0 then
 			local line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.BattleNetApp then
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_ENABLED), _G.GameFontNormal, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "BattleNetApp")
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
 				RenderBattleNetLines("BattleNetApp", Tooltip:AddLine(), DB.Tooltip.NotesArrangement.BattleNetApp)
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.BATTLENET_OPTIONS_LABEL, SECTION_ICON_DISABLED), _G.GameFontDisable, "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "BattleNetApp")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "BattleNetApp")
 			end
 		end
+	end
 
-		-- ----------------------------------------------------------------------------
-		-- Guild
-		-- ----------------------------------------------------------------------------
-		local guildMOTD
+	-- ----------------------------------------------------------------------------
+	-- Guild
+	-- ----------------------------------------------------------------------------
+	local GuildMOTDText
+	local GuildMOTDLine
 
+	local function DisplaySectionGuild()
 		if #PlayerLists.Guild > 0 then
 			local line = Tooltip:AddLine()
 
 			if not DB.Tooltip.CollapsedSections.Guild then
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_ENABLED, _G.GetGuildInfo("player"), SECTION_ICON_ENABLED), "GameFontNormal", "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "Guild")
 
 				Tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -1119,27 +1191,69 @@ do
 						end
 					end
 				end
+				GuildMOTDText = _G.GetGuildRosterMOTD()
 
-				guildMOTD = _G.GetGuildRosterMOTD()
+				if GuildMOTDText and GuildMOTDText ~= "" then
+					GuildMOTDLine = Tooltip:AddLine()
+
+					if _G.CanEditMOTD() then
+						Tooltip:SetCellScript(GuildMOTDLine, 1, "OnMouseUp", GuildMOTD_OnMouseUp)
+					end
+
+					Tooltip:AddLine(" ")
+				end
 			else
 				Tooltip:SetCell(line, 1, ("%s%s%s"):format(SECTION_ICON_DISABLED, _G.GetGuildInfo("player"), SECTION_ICON_DISABLED), "GameFontDisable", "CENTER", 0)
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", ToggleSectionVisibility, "Guild")
+				Tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "Guild")
 			end
+		end
+	end
 
-			Tooltip:AddLine(" ")
+	local SECTION_NAME_TO_DISPLAY_FUNCTION = {
+		WoWFriends = DisplaySectionWoWFriends,
+		BattleNetGames = DisplaySectionBattleNetGames,
+		BattleNetApp = DisplaySectionBattleNetApp,
+		Guild = DisplaySectionGuild,
+	}
+
+	function DrawTooltip(anchorFrame)
+		if not anchorFrame then
+			return
 		end
 
+		TooltipAnchor = anchorFrame
+		GenerateTooltipData()
+
+		if not Tooltip then
+			Tooltip = LibQTip:Acquire(FOLDER_NAME, NUM_TOOLTIP_COLUMNS)
+			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
+			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
+			Tooltip:SetScale(DB.Tooltip.Scale)
+			Tooltip:SmartAnchorTo(anchorFrame)
+			Tooltip:SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
+			Tooltip:SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
+
+			Tooltip.OnRelease = Tooltip_OnRelease
+		end
+
+		Tooltip:Clear()
+		Tooltip:SetCellMarginH(0)
+		Tooltip:SetCellMarginV(1)
+
+		Tooltip:SetCell(Tooltip:AddLine(), 1, FOLDER_NAME, TitleFont, "CENTER", 0)
+		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
+
+		GuildMOTDLine = nil
+		GuildMOTDText = nil
+
+		for index = 1, #DB.Tooltip.SectionDisplayOrders do
+			SECTION_NAME_TO_DISPLAY_FUNCTION[DB.Tooltip.SectionDisplayOrders[index]]()
+		end
 		Tooltip:Show()
 
-		if guildMOTD and guildMOTD ~= "" then
-			local line = Tooltip:AddLine()
-			Tooltip:SetCell(line, 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. guildMOTD .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
-
-			if _G.CanEditMOTD() then
-				Tooltip:SetCellScript(line, 1, "OnMouseUp", GuildMOTD_OnMouseUp)
-			end
-
-			Tooltip:AddLine(" ")
+		-- This must be done after everything else has been added to the tooltip in order to have an accurate width.
+		if GuildMOTDLine and GuildMOTDText then
+			Tooltip:SetCell(GuildMOTDLine, 1, _G.GUILD_MOTD_TEMPLATE:format(_G.GREEN_FONT_COLOR_CODE .. GuildMOTDText .. "|r"), 0, 0, 0, Tooltip:GetWidth() - 20)
 		end
 
 		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
