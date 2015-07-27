@@ -563,13 +563,7 @@ do
 
 				for toonIndex = 1, numToons do
 					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendToonInfo(battleNetIndex, toonIndex)
-
-					local characterName = toonName
-					if presenceName then
-						characterName = characterName or battleTag
-					end
-					characterName = characterName or _G.UNKNOWN
-
+					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
 					local entry = {
 						BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
 						Class = class,
