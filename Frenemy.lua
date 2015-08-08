@@ -397,7 +397,7 @@ local function ColorPlayerLevel(level)
 end
 
 local function ColorZoneName(zoneName)
-	local color = ZoneColorsByName[zoneName] or _G.GRAY_FONT_COLOR
+	local color = ZoneColorsByName[zoneName:gsub(" %b()", "")] or _G.GRAY_FONT_COLOR
 	return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName or _G.UNKNOWN)
 end
 
