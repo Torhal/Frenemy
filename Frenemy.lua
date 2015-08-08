@@ -604,17 +604,18 @@ do
 
 		if _G.IsInGuild() then
 			for index = 1, _G.GetNumGuildMembers() do
-				local fullToonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, status, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
+				local fullToonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, awayStatus, _, _, _, isMobile = _G.GetGuildRosterInfo(index)
 
 				if isOnline or isMobile then
 					local toonName, realmName = ("-"):split(fullToonName)
 
-					if status == 0 then
-						status = isMobile and STATUS_ICON_MOBILE_ONLINE or STATUS_ICON_ONLINE
-					elseif status == 1 then
-						status = isMobile and STATUS_ICON_MOBILE_AWAY or STATUS_ICON_AFK
-					elseif status == 2 then
-						status = isMobile and STATUS_ICON_MOBILE_BUSY or STATUS_ICON_DND
+					local statusIcon
+					if awayStatus == 0 then
+						statusIcon = isOnline and STATUS_ICON_ONLINE or STATUS_ICON_MOBILE_ONLINE
+					elseif awayStatus == 1 then
+						statusIcon = isOnline and STATUS_ICON_AFK or STATUS_ICON_MOBILE_AWAY
+					elseif awayStatus == 2 then
+						statusIcon = isOnline and STATUS_ICON_DND or STATUS_ICON_MOBILE_BUSY
 					end
 
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
@@ -636,7 +637,7 @@ do
 						Rank = rank,
 						RankIndex = rankIndex,
 						RealmName = realmName or PLAYER_REALM,
-						StatusIcon = status,
+						StatusIcon = statusIcon,
 						ToonName = toonName,
 						ZoneName = isMobile and (isOnline and ("%s %s"):format(zoneName, _G.PARENS_TEMPLATE:format(_G.REMOTE_CHAT)) or _G.REMOTE_CHAT) or zoneName,
 					})
