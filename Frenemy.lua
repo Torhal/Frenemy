@@ -21,6 +21,7 @@ local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale(FOLDER_NAME)
 local Dialog = LibStub("LibDialog-1.0")
+local HereBeDragons = LibStub("HereBeDragons-1.0")
 local LibQTip = LibStub('LibQTip-1.0')
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
@@ -1337,40 +1338,18 @@ local MICRO_DUNGEON_IDS = {
 }
 
 function Frenemy:HandleZoneChange(eventName)
-	local in_instance = _G.IsInInstance()
-
 	if private.inCombat then
 		private.needsAreaID = true
 		return
 	end
-	local mapZoneID = _G.GetCurrentMapAreaID()
 
-	local worldMapFrame = _G.WorldMapFrame
-	local mapIsVisible = worldMapFrame:IsVisible()
-	local SFXValue = tonumber(_G.GetCVar("Sound_EnableSFX"))
-
-	if not mapIsVisible then
-		_G.SetCVar("Sound_EnableSFX", 0)
-		worldMapFrame:Show()
-	end
-	local _, _, _, _, microDungeonMapName = _G.GetMapInfo()
-	local microDungeonID = MICRO_DUNGEON_IDS[microDungeonMapName]
-
-	_G.SetMapToCurrentZone()
-
+	local mapZoneID = HereBeDragons:GetPlayerZone()
 	local needDisplayUpdate = CurrentZoneID ~= mapZoneID
-	CurrentZoneID = microDungeonID or mapZoneID
+	CurrentZoneID = mapZoneID
 
-	if mapIsVisible then
-		_G.SetMapByID(mapZoneID)
-	else
-		worldMapFrame:Hide()
-		_G.SetCVar("Sound_EnableSFX", SFXValue)
-	end
+	if CurrentZoneID and CurrentZoneID > 0 then
+		local pvpType, _, factionName = _G.GetZonePVPInfo()
 
-	local pvpType, _, factionName = _G.GetZonePVPInfo()
-
-	if CurrentZoneID and CurrentZoneID >= 1 then
 		if pvpType == "hostile" or pvpType == "friendly" then
 			pvpType = factionName
 		elseif not pvpType or pvpType == "" then
