@@ -560,10 +560,10 @@ do
 		if OnlineBattleNetCount > 0 then
 			for battleNetIndex = 1, OnlineBattleNetCount do
 				local presenceID, presenceName, battleTag, isBattleTagPresence, _, toonID, client, isOnline, _, isAFK, isDND, broadcastText, noteText, isRIDFriend, broadcastTime = _G.BNGetFriendInfo(battleNetIndex)
-				local numToons = _G.BNGetNumFriendToons(battleNetIndex)
+				local numToons = _G.BNGetNumFriendGameAccounts(battleNetIndex)
 
 				for toonIndex = 1, numToons do
-					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendToonInfo(battleNetIndex, toonIndex)
+					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
 					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
 					local entry = {
 						BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
