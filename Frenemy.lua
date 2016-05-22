@@ -200,13 +200,13 @@ local HelpTip
 local Tooltip
 
 -- Statistics: Populated and maintained in UpdateStatistics()
-local OnlineBattleNetCount
-local OnlineFriendsCount
-local OnlineGuildMembersCount
+local OnlineBattleNetCount = 0
+local OnlineFriendsCount = 0
+local OnlineGuildMembersCount = 0
 
-local TotalBattleNetCount
-local TotalFriendsCount
-local TotalGuildMembersCount
+local TotalBattleNetCount = 0
+local TotalFriendsCount = 0
+local TotalGuildMembersCount = 0
 
 -- Zone data
 local CurrentZoneID
