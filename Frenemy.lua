@@ -518,6 +518,7 @@ do
 	local TooltipAnchor
 
 	-- Used to handle duplication between in-game and RealID friends.
+	local OnlineFriendsByPresenceName = {}
 	local OnlineFriendsByName = {}
 	local GuildMemberIndexByName = {}
 	local WoWFriendIndexByName = {}
@@ -529,7 +530,9 @@ do
 		for name, data in pairs(PlayerLists) do
 			table.wipe(data)
 		end
+
 		table.wipe(OnlineFriendsByName)
+		table.wipe(OnlineFriendsByPresenceName)
 		table.wipe(GuildMemberIndexByName)
 		table.wipe(WoWFriendIndexByName)
 
@@ -541,20 +544,22 @@ do
 				WoWFriendIndexByName[fullToonName] = friendIndex
 				WoWFriendIndexByName[toonName] = friendIndex
 
-				local entry = {
-					Class = class,
-					FullToonName = fullToonName,
-					IsLocalFriend = true,
-					Level = level,
-					Note = note,
-					RealmName = realmName or PLAYER_REALM,
-					StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
-					ToonName = toonName,
-					ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
-				}
+				if not OnlineFriendsByName[toonName] then
+					local entry = {
+						Class = class,
+						FullToonName = fullToonName,
+						IsLocalFriend = true,
+						Level = level,
+						Note = note,
+						RealmName = realmName or PLAYER_REALM,
+						StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
+						ToonName = toonName,
+						ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
+					}
 
-				OnlineFriendsByName[toonName] = entry
-				table.insert(PlayerLists.WoWFriends, entry)
+					table.insert(PlayerLists.WoWFriends, entry)
+					OnlineFriendsByName[toonName] = entry
+				end
 			end
 		end
 
@@ -592,13 +597,18 @@ do
 									existingFriend[key] = value
 								end
 							end
-						else
+						elseif not OnlineFriendsByPresenceName[entry.PresenceName] then
 							table.insert(PlayerLists.WoWFriends, entry)
+							OnlineFriendsByPresenceName[entry.PresenceName] = entry
 						end
-					elseif client == _G.BNET_CLIENT_APP or client == _G.BNET_CLIENT_CLNT then
-						table.insert(PlayerLists.BattleNetApp, entry)
-					elseif toonID then
-						table.insert(PlayerLists.BattleNetGames, entry)
+					elseif not OnlineFriendsByPresenceName[entry.PresenceName] then
+						if client == _G.BNET_CLIENT_APP or client == _G.BNET_CLIENT_CLNT then
+							table.insert(PlayerLists.BattleNetApp, entry)
+							OnlineFriendsByPresenceName[entry.PresenceName] = entry
+						elseif toonID then
+							table.insert(PlayerLists.BattleNetGames, entry)
+							OnlineFriendsByPresenceName[entry.PresenceName] = entry
+						end
 					end
 				end
 			end
