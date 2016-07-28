@@ -651,7 +651,7 @@ do
 						RealmName = realmName or PLAYER_REALM,
 						StatusIcon = statusIcon,
 						ToonName = toonName,
-						ZoneName = isMobile and (isOnline and ("%s %s"):format(zoneName, _G.PARENS_TEMPLATE:format(_G.REMOTE_CHAT)) or _G.REMOTE_CHAT) or (zoneName or _G.UNKNOWN),
+						ZoneName = isMobile and (isOnline and ("%s %s"):format(zoneName or _G.UNKNOWN, _G.PARENS_TEMPLATE:format(_G.REMOTE_CHAT)) or _G.REMOTE_CHAT) or (zoneName or _G.UNKNOWN),
 					})
 				end
 			end
