@@ -11,12 +11,12 @@
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: Delayed
 
+# Special snowflake.
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
 #@no-lib-strip@
 embeds.xml
 #@end-no-lib-strip@
-
-# Special snowflake.
-Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 locale.xml
 
