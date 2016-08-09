@@ -106,44 +106,11 @@ local CLASS_ICONS = {}
 do
 	local textureFormat = [[|TInterface\TargetingFrame\UI-CLASSES-CIRCLES:0:0:0:0:256:256:%d:%d:%d:%d|t]]
 	local textureSize = 256
-	local increment = 64
-	local left = 0
-	local right = increment
-	local top = 0
-	local bottom = increment
 
-	-- This is the order in which the icons appear in the UI-CLASSES-CIRCLES image.
-	local CLASS_ICON_SORT_ORDER = {
-		"WARRIOR",
-		"MAGE",
-		"ROGUE",
-		"DRUID",
-		"HUNTER",
-		"SHAMAN",
-		"PRIEST",
-		"WARLOCK",
-		"PALADIN",
-		"DEATHKNIGHT",
-		"MONK",
-	}
-
-	for index = 1, #CLASS_ICON_SORT_ORDER do
-		local class_name = CLASS_ICON_SORT_ORDER[index]
-		CLASS_ICONS[class_name] = textureFormat:format(left, right, top, bottom)
-
-		if bottom == textureSize then
-			break
-		end
-
-		if right == textureSize then
-			left = 0
-			right = increment
-			top = top + increment
-			bottom = bottom + increment
-		else
-			left = left + increment
-			right = right + increment
-		end
+	for index = 1, #_G.CLASS_SORT_ORDER do
+		local className = _G.CLASS_SORT_ORDER[index]
+		local left, right, top, bottom = _G.unpack(_G.CLASS_ICON_TCOORDS[className])
+		CLASS_ICONS[className] = textureFormat:format(left * textureSize, right * textureSize, top * textureSize, bottom * textureSize)
 	end
 end
 
