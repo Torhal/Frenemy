@@ -1201,6 +1201,8 @@ do
 				GuildMOTDText = _G.GetGuildRosterMOTD()
 
 				if GuildMOTDText and GuildMOTDText ~= "" then
+					Tooltip:AddLine(" ")
+
 					GuildMOTDLine = Tooltip:AddLine()
 
 					if _G.CanEditMOTD() then
