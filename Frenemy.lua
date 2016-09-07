@@ -1,36 +1,66 @@
 -- ----------------------------------------------------------------------------
 -- Localized Lua globals.
 -- ----------------------------------------------------------------------------
-local _G = getfenv(0)
-
+-- Libraries
 local math = _G.math
 local string = _G.string
 local table = _G.table
 
+-- Functions
 local pairs = _G.pairs
 local tonumber = _G.tonumber
+local time = _G.time
 local type = _G.type
 
 -- ----------------------------------------------------------------------------
 -- AddOn namespace.
 -- ----------------------------------------------------------------------------
-local FOLDER_NAME, private = ...
+local AddOnFolderName, private = ...
 
 local LibStub = _G.LibStub
-local Frenemy = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
+local Frenemy = LibStub("AceAddon-3.0"):NewAddon(AddOnFolderName, "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 
-local L = LibStub("AceLocale-3.0"):GetLocale(FOLDER_NAME)
+local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 local Dialog = LibStub("LibDialog-1.0")
 local HereBeDragons = LibStub("HereBeDragons-1.0")
 local LibQTip = LibStub('LibQTip-1.0')
 
-local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
+local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(AddOnFolderName, {
 	icon = [[Interface\Calendar\MeetingIcon]],
 	text = " ",
 	type = "data source",
 })
 
-local RequestUpdater = _G.CreateFrame("Frame")
+-- ----------------------------------------------------------------------------
+-- Debugger.
+-- ----------------------------------------------------------------------------
+do
+	local TextDump = LibStub("LibTextDump-1.0")
+
+	local DEBUGGER_WIDTH = 750
+	local DEBUGGER_HEIGHT = 800
+
+	local debugger
+
+	function private.Debug(...)
+		if not debugger then
+			debugger = TextDump:New(("%s Debug Output"):format(AddOnFolderName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
+		end
+
+		local message = string.format(...)
+		debugger:AddLine(message, "%X")
+
+		return message
+	end
+
+	function private.GetDebugger()
+		if not debugger then
+			debugger = TextDump:New(("%s Debug Output"):format(AddOnFolderName), DEBUGGER_WIDTH, DEBUGGER_HEIGHT)
+		end
+
+		return debugger
+	end
+end
 
 -- ----------------------------------------------------------------------------
 -- Constants
@@ -350,7 +380,7 @@ Dialog:Register("FrenemySetGuildMOTD", {
 	icon = [[Interface\Calendar\MeetingIcon]],
 	width = 400,
 	on_show = function(self, text)
-		self.text:SetFormattedText("%s%s|r", _G.BATTLENET_FONT_COLOR_CODE, FOLDER_NAME)
+		self.text:SetFormattedText("%s%s|r", _G.BATTLENET_FONT_COLOR_CODE, AddOnFolderName)
 	end
 })
 
@@ -708,7 +738,7 @@ do
 		DrawTooltip(TooltipAnchor)
 	end
 
-	local SectionDropDown = _G.CreateFrame("Frame", FOLDER_NAME .. "SectionDropDown", _G.UIParent, "UIDropDownMenuTemplate")
+	local SectionDropDown = _G.CreateFrame("Frame", AddOnFolderName .. "SectionDropDown", _G.UIParent, "UIDropDownMenuTemplate")
 	SectionDropDown.displayMode = "MENU"
 	SectionDropDown.info = {}
 	SectionDropDown.levelAdjust = 0
@@ -842,7 +872,7 @@ do
 	end
 
 	local function ShowHelpTip(tooltipCell)
-		local helpTip = LibQTip:Acquire(FOLDER_NAME .. "HelpTip", 2)
+		local helpTip = LibQTip:Acquire(AddOnFolderName .. "HelpTip", 2)
 		helpTip:SetAutoHideDelay(0.1, tooltipCell)
 		helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
 		helpTip:SetScale(DB.Tooltip.Scale)
@@ -1201,7 +1231,7 @@ do
 		GenerateTooltipData()
 
 		if not Tooltip then
-			Tooltip = LibQTip:Acquire(FOLDER_NAME, NUM_TOOLTIP_COLUMNS)
+			Tooltip = LibQTip:Acquire(AddOnFolderName, NUM_TOOLTIP_COLUMNS)
 			Tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
 			Tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
 			Tooltip:SetScale(DB.Tooltip.Scale)
@@ -1216,7 +1246,7 @@ do
 		Tooltip:SetCellMarginH(0)
 		Tooltip:SetCellMarginV(1)
 
-		Tooltip:SetCell(Tooltip:AddLine(), 1, FOLDER_NAME, TitleFont, "CENTER", 0)
+		Tooltip:SetCell(Tooltip:AddLine(), 1, AddOnFolderName, TitleFont, "CENTER", 0)
 		Tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
 		GuildMOTDLine = nil
@@ -1280,21 +1310,6 @@ end
 -- ----------------------------------------------------------------------------
 -- Events.
 -- ----------------------------------------------------------------------------
-local function UpdateAndDisplay()
-	UpdateStatistics()
-	DataObject:UpdateDisplay()
-
-	if Tooltip and Tooltip:IsShown() then
-		DrawTooltip(DataObject)
-	end
-end
-
-Frenemy.BN_TOON_NAME_UPDATED = UpdateAndDisplay
-Frenemy.BN_FRIEND_INFO_CHANGED = UpdateAndDisplay
-Frenemy.FRIENDLIST_UPDATE = UpdateAndDisplay
-Frenemy.GUILD_RANKS_UPDATE = UpdateAndDisplay
-Frenemy.GUILD_ROSTER_UPDATE = UpdateAndDisplay
-
 function Frenemy:PLAYER_REGEN_DISABLED(eventName)
 	private.inCombat = true
 end
@@ -1341,7 +1356,7 @@ function Frenemy:HandleZoneChange(eventName)
 		SetZoneNameColors(CurrentZoneID, zonePVPStatus)
 
 		if needDisplayUpdate then
-			UpdateAndDisplay()
+			self:UpdateData()
 		end
 	end
 end
@@ -1349,15 +1364,6 @@ end
 -- ----------------------------------------------------------------------------
 -- Framework.
 -- ----------------------------------------------------------------------------
-local function CreateUpdater(parent_frame, interval, loop_func)
-	local updater = parent_frame:CreateAnimationGroup()
-	updater:CreateAnimation("Animation"):SetDuration(interval)
-	updater:SetScript("OnLoop", loop_func)
-	updater:SetLooping("REPEAT")
-
-	return updater
-end
-
 local function RequestUpdates()
 	_G.ShowFriends()
 
@@ -1367,33 +1373,96 @@ local function RequestUpdates()
 end
 
 function Frenemy:OnEnable()
-	self:RegisterEvent("BN_FRIEND_INFO_CHANGED")
-	self:RegisterEvent("BN_TOON_NAME_UPDATED")
-	self:RegisterEvent("FRIENDLIST_UPDATE")
-	self:RegisterEvent("GUILD_RANKS_UPDATE")
-	self:RegisterEvent("GUILD_ROSTER_UPDATE")
+	self:RegisterBucketEvent({
+		"BN_FRIEND_INFO_CHANGED",
+		"BN_TOON_NAME_UPDATED",
+		"FRIENDLIST_UPDATE",
+		"GUILD_RANKS_UPDATE",
+		"GUILD_ROSTER_UPDATE",
+	}, 1, "UpdateData")
+
 	self:RegisterEvent("ZONE_CHANGED", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_INDOORS", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "HandleZoneChange")
 
 	self:HandleZoneChange("OnEnable")
+	self:ScheduleRepeatingTimer(RequestUpdates, REQUEST_UPDATE_INTERVAL)
 
 	RequestUpdates()
-	self.RequestUpdater = CreateUpdater(RequestUpdater, REQUEST_UPDATE_INTERVAL, RequestUpdates)
-	self.RequestUpdater:Play()
 end
 
 function Frenemy:OnInitialize()
-	DB = LibStub("AceDB-3.0"):New(FOLDER_NAME .. "DB", DB_DEFAULTS, true).global
+	DB = LibStub("AceDB-3.0"):New(AddOnFolderName .. "DB", DB_DEFAULTS, true).global
 	private.DB = DB
 
 	local LDBIcon = LibStub("LibDBIcon-1.0")
 	if LDBIcon then
-		LDBIcon:Register(FOLDER_NAME, DataObject, DB.DataObject.MinimapIcon)
+		LDBIcon:Register(AddOnFolderName, DataObject, DB.DataObject.MinimapIcon)
 	end
+
 	private.SetupOptions()
+	self:RegisterChatCommand("frenemy", "ChatCommand")
 
 	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
 		SetZoneNameColors(zoneID, zonePVPStatus)
 	end
 end
+
+do
+	local UPDATE_DISPLAY_THROTTLE_INTERVAL_SECONDS = 5
+	local lastUpdateTime = time()
+
+	function Frenemy:UpdateData()
+		UpdateStatistics()
+		DataObject:UpdateDisplay()
+
+		if Tooltip and Tooltip:IsShown() then
+			local now = time()
+
+			if now > lastUpdateTime + UPDATE_DISPLAY_THROTTLE_INTERVAL_SECONDS then
+				lastUpdateTime = now
+
+				DrawTooltip(DataObject)
+			end
+		end
+	end
+end
+
+do
+	local SUBCOMMAND_FUNCS = {
+		--@debug@
+		DEBUG = function()
+			local debugger = private.GetDebugger()
+
+			if debugger:Lines() == 0 then
+				debugger:AddLine("Nothing to report.")
+				debugger:Display()
+				debugger:Clear()
+				return
+			end
+
+			debugger:Display()
+		end,
+		--@end-debug@
+	}
+
+	function Frenemy:ChatCommand(input)
+		local subcommand, arguments = self:GetArgs(input, 2)
+
+		if subcommand then
+			local func = SUBCOMMAND_FUNCS[subcommand:upper()]
+
+			if func then
+				func(arguments or "")
+			end
+		else
+			local optionsFrame = _G.InterfaceOptionsFrame
+
+			if optionsFrame:IsVisible() then
+				optionsFrame:Hide()
+			else
+				_G.InterfaceOptionsFrame_OpenToCategory(self.OptionsFrame)
+			end
+		end
+	end
+end -- do-block
