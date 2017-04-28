@@ -1,4 +1,4 @@
-## Interface: 70100
+## Interface: 70200
 ## Title: Frenemy
 ## Notes: A customizable view of friends and guildmates.
 ## Author: Torhal
