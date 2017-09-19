@@ -781,7 +781,7 @@ do
 			local sectionName = _G.UIDROPDOWNMENU_MENU_VALUE
 
 			info.arg1 = sectionName
-			info.func  = ToggleSectionVisibility
+			info.func = ToggleSectionVisibility
 			info.notCheckable = true
 			info.text = DB.Tooltip.CollapsedSections[sectionName] and L.EXPAND_SECTION or L.COLLAPSE_SECTION
 			_G.UIDropDownMenu_AddButton(info, level)
@@ -815,6 +815,7 @@ do
 			end
 		end
 	end
+
 	SectionDropDown.initialize = InitializeSectionDropDown
 
 	local function SectionTitle_OnMouseUp(tooltipCell, sectionName, mouseButton)
