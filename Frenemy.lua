@@ -1297,12 +1297,12 @@ function DataObject.OnLeave()
 	-- Null operation: Some LDB displays get cranky if this method is missing.
 end
 
+
 function DataObject:UpdateDisplay()
-	local output = ("%s%s: %d|r, "):format(_G.NORMAL_FONT_COLOR_CODE, _G.FRIENDS, OnlineFriendsCount)
-	output = ("%s%s%s: %d|r"):format(output, _G.BATTLENET_FONT_COLOR_CODE, _G.BATTLENET_FRIEND, OnlineBattleNetCount)
+	local output = ("%s: %s%d/%d|r"):format(_G.FRIENDS, _G.BATTLENET_FONT_COLOR_CODE, OnlineFriendsCount + OnlineBattleNetCount, TotalFriendsCount + TotalBattleNetCount)
 
 	if _G.IsInGuild() then
-		output = ("%s, %s%s: %d|r"):format(output, _G.GREEN_FONT_COLOR_CODE, _G.GUILD, OnlineGuildMembersCount)
+		output = ("%s %s: %s%d/%d|r"):format(output, _G.GUILD, _G.GREEN_FONT_COLOR_CODE, OnlineGuildMembersCount, TotalGuildMembersCount)
 	end
 
 	self.text = output
