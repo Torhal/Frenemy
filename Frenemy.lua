@@ -569,7 +569,7 @@ do
 					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
 					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
 					local entry = {
-						BroadcastText = (broadcastText and broadcastText ~= "") and BROADCAST_ICON .. _G.FRIENDS_OTHER_NAME_COLOR_CODE .. broadcastText .. "|r" or nil,
+						BroadcastText = (broadcastText and broadcastText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, broadcastText, _G.SecondsToTime(time() - broadcastTime, false, true, 1)) or nil,
 						Class = class,
 						Client = client,
 						ClientIndex = CLIENT_SORT_ORDERS[client],
