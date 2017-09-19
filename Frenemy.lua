@@ -664,7 +664,7 @@ do
 	-- Controls
 	-- ----------------------------------------------------------------------------
 	local function BattleNetFriend_OnMouseUp(tooltipCell, playerEntry, button)
-		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() and playerEntry.RealmName == PLAYER_REALM then
@@ -687,7 +687,7 @@ do
 			_G.LoadAddOn("Blizzard_GuildUI")
 		end
 
-		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
 
@@ -829,7 +829,7 @@ do
 	end
 
 	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, mouseButton)
-		_G.PlaySound("igMainMenuOptionCheckBoxOn")
+		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
 
