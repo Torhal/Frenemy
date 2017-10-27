@@ -65,6 +65,8 @@ end
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
+local BNET_MOBILE = "BSAp"
+
 local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_WOW] = 1,
 	[_G.BNET_CLIENT_SC2] = 2,
@@ -76,6 +78,13 @@ local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_DESTINY2] = 8,
 	[_G.BNET_CLIENT_CLNT] = 9,
 	[_G.BNET_CLIENT_APP] = 10,
+	[BNET_MOBILE] = 11,
+}
+
+local NON_GAME_CLIENT = {
+	[_G.BNET_CLIENT_CLNT] = true,
+	[_G.BNET_CLIENT_APP] = true,
+	[BNET_MOBILE] = true,
 }
 
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
@@ -601,13 +610,13 @@ do
 							OnlineFriendsByPresenceName[entry.PresenceName] = entry
 						end
 					elseif not OnlineFriendsByPresenceName[entry.PresenceName] then
-						if client == _G.BNET_CLIENT_APP or client == _G.BNET_CLIENT_CLNT then
+						if NON_GAME_CLIENT[client] then
 							table.insert(PlayerLists.BattleNetApp, entry)
-							OnlineFriendsByPresenceName[entry.PresenceName] = entry
 						elseif toonID then
 							table.insert(PlayerLists.BattleNetGames, entry)
-							OnlineFriendsByPresenceName[entry.PresenceName] = entry
 						end
+
+						OnlineFriendsByPresenceName[entry.PresenceName] = entry
 					end
 				end
 			end
