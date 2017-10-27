@@ -65,7 +65,7 @@ end
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
-local BNET_MOBILE = "BSAp"
+local BNET_CLIENT_MOBILE = "BSAp"
 
 local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_WOW] = 1,
@@ -78,13 +78,13 @@ local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_DESTINY2] = 8,
 	[_G.BNET_CLIENT_CLNT] = 9,
 	[_G.BNET_CLIENT_APP] = 10,
-	[BNET_MOBILE] = 11,
+	[BNET_CLIENT_MOBILE] = 11,
 }
 
 local NON_GAME_CLIENT = {
 	[_G.BNET_CLIENT_CLNT] = true,
 	[_G.BNET_CLIENT_APP] = true,
-	[BNET_MOBILE] = true,
+	[BNET_CLIENT_MOBILE] = true,
 }
 
 local FRIENDS_WOW_NAME_COLOR = _G.FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
