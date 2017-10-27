@@ -177,14 +177,17 @@ local COLUMN_ICON_GAME = CreateIcon([[Interface\Buttons\UI-GroupLoot-Dice-Up]])
 local COLUMN_ICON_LEVEL = CreateIcon([[Interface\GROUPFRAME\UI-GROUP-MAINASSISTICON]])
 
 local FACTION_ICON_SIZE = 18
-local FACTION_ICON_ALLIANCE = CreateIcon([[Interface\COMMON\icon-alliance]], FACTION_ICON_SIZE)
-local FACTION_ICON_HORDE = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE)
-local FACTION_ICON_NEUTRAL = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE)
+
+local FACTION_NAME_TO_ICON = {
+	Alliance = CreateIcon([[Interface\COMMON\icon-alliance]], FACTION_ICON_SIZE),
+	Horde = CreateIcon([[Interface\COMMON\icon-horde]], FACTION_ICON_SIZE),
+	Neutral = CreateIcon([[Interface\COMMON\Indicator-Gray]], FACTION_ICON_SIZE),
+}
 
 local HELP_ICON = CreateIcon([[Interface\COMMON\help-i]], 20)
 
 local PLAYER_ICON_GROUP = [[|TInterface\Scenarios\ScenarioIcon-Check:0|t]]
-local PLAYER_ICON_FACTION = PLAYER_FACTION == "Horde" and FACTION_ICON_HORDE or (PLAYER_FACTION == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL
+local PLAYER_ICON_FACTION = FACTION_NAME_TO_ICON[PLAYER_FACTION]
 
 local SECTION_ICON_DISABLED = CreateIcon([[Interface\COMMON\Indicator-Red]])
 local SECTION_ICON_ENABLED = CreateIcon([[Interface\COMMON\Indicator-Green]])
@@ -584,7 +587,7 @@ do
 						Class = class,
 						Client = client,
 						ClientIndex = CLIENT_SORT_ORDERS[client],
-						FactionIcon = faction and faction == "Horde" and FACTION_ICON_HORDE or (faction == "Alliance" and FACTION_ICON_ALLIANCE) or FACTION_ICON_NEUTRAL,
+						FactionIcon = FACTION_NAME_TO_ICON[factionName],
 						GameText = gameText ~= "" and gameText or _G.UNKNOWN,
 						Level = level and tonumber(level) or 0,
 						Note = noteText ~= "" and noteText,
