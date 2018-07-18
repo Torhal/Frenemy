@@ -576,14 +576,14 @@ do
 
 		if OnlineBattleNetCount > 0 then
 			for battleNetIndex = 1, OnlineBattleNetCount do
-				local presenceID, presenceName, battleTag, isBattleTagPresence, _, toonID, client, isOnline, _, isAFK, isDND, broadcastText, noteText, isRIDFriend, broadcastTime = _G.BNGetFriendInfo(battleNetIndex)
+				local bnetAccountID, accountName, battleTag, isBattleTag, _, bnetGameAccountID, client, isOnline, _, isAFK, isDND, messageText, noteText, isRIDFriend, messageTime = _G.BNGetFriendInfo(battleNetIndex)
 				local numToons = _G.BNGetNumFriendGameAccounts(battleNetIndex)
 
 				for toonIndex = 1, numToons do
-					local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
+					local hasFocus, toonName, client, realmName, realmID, factionName, race, class, guild, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
 					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
 					local entry = {
-						BroadcastText = (broadcastText and broadcastText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, broadcastText, _G.SecondsToTime(time() - broadcastTime, false, true, 1)) or nil,
+						BroadcastText = (messageText and messageText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, messageText, _G.SecondsToTime(time() - messageTime, false, true, 1)) or nil,
 						Class = class,
 						Client = client,
 						ClientIndex = CLIENT_SORT_ORDERS[client],
@@ -591,8 +591,8 @@ do
 						GameText = gameText ~= "" and gameText or _G.UNKNOWN,
 						Level = level and tonumber(level) or 0,
 						Note = noteText ~= "" and noteText,
-						PresenceID = presenceID,
-						PresenceName = presenceName or _G.UNKNOWN,
+						PresenceID = bnetAccountID,
+						PresenceName = accountName or _G.UNKNOWN,
 						RealmName = realmName or "",
 						StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 						ToonName = characterName,
@@ -615,7 +615,7 @@ do
 					elseif not OnlineFriendsByPresenceName[entry.PresenceName] then
 						if NON_GAME_CLIENT[client] then
 							table.insert(PlayerLists.BattleNetApp, entry)
-						elseif toonID then
+						elseif bnetGameAccountID then
 							table.insert(PlayerLists.BattleNetGames, entry)
 						end
 
