@@ -22,7 +22,7 @@ local Frenemy = LibStub("AceAddon-3.0"):NewAddon(AddOnFolderName, "AceBucket-3.0
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 local Dialog = LibStub("LibDialog-1.0")
-local HereBeDragons = LibStub("HereBeDragons-1.0")
+local HereBeDragons = LibStub("HereBeDragons-2.0")
 local LibQTip = LibStub('LibQTip-1.0')
 
 local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(AddOnFolderName, {
