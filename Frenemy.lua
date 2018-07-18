@@ -648,7 +648,7 @@ do
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
 					-- traveling with the tooltip showing.
 					if isOnline and toonName == PLAYER_NAME then
-						zoneName = CurrentMapID and _G.GetMapNameByID(CurrentMapID) or _G.UNKNOWN
+						zoneName = CurrentMapID and HereBeDragons:GetLocalizedMap(CurrentMapID) or _G.UNKNOWN
 					end
 
 					GuildMemberIndexByName[fullToonName] = index
