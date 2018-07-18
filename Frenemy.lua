@@ -1331,11 +1331,11 @@ function Frenemy:PLAYER_REGEN_DISABLED()
 end
 
 
-function Frenemy:PLAYER_REGEN_ENABLED(eventName)
+function Frenemy:PLAYER_REGEN_ENABLED()
 	private.inCombat = nil
 
 	if private.needsAreaID then
-		self:HandleZoneChange(eventName)
+		self:HandleZoneChange()
 		private.needsAreaID = nil
 	end
 end
@@ -1388,11 +1388,11 @@ function Frenemy:OnEnable()
 		"GUILD_ROSTER_UPDATE",
 	}, 1, "UpdateData")
 
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_INDOORS", "HandleZoneChange")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "HandleZoneChange")
 
-	self:HandleZoneChange("OnEnable")
 	self:ScheduleRepeatingTimer(RequestUpdates, REQUEST_UPDATE_INTERVAL)
 
 	RequestUpdates()
