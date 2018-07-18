@@ -1383,7 +1383,6 @@ end
 function Frenemy:OnEnable()
 	self:RegisterBucketEvent({
 		"BN_FRIEND_INFO_CHANGED",
-		"BN_TOON_NAME_UPDATED",
 		"FRIENDLIST_UPDATE",
 		"GUILD_RANKS_UPDATE",
 		"GUILD_ROSTER_UPDATE",
