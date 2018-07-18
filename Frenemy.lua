@@ -220,7 +220,7 @@ local TotalFriendsCount = 0
 local TotalGuildMembersCount = 0
 
 -- Zone data
-local CurrentZoneID
+local CurrentMapID
 
 -- Populated from SavedVariables and during travel.
 local ZoneColorsByName = {
@@ -429,20 +429,24 @@ local function PercentColorGradient(min, max)
 	elseif percentage <= 0 then
 		return red_low, green_low, blue_low
 	end
+
 	local integral, fractional = math.modf(percentage * 2)
 
 	if integral == 1 then
 		red_low, green_low, blue_low, red_mid, green_mid, blue_mid = red_mid, green_mid, blue_mid, red_high, green_high, blue_high
 	end
+
 	return red_low + (red_mid - red_low) * fractional, green_low + (green_mid - green_low) * fractional, blue_low + (blue_mid - blue_low) * fractional
 end
 
-local function SetZoneNameColors(zoneID, zonePVPStatus)
-	local mapName = _G.GetMapNameByID(zoneID)
+local function SetMapNameColor(mapID, zonePVPStatus)
+	local mapName = HereBeDragons:GetLocalizedMap(mapID)
+
 	if not mapName then
-		DB.ZoneData[zoneID] = nil
+		DB.ZoneData[mapID] = nil
 		return
 	end
+
 	ZoneColorsByName[mapName] = private.ZonePVPStatusRGB[zonePVPStatus]
 end
 
@@ -644,7 +648,7 @@ do
 					-- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
 					-- traveling with the tooltip showing.
 					if isOnline and toonName == PLAYER_NAME then
-						zoneName = CurrentZoneID and _G.GetMapNameByID(CurrentZoneID) or _G.UNKNOWN
+						zoneName = CurrentMapID and _G.GetMapNameByID(CurrentMapID) or _G.UNKNOWN
 					end
 
 					GuildMemberIndexByName[fullToonName] = index
@@ -1342,11 +1346,11 @@ function Frenemy:HandleZoneChange()
 		return
 	end
 
-	local mapZoneID = HereBeDragons:GetPlayerZone()
-	local needDisplayUpdate = CurrentZoneID ~= mapZoneID
-	CurrentZoneID = mapZoneID
+	local mapID = HereBeDragons:GetPlayerZone()
+	local needDisplayUpdate = CurrentMapID ~= mapID
+	CurrentMapID = mapID
 
-	if CurrentZoneID and CurrentZoneID > 0 then
+	if CurrentMapID and CurrentMapID > 0 then
 		local pvpType, _, factionName = _G.GetZonePVPInfo()
 
 		if pvpType == "hostile" or pvpType == "friendly" then
@@ -1356,8 +1360,8 @@ function Frenemy:HandleZoneChange()
 		end
 
 		local zonePVPStatus = private.ZonePVPStatusByLabel[pvpType:upper()]
-		DB.ZoneData[CurrentZoneID] = zonePVPStatus
-		SetZoneNameColors(CurrentZoneID, zonePVPStatus)
+		DB.ZoneData[CurrentMapID] = zonePVPStatus
+		SetMapNameColor(CurrentMapID, zonePVPStatus)
 
 		if needDisplayUpdate then
 			self:UpdateData()
@@ -1408,7 +1412,7 @@ function Frenemy:OnInitialize()
 	self:RegisterChatCommand("frenemy", "ChatCommand")
 
 	for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
-		SetZoneNameColors(zoneID, zonePVPStatus)
+		SetMapNameColor(zoneID, zonePVPStatus)
 	end
 end
 
