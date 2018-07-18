@@ -393,7 +393,7 @@ Dialog:Register("FrenemySetGuildMOTD", {
 	hide_on_escape = true,
 	icon = [[Interface\Calendar\MeetingIcon]],
 	width = 400,
-	on_show = function(self, text)
+	on_show = function(self)
 		self.text:SetFormattedText("%s%s|r", _G.BATTLENET_FONT_COLOR_CODE, AddOnFolderName)
 	end
 })
@@ -538,7 +538,7 @@ do
 	-- Data compilation.
 	-- ----------------------------------------------------------------------------
 	local function GenerateTooltipData()
-		for name, data in pairs(PlayerLists) do
+		for _, data in pairs(PlayerLists) do
 			table.wipe(data)
 		end
 
@@ -549,7 +549,7 @@ do
 
 		if OnlineFriendsCount > 0 then
 			for friendIndex = 1, OnlineFriendsCount do
-				local fullToonName, level, class, zoneName, connected, status, note = _G.GetFriendInfo(friendIndex)
+				local fullToonName, level, class, zoneName, _, status, note = _G.GetFriendInfo(friendIndex)
 				local toonName, realmName = ("-"):split(fullToonName)
 
 				WoWFriendIndexByName[fullToonName] = friendIndex
@@ -576,11 +576,11 @@ do
 
 		if OnlineBattleNetCount > 0 then
 			for battleNetIndex = 1, OnlineBattleNetCount do
-				local bnetAccountID, accountName, battleTag, isBattleTag, _, bnetGameAccountID, client, isOnline, _, isAFK, isDND, messageText, noteText, isRIDFriend, messageTime = _G.BNGetFriendInfo(battleNetIndex)
+				local bnetAccountID, accountName, battleTag, _, _, bnetGameAccountID, _, _, _, isAFK, isDND, messageText, noteText, _, messageTime = _G.BNGetFriendInfo(battleNetIndex)
 				local numToons = _G.BNGetNumFriendGameAccounts(battleNetIndex)
 
 				for toonIndex = 1, numToons do
-					local hasFocus, toonName, client, realmName, realmID, factionName, race, class, guild, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
+					local _, toonName, client, realmName, _, factionName, _, class, _, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
 					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
 					local entry = {
 						BroadcastText = (messageText and messageText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, messageText, _G.SecondsToTime(time() - messageTime, false, true, 1)) or nil,
@@ -677,8 +677,8 @@ do
 	-- ----------------------------------------------------------------------------
 	-- Controls
 	-- ----------------------------------------------------------------------------
-	local function BattleNetFriend_OnMouseUp(tooltipCell, playerEntry, button)
-		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
+	local function BattleNetFriend_OnMouseUp(_, playerEntry, button)
+		_G.PlaySound(_G.SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() and playerEntry.RealmName == PLAYER_REALM then
@@ -696,12 +696,12 @@ do
 		end
 	end
 
-	local function GuildMember_OnMouseUp(tooltipCell, playerEntry, button)
+	local function GuildMember_OnMouseUp(_, playerEntry, button)
 		if not _G.IsAddOnLoaded("Blizzard_GuildUI") then
 			_G.LoadAddOn("Blizzard_GuildUI")
 		end
 
-		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
+		_G.PlaySound(_G.SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
 
@@ -726,11 +726,11 @@ do
 		end
 	end
 
-	local function GuildMOTD_OnMouseUp(tooltipCell)
+	local function GuildMOTD_OnMouseUp()
 		Dialog:Spawn("FrenemySetGuildMOTD")
 	end
 
-	local function ToggleColumnSortMethod(tooltipCell, sortFieldData)
+	local function ToggleColumnSortMethod(_, sortFieldData)
 		local sectionName, fieldName = (":"):split(sortFieldData)
 
 		if not sectionName or not fieldName then
@@ -832,7 +832,7 @@ do
 
 	SectionDropDown.initialize = InitializeSectionDropDown
 
-	local function SectionTitle_OnMouseUp(tooltipCell, sectionName, mouseButton)
+	local function SectionTitle_OnMouseUp(_, sectionName, mouseButton)
 		if mouseButton == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
 			_G.CloseDropDownMenus()
@@ -843,8 +843,8 @@ do
 		ToggleSectionVisibility(nil, sectionName)
 	end
 
-	local function WoWFriend_OnMouseUp(tooltipCell, playerEntry, mouseButton)
-		_G.PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
+	local function WoWFriend_OnMouseUp(_, playerEntry, mouseButton)
+		_G.PlaySound(_G.SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
 		local playerName = playerEntry.Realm == PLAYER_REALM and playerEntry.ToonName or playerEntry.FullToonName
 
@@ -877,7 +877,7 @@ do
 		return label
 	end
 
-	local function HideHelpTip(tooltipCell)
+	local function HideHelpTip()
 		if HelpTip then
 			HelpTip:Hide()
 			HelpTip:Release()
@@ -900,12 +900,8 @@ do
 		local firstEntryType = true
 
 		for entryType, data in pairs(HELP_TIP_DEFINITIONS) do
-			local line
+			local line = firstEntryType and helpTip:AddLine() or helpTip:AddLine(" ")
 
-			if not firstEntryType then
-				line = helpTip:AddLine(" ")
-			end
-			line = helpTip:AddLine()
 			helpTip:SetCell(line, 1, entryType, _G.GameFontNormal, "CENTER", 0)
 			helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -914,6 +910,7 @@ do
 				helpTip:SetCell(line, 1, keyStroke)
 				helpTip:SetCell(line, 2, description)
 			end
+
 			firstEntryType = false
 		end
 
@@ -1325,7 +1322,7 @@ end
 -- ----------------------------------------------------------------------------
 -- Events.
 -- ----------------------------------------------------------------------------
-function Frenemy:PLAYER_REGEN_DISABLED(eventName)
+function Frenemy:PLAYER_REGEN_DISABLED()
 	private.inCombat = true
 end
 
@@ -1339,15 +1336,7 @@ function Frenemy:PLAYER_REGEN_ENABLED(eventName)
 	end
 end
 
--- Contains a dirty hack due to Blizzard's strange handling of Micro Dungeons; GetMapInfo() will not return correct information
--- unless the WorldMapFrame is shown.
--- MapFileName = MapAreaID
-local MICRO_DUNGEON_IDS = {
-	ShrineofTwoMoons = 903,
-	ShrineofSevenStars = 905,
-}
-
-function Frenemy:HandleZoneChange(eventName)
+function Frenemy:HandleZoneChange()
 	if private.inCombat then
 		private.needsAreaID = true
 		return
