@@ -14,10 +14,7 @@
 # Special snowflake.
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
-#@no-lib-strip@
 embeds.xml
-#@end-no-lib-strip@
-
 locale.xml
 
 Shared.lua

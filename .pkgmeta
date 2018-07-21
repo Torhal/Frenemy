@@ -1,6 +1,6 @@
 package-as: Frenemy
 
-enable-nolib-creation: yes
+enable-nolib-creation: no
 
 externals:
   Libs/LibStub:
