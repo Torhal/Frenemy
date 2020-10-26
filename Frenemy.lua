@@ -68,6 +68,9 @@ end
 local BNET_CLIENT_MOBILE = "BSAp"
 
 local CLIENT_SORT_ORDERS = {
+	-- ----------------------------------------------------------------------------
+	-- Blizzard Games
+	-- ----------------------------------------------------------------------------
 	[_G.BNET_CLIENT_WOW] = 1,
 	[_G.BNET_CLIENT_SC2] = 2,
 	[_G.BNET_CLIENT_D3] = 3,
@@ -75,11 +78,20 @@ local CLIENT_SORT_ORDERS = {
 	[_G.BNET_CLIENT_HEROES] = 5,
 	[_G.BNET_CLIENT_OVERWATCH] = 6,
 	[_G.BNET_CLIENT_SC] = 7,
-	[_G.BNET_CLIENT_DESTINY2] = 8,
-	[_G.BNET_CLIENT_COD] = 9,
-	[_G.BNET_CLIENT_CLNT] = 10,
-	[_G.BNET_CLIENT_APP] = 11,
-	[BNET_CLIENT_MOBILE] = 12,
+	[_G.BNET_CLIENT_WC3] = 8,
+	-- ----------------------------------------------------------------------------
+	-- Activision Games
+	-- ----------------------------------------------------------------------------
+	[_G.BNET_CLIENT_DESTINY2] = 9,
+	[_G.BNET_CLIENT_COD] = 10,
+	[_G.BNET_CLIENT_COD_MW] = 11,
+	[_G.BNET_CLIENT_COD_MW2] = 12,
+	-- ----------------------------------------------------------------------------
+	-- Clients
+	-- ----------------------------------------------------------------------------
+	[_G.BNET_CLIENT_CLNT] = 13,
+	[_G.BNET_CLIENT_APP] = 14,
+	[BNET_CLIENT_MOBILE] = 15
 }
 
 local NON_GAME_CLIENT = {
