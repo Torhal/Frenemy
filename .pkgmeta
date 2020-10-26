@@ -33,8 +33,8 @@ externals:
   Libs/LibDBIcon-1.0:
     url: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
   Libs/LibDialog-1.0:
-    url: http://hg.wowace.com/wow/libdialog-1-0/mainline
+    url: https://repos.wowace.com/wow/libdialog-1-0
   Libs/LibQTip-1.0:
-    url: https://repos.wowace.com/wow/libqtip-1-0/trunk
+    url: https://repos.wowace.com/wow/libqtip-1-0
   Libs/LibTextDump-1.0:
     url: https://repos.wowace.com/wow/libtextdump-1-0
