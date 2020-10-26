@@ -453,7 +453,8 @@ end
 
 local function UpdateStatistics()
 	TotalBattleNetCount, OnlineBattleNetCount = _G.BNGetNumFriends()
-	TotalFriendsCount, OnlineFriendsCount = _G.GetNumFriends()
+	TotalFriendsCount = _G.C_FriendList.GetNumFriends()
+	OnlineFriendsCount = _G.C_FriendList.GetNumOnlineFriends()
 
 	if _G.IsInGuild() then
 		local _
@@ -554,21 +555,23 @@ do
 
 		if OnlineFriendsCount > 0 then
 			for friendIndex = 1, OnlineFriendsCount do
-				local fullToonName, level, class, zoneName, _, status, note = _G.GetFriendInfo(friendIndex)
+				local friendInfo = _G.C_FriendList.GetFriendInfoByIndex(friendIndex)
+				local fullToonName = friendInfo.name
 				local toonName, realmName = ("-"):split(fullToonName)
+				local zoneName = friendInfo.area
 
 				WoWFriendIndexByName[fullToonName] = friendIndex
 				WoWFriendIndexByName[toonName] = friendIndex
 
 				if not OnlineFriendsByName[toonName] then
 					local entry = {
-						Class = class,
+						Class = friendInfo.className,
 						FullToonName = fullToonName,
 						IsLocalFriend = true,
-						Level = level,
-						Note = note,
+						Level = friendInfo.level,
+						Note = friendInfo.notes,
 						RealmName = realmName or PLAYER_REALM,
-						StatusIcon = status == _G.CHAT_FLAG_AFK and STATUS_ICON_AFK or (status == _G.CHAT_FLAG_DND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
+						StatusIcon = friendInfo.afk and STATUS_ICON_AFK or (friendInfo.dnd and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 						ToonName = toonName,
 						ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
 					}
@@ -579,27 +582,40 @@ do
 			end
 		end
 
-		if OnlineBattleNetCount > 0 then
-			for battleNetIndex = 1, OnlineBattleNetCount do
-				local bnetAccountID, accountName, battleTag, _, _, bnetGameAccountID, _, _, _, isAFK, isDND, messageText, noteText, _, messageTime = _G.BNGetFriendInfo(battleNetIndex)
-				local numToons = _G.BNGetNumFriendGameAccounts(battleNetIndex)
+		if TotalBattleNetCount > 0 then
+			for battleNetIndex = 1, TotalBattleNetCount do
+				local friendInfo = _G.C_BattleNet.GetFriendAccountInfo(battleNetIndex)
+				local accountName = friendInfo.accountName
+				local battleTag = friendInfo.battleTag
+				local bnetAccountID = friendInfo.bnetAccountID
+				local messageText = friendInfo.customMessage
+				local noteText = friendInfo.note
+
+				local numToons = _G.C_BattleNet.GetFriendNumGameAccounts(battleNetIndex)
 
 				for toonIndex = 1, numToons do
-					local _, toonName, client, realmName, _, factionName, _, class, _, zoneName, level, gameText = _G.BNGetFriendGameAccountInfo(battleNetIndex, toonIndex)
+					local toonInfo = _G.C_BattleNet.GetFriendGameAccountInfo(battleNetIndex, toonIndex)
+					local client = toonInfo.clientProgram
+					local gameText = toonInfo.richPresence
+					local level = toonInfo.characterLevel
+					local realmName = toonInfo.realmName
+					local toonName = toonInfo.characterName
+					local zoneName = toonInfo.areaName
 					local characterName = _G.BNet_GetValidatedCharacterName(toonName, battleTag, client)
+
 					local entry = {
-						BroadcastText = (messageText and messageText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, messageText, _G.SecondsToTime(time() - messageTime, false, true, 1)) or nil,
-						Class = class,
+						BroadcastText = (messageText and messageText ~= "") and ("%s%s%s (%s)|r"):format(BROADCAST_ICON, _G.FRIENDS_OTHER_NAME_COLOR_CODE, messageText, _G.SecondsToTime(time() - friendInfo.customMessageTime, false, true, 1)) or nil,
+						Class = toonInfo.className,
 						Client = client,
 						ClientIndex = CLIENT_SORT_ORDERS[client],
-						FactionIcon = FACTION_NAME_TO_ICON[factionName],
+						FactionIcon = FACTION_NAME_TO_ICON[toonInfo.factionName],
 						GameText = gameText ~= "" and gameText or _G.UNKNOWN,
 						Level = level and tonumber(level) or 0,
 						Note = noteText ~= "" and noteText,
 						PresenceID = bnetAccountID,
 						PresenceName = accountName or _G.UNKNOWN,
 						RealmName = realmName or "",
-						StatusIcon = isAFK and STATUS_ICON_AFK or (isDND and STATUS_ICON_DND or STATUS_ICON_ONLINE),
+						StatusIcon = toonInfo.isGameAFK and STATUS_ICON_AFK or (toonInfo.isGameBusy and STATUS_ICON_DND or STATUS_ICON_ONLINE),
 						ToonName = characterName,
 						ZoneName = zoneName ~= "" and zoneName or _G.UNKNOWN,
 					}
@@ -620,7 +636,7 @@ do
 					elseif not OnlineFriendsByPresenceName[entry.PresenceName] then
 						if NON_GAME_CLIENT[client] then
 							table.insert(PlayerLists.BattleNetApp, entry)
-						elseif bnetGameAccountID then
+						elseif toonInfo.gameAccountID then
 							table.insert(PlayerLists.BattleNetGames, entry)
 						end
 
@@ -687,12 +703,12 @@ do
 
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() and playerEntry.RealmName == PLAYER_REALM then
-				_G.InviteToGroup(playerEntry.ToonName)
+				_G.C_PartyInfo.InviteUnit(playerEntry.ToonName)
 			elseif _G.IsControlKeyDown() then
 				_G.FriendsFrame.NotesID = playerEntry.PresenceID
 				_G.StaticPopup_Show("SET_BNFRIENDNOTE", playerEntry.PresenceName)
 			elseif not _G.BNIsSelf(playerEntry.PresenceID) then
-				_G.ChatFrame_SendSmartTell(playerEntry.PresenceName)
+				_G.ChatFrame_SendBNetTell(playerEntry.PresenceName)
 			end
 		elseif button == "RightButton" then
 			Tooltip:SetFrameStrata("DIALOG")
@@ -712,7 +728,7 @@ do
 
 		if button == "LeftButton" then
 			if _G.IsAltKeyDown() then
-				_G.InviteToGroup(playerName)
+				_G.C_PartyInfo.InviteUnit(playerName)
 			elseif _G.IsControlKeyDown() and _G.CanEditPublicNote() then
 				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerName])
 				_G.StaticPopup_Show("SET_GUILDPLAYERNOTE")
@@ -720,7 +736,7 @@ do
 				_G.ChatFrame_SendTell(playerName)
 			end
 		elseif button == "RightButton" then
-			if _G.IsControlKeyDown() and _G.CanEditOfficerNote() then
+			if _G.IsControlKeyDown() and _G.C_GuildInfo.CanEditOfficerNote() then
 				_G.SetGuildRosterSelection(GuildMemberIndexByName[playerName])
 				_G.StaticPopup_Show("SET_GUILDOFFICERNOTE")
 			else
@@ -855,7 +871,7 @@ do
 
 		if mouseButton == "LeftButton" then
 			if _G.IsAltKeyDown() then
-				_G.InviteToGroup(playerName)
+				_G.C_PartyInfo.InviteUnit(playerName)
 			elseif _G.IsControlKeyDown() then
 				_G.FriendsFrame.NotesID = WoWFriendIndexByName[playerName]
 				_G.StaticPopup_Show("SET_FRIENDNOTE", playerName)
@@ -1374,10 +1390,10 @@ end
 -- Framework.
 -- ----------------------------------------------------------------------------
 local function RequestUpdates()
-	_G.ShowFriends()
+	_G.C_FriendList.ShowFriends()
 
 	if _G.IsInGuild() then
-		_G.GuildRoster()
+		_G.C_GuildInfo.GuildRoster()
 	end
 end
 
