@@ -621,7 +621,7 @@ do
 						Client = client,
 						ClientIndex = CLIENT_SORT_ORDERS[client],
 						FactionIcon = FACTION_NAME_TO_ICON[toonInfo.factionName],
-						GameText = gameText ~= "" and gameText or _G.UNKNOWN,
+						GameText = gameText ~= "" and gameText or _G.COMMUNITIES_PRESENCE_MOBILE_CHAT,
 						Level = level and tonumber(level) or 0,
 						Note = noteText ~= "" and noteText,
 						PresenceID = bnetAccountID,
