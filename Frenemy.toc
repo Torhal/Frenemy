@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 100005
 ## Title: Frenemy
 ## Notes: A customizable view of friends and guildmates.
 ## Author: Torhal
