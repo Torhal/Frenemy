@@ -1,8 +1,19 @@
-local FOLDER_NAME, private = ...
-local L = LibStub("AceLocale-3.0"):NewLocale(FOLDER_NAME, "enUS", true)
+-- ----------------------------------------------------------------------------
+-- AddOn Namespace
+-- ----------------------------------------------------------------------------
+local AddOnFolderName = ... ---@type string
+local private = select(2, ...) ---@class PrivateNamespace
 
-if not L then return end
+---@class Localizations: Dictionary<string>
+local L = LibStub("AceLocale-3.0"):NewLocale(AddOnFolderName, "enUS", true)
 
+if not L then
+    return
+end
+
+-- ----------------------------------------------------------------------------
+-- Localizations
+-- ----------------------------------------------------------------------------
 L.ALT_KEY = "Alt-"
 L.COLLAPSE_SECTION = "Collapse"
 L.COLUMN_LABEL_REALM = "Realm"

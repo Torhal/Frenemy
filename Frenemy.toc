@@ -11,11 +11,13 @@
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: Delayed
 
-# Special snowflake.
-
 embeds.xml
-locale.xml
 
-Shared.lua
+Locales\Manifest.xml
+Common\Manifest.xml
+Preferences\Manifest.xml
+TooltipHandler\Manifest.xml
+
+DataObject.lua
 Frenemy.lua
-Config.lua
+
