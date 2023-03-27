@@ -11,6 +11,9 @@
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: Delayed
 
+## X-Curse-Project-ID: 79480
+## X-WoWI-ID: 22846
+
 embeds.xml
 
 Locales\Manifest.xml
