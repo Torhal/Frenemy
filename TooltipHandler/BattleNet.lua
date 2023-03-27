@@ -140,7 +140,7 @@ local function GenerateData()
                 ToonName = characterName,
             }
 
-            if clientProgram == BNET_CLIENT_WOW then
+            if clientProgram == BNET_CLIENT_WOW and gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
                 local existingFriend = OnlineFriendsByName[toonName]
                 local realmName = gameAccountInfo.realmName
 
