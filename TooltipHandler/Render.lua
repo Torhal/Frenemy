@@ -61,10 +61,14 @@ local function ShowHelpTip(tooltipCell)
         handler.Tooltip.Help = helpTip
     end
 
-    local firstEntryType = true
+    local isInitialSection = true
 
     for entryType, data in pairs(HelpTipDefinitions) do
-        local line = firstEntryType and helpTip:AddLine() or helpTip:AddLine(" ")
+        if not isInitialSection then
+            helpTip:AddLine(" ")
+        end
+
+        local line = helpTip:AddLine()
 
         helpTip:SetCell(line, 1, entryType, GameFontNormal, "CENTER", 0)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -75,7 +79,7 @@ local function ShowHelpTip(tooltipCell)
             helpTip:SetCell(line, 2, description)
         end
 
-        firstEntryType = false
+        isInitialSection = false
     end
 
     HideDropDownMenu(1)
