@@ -161,7 +161,7 @@ function private.TooltipHandler:Render(anchorFrame)
         tooltip:SetCell(
             MOTD.LineID,
             1,
-            GUILD_MOTD_TEMPLATE:format(GREEN_FONT_COLOR_CODE .. MOTD.Text .. "|r"),
+            ("%s%s|r"):format(GREEN_FONT_COLOR_CODE, MOTD.Text),
             nil,
             "LEFT",
             0,

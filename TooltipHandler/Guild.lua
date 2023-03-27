@@ -424,6 +424,9 @@ local function DisplaySectionGuild(tooltip)
 
     tooltip:AddLine(" ")
 
+    local headerLineMOTD = tooltip:AddLine()
+    tooltip:SetCell(headerLineMOTD, 1, GUILD_MOTD_TEMPLATE:gsub('"%%s"', ""), nil, "CENTER", 0)
+
     MOTD.LineID = tooltip:AddLine()
 
     if CanEditMOTD() then
