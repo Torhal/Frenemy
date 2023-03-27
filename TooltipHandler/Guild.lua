@@ -416,17 +416,21 @@ local function DisplaySectionGuild(tooltip)
     local MOTD = private.TooltipHandler.Guild.MOTD
     MOTD.Text = GetGuildRosterMOTD()
 
-    if MOTD.Text and MOTD.Text ~= "" then
+    if not MOTD.Text or MOTD.Text == "" then
         tooltip:AddLine(" ")
 
-        MOTD.LineID = tooltip:AddLine()
-
-        if CanEditMOTD() then
-            tooltip:SetCellScript(MOTD.LineID, 1, "OnMouseUp", GuildMOTD_OnMouseUp)
-        end
-
-        tooltip:AddLine(" ")
+        return
     end
+
+    tooltip:AddLine(" ")
+
+    MOTD.LineID = tooltip:AddLine()
+
+    if CanEditMOTD() then
+        tooltip:SetCellScript(MOTD.LineID, 1, "OnMouseUp", GuildMOTD_OnMouseUp)
+    end
+
+    tooltip:AddLine(" ")
 end
 
 -- ----------------------------------------------------------------------------
