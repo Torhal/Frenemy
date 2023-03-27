@@ -260,7 +260,7 @@ do
     ---@param targetTokenList Dictionary<string>
     local function GenerateColorsAndTokens(localizedClassNames, targetTokenList)
         for classToken, localizedName in pairs(localizedClassNames) do
-            local color = RAID_CLASS_COLORS[classToken]
+            local color = C_ClassColor.GetClassColor(classToken)
 
             if color then
                 ClassData.Color[localizedName] = color:GenerateHexColorMarkup()
