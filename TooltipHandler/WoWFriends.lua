@@ -22,7 +22,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
-local FRIENDS_WOW_NAME_COLOR = FRIENDS_WOW_NAME_COLOR_CODE:gsub("|cff", "")
 
 -- Used to handle duplication between in-game and RealID friends.
 local WoWFriendIndexByName = {}
@@ -241,14 +240,12 @@ local function DisplaySectionWoWFriends(tooltip)
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-    local classColor = private.TooltipHandler.Class.Color
     local classToken = private.TooltipHandler.Class.Token
     local tooltipIcon = private.TooltipHandler.Icon
 
     for index = 1, #PlayerLists.WoWFriends do
         local player = PlayerLists.WoWFriends[index]
         local groupIndicator = IsUnitGrouped(player.ToonName) and Icon.Player.Group or ""
-        local nameColor = classColor[player.Class] or FRIENDS_WOW_NAME_COLOR
         local presenceName = player.PresenceName
                 and ("%s%s|r"):format(FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName)
             or NOT_APPLICABLE
@@ -274,7 +271,12 @@ local function DisplaySectionWoWFriends(tooltip)
         tooltip:SetCell(
             line,
             WoWFriendsColumn.ToonName,
-            ("%s|cff%s%s|r%s"):format(Icon.Player.Faction, nameColor, player.ToonName, groupIndicator),
+            ("%s%s%s|r%s"):format(
+                Icon.Player.Faction,
+                private.TooltipHandler.Class.Color[player.Class] or FRIENDS_WOW_NAME_COLOR_CODE,
+                player.ToonName,
+                groupIndicator
+            ),
             nil,
             nil,
             WoWFriendsColSpan.ToonName

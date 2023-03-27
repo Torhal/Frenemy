@@ -256,23 +256,21 @@ local ClassData = {
 }
 
 do
-    for classToken, localizedName in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-        local color = RAID_CLASS_COLORS[classToken]
+    ---@param localizedClassNames Dictionary<string>
+    ---@param targetTokenList Dictionary<string>
+    local function GenerateColorsAndTokens(localizedClassNames, targetTokenList)
+        for classToken, localizedName in pairs(localizedClassNames) do
+            local color = RAID_CLASS_COLORS[classToken]
 
-        if color then
-            ClassData.Color[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
-            ClassData.Token.Female[localizedName] = classToken
+            if color then
+                ClassData.Color[localizedName] = color:GenerateHexColorMarkup()
+                targetTokenList[localizedName] = classToken
+            end
         end
     end
 
-    for classToken, localizedName in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-        local color = RAID_CLASS_COLORS[classToken]
-
-        if color then
-            ClassData.Color[localizedName] = ("%02x%02x%02x"):format(color.r * 255, color.g * 255, color.b * 255)
-            ClassData.Token.Male[localizedName] = classToken
-        end
-    end
+    GenerateColorsAndTokens(LOCALIZED_CLASS_NAMES_FEMALE, ClassData.Token.Female)
+    GenerateColorsAndTokens(LOCALIZED_CLASS_NAMES_MALE, ClassData.Token.Male)
 end -- do-block
 
 -- ----------------------------------------------------------------------------

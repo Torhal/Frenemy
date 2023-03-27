@@ -309,9 +309,9 @@ local function DisplaySectionGuild(tooltip)
         tooltip:SetCell(
             line,
             GuildColumn.ToonName,
-            ("%s|cff%s%s|r%s"):format(
+            ("%s%s%s|r%s"):format(
                 player.StatusIcon,
-                private.TooltipHandler.Class.Color[player.Class] or "ffffff",
+                private.TooltipHandler.Class.Color[player.Class] or "|cffffff",
                 player.ToonName,
                 IsUnitGrouped(player.ToonName) and Icon.Player.Group or ""
             ),
