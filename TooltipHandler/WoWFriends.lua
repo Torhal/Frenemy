@@ -69,6 +69,7 @@ local function GenerateData()
         WoWFriendIndexByName[toonName] = friendIndex
 
         if not OnlineFriendsByName[toonName] then
+            ---@type WoWFriend
             local friendData = {
                 Class = friendInfo.className,
                 FullToonName = fullToonName,

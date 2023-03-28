@@ -82,22 +82,26 @@ local function GenerateData()
             GuildMemberIndexByName[fullToonName] = index
             GuildMemberIndexByName[toonName] = index
 
-            table.insert(PlayerLists.Guild, {
-                Class = class,
-                FullToonName = fullToonName,
-                IsMobile = isMobile,
-                Level = level,
-                OfficerNote = officerNote ~= "" and officerNote or nil,
-                PublicNote = note ~= "" and note or nil,
-                Rank = rank,
-                RankIndex = rankIndex,
-                RealmName = realmName or Player.RealmName,
-                StatusIcon = statusIcon,
-                ToonName = toonName,
-                ZoneName = isMobile
-                        and (isOnline and ("%s %s"):format(zoneName or UNKNOWN, PARENS_TEMPLATE:format(REMOTE_CHAT)) or REMOTE_CHAT)
-                    or (zoneName or UNKNOWN),
-            })
+            table.insert(
+                PlayerLists.Guild,
+                ---@type GuildMember
+                {
+                    Class = class,
+                    FullToonName = fullToonName,
+                    IsMobile = isMobile,
+                    Level = level,
+                    OfficerNote = officerNote ~= "" and officerNote or nil,
+                    PublicNote = note ~= "" and note or nil,
+                    Rank = rank,
+                    RankIndex = rankIndex,
+                    RealmName = realmName or Player.RealmName,
+                    StatusIcon = statusIcon,
+                    ToonName = toonName,
+                    ZoneName = isMobile
+                            and (isOnline and ("%s %s"):format(zoneName or UNKNOWN, PARENS_TEMPLATE:format(REMOTE_CHAT)) or REMOTE_CHAT)
+                        or (zoneName or UNKNOWN),
+                }
+            )
         end
     end
 end
