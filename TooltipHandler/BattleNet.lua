@@ -19,48 +19,48 @@ local ToggleColumnSortMethod = private.TooltipHandler.CellScripts.ToggleColumnSo
 -- Constants
 -- ----------------------------------------------------------------------------
 local BNET_CLIENT_MOBILE_CHAT = "BSAp"
+local BattleNetClientIndex = {} ---@type Dictionary<integer>
 
--- local OLD_CLIENT_SORT_ORDERS = {
--- 	-- ----------------------------------------------------------------------------
--- 	-- Blizzard Games
--- 	-- ----------------------------------------------------------------------------
--- 	[BNET_CLIENT_WOW] = 1,
--- 	[BNET_CLIENT_SC2] = 2,
--- 	[BNET_CLIENT_D3] = 3,
--- 	[BNET_CLIENT_WTCG] = 4,
--- 	[BNET_CLIENT_HEROES] = 5,
--- 	[BNET_CLIENT_OVERWATCH] = 6,
--- 	[BNET_CLIENT_SC] = 7,
--- 	[BNET_CLIENT_WC3] = 8,
--- 	-- ----------------------------------------------------------------------------
--- 	-- Activision Games
--- 	-- ----------------------------------------------------------------------------
--- 	[BNET_CLIENT_DESTINY2] = 9,
--- 	[BNET_CLIENT_COD] = 10,
--- 	[BNET_CLIENT_COD_MW] = 11,
--- 	[BNET_CLIENT_COD_MW2] = 12,
--- 	-- ----------------------------------------------------------------------------
--- 	-- Clients
--- 	-- ----------------------------------------------------------------------------
--- 	[BNET_CLIENT_CLNT] = 13,
--- 	[BNET_CLIENT_APP] = 14,
--- }
+do
+    local BattleNetClientTokens = {
+        -- ----------------------------------------------------------------------------
+        -- Blizzard Games
+        -- ----------------------------------------------------------------------------
+        "RTRO", -- Blizzard Arcade Collection
+        "OSI", -- Diablo II: Resurrected
+        "D3", -- Diablo III
+        "ANBS", -- Diablo Immortal
+        "WTCG", -- Hearthstone
+        "Hero", -- Heroes of the Storm
+        "Pro", -- Overwatch
+        "S1", -- StarCraft
+        "S2", -- StarCraft II
+        "W3", -- Warcraft III: Reforged
+        "GRY", -- Warcraft Arclight Rumble
+        "WoW", -- World of Warcraft
+        -- ----------------------------------------------------------------------------
+        -- Activision Games
+        -- ----------------------------------------------------------------------------
+        "VIPR", -- Call of Duty
+        "ZEUS", -- Call of Duty: Black Ops Cold War
+        "ODIN", -- Call of Duty: Modern Warfare
+        "LAZR", -- Call of Duty: Modern Warfare II
+        "FORE", -- Call of Duty: Vanguard
+        "WLBY", -- Crash Bandicoot 4
+        -- ----------------------------------------------------------------------------
+        -- Non-Game Clients
+        -- ----------------------------------------------------------------------------
+        BNET_CLIENT_CLNT,
+        BNET_CLIENT_APP,
+        BNET_CLIENT_MOBILE_CHAT,
+    }
 
-local CLIENT_SORT_ORDERS = {
-    -- ----------------------------------------------------------------------------
-    -- Blizzard Games
-    -- ----------------------------------------------------------------------------
-    [BNET_CLIENT_WOW] = 1,
-    [BNET_CLIENT_HEROES] = 5,
-    -- ----------------------------------------------------------------------------
-    -- Clients
-    -- ----------------------------------------------------------------------------
-    [BNET_CLIENT_CLNT] = 13,
-    [BNET_CLIENT_APP] = 14,
-    [BNET_CLIENT_MOBILE_CHAT] = 15,
-}
+    for index, value in ipairs(BattleNetClientTokens) do
+        BattleNetClientIndex[value] = index
+    end
+end
 
-local NON_GAME_CLIENT = {
+local BattleNetNonGameClient = {
     [BNET_CLIENT_CLNT] = true,
     [BNET_CLIENT_APP] = true,
     [BNET_CLIENT_MOBILE_CHAT] = true,
@@ -130,7 +130,7 @@ local function GenerateData()
                     ClientIconSize,
                     ClientIconSize
                 ),
-                ClientIndex = CLIENT_SORT_ORDERS[clientProgram],
+                ClientIndex = BattleNetClientIndex[clientProgram],
                 GameText = gameText ~= "" and gameText or COMMUNITIES_PRESENCE_MOBILE_CHAT,
                 Note = noteText ~= "" and noteText or nil,
                 PresenceID = bnetAccountID,
@@ -174,7 +174,7 @@ local function GenerateData()
                     OnlineFriendsByPresenceName[bNetFriendData.PresenceName] = wowFriendData
                 end
             elseif not OnlineFriendsByPresenceName[bNetFriendData.PresenceName] then
-                if NON_GAME_CLIENT[clientProgram] then
+                if BattleNetNonGameClient[clientProgram] then
                     table.insert(PlayerLists.BattleNetApp, bNetFriendData)
                 elseif gameAccountInfo.gameAccountID then
                     table.insert(PlayerLists.BattleNetGames, bNetFriendData)
