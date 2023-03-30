@@ -35,6 +35,6 @@ externals:
   Libs/LibDialog-1.0:
     url: https://repos.wowace.com/wow/libdialog-1-0
   Libs/LibQTip-1.0:
-    url: https://repos.wowace.com/wow/libqtip-1-0
+    url: https://github.com/Torhal/LibQTip-1.0.git
   Libs/LibTextDump-1.0:
     url: https://repos.wowace.com/wow/libtextdump-1-0
