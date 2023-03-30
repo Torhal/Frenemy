@@ -159,12 +159,12 @@ do
                 func(arguments or "")
             end
         else
-            local optionsFrame = InterfaceOptionsFrame
+            local settingsPanel = SettingsPanel
 
-            if optionsFrame:IsVisible() then
-                optionsFrame:Hide()
+            if settingsPanel:IsVisible() then
+                settingsPanel:Hide()
             else
-                InterfaceOptionsFrame_OpenToCategory(private.Preferences.OptionsFrame)
+                Settings.OpenToCategory(private.Preferences.OptionsFrame)
             end
         end
     end

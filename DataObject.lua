@@ -34,7 +34,13 @@ local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(AddOnFolderName, {
                 ToggleFriendsFrame(FRIENDS_FRAME_TAB_TOGGLES.FRIENDS)
             end
         else
-            InterfaceOptionsFrame_OpenToCategory(private.Preferences.OptionsFrame)
+            local settingsPanel = SettingsPanel
+
+            if settingsPanel:IsVisible() then
+                settingsPanel:Hide()
+            else
+                Settings.OpenToCategory(private.Preferences.OptionsFrame)
+            end
         end
     end,
     OnEnter = function(displayFrame)
