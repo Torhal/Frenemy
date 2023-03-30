@@ -4617,7 +4617,15 @@
     "BN_TOAST_OFFLINE",
     "BNToastFrameIconTexture",
     "BN_TOAST_ONLINE",
-    "BN_TOAST_NEW_CLUB_INVITATION"
+    "BN_TOAST_NEW_CLUB_INVITATION",
+    "SettingsTooltip",
+    "ALT_KEY",
+    "CTRL_KEY",
+    "SHIFT_KEY",
+    "NONE_KEY",
+    "VIDEO_OPTIONS_NEED_CLIENTRESTART",
+    "VIDEO_OPTIONS_RECOMMENDED",
+    "WARNING_FONT_COLOR"
   ],
   "Lua.format.enable": false,
   "[lua]": {
