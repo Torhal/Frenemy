@@ -23,23 +23,28 @@ function Frenemy:HandleZoneChange(callbackName, mapID)
     local needDisplayUpdate = MapHandler.Data.MapID ~= mapID
     MapHandler.Data.MapID = mapID
 
-    if MapHandler.Data.MapID and MapHandler.Data.MapID > 0 then
-        local pvpType, _, factionName = GetZonePVPInfo()
+    if not MapHandler.Data.MapID or MapHandler.Data.MapID <= 0 then
+        MapHandler.Data.MapName = UNKNOWN
+        return
+    end
 
-        if pvpType == "hostile" or pvpType == "friendly" then
-            pvpType = factionName
-        elseif not pvpType or pvpType == "" then
-            pvpType = "normal"
-        end
+    MapHandler.Data.MapName = HereBeDragons:GetLocalizedMap(mapID) or UNKNOWN
 
-        local zonePVPStatus = MapHandler.GetZonePVPStatus(pvpType)
-        private.DB.ZoneData[MapHandler.Data.MapID] = zonePVPStatus
+    local pvpType, _, factionName = GetZonePVPInfo()
 
-        MapHandler:SetRGBColor(MapHandler.Data.MapID, zonePVPStatus)
+    if pvpType == "hostile" or pvpType == "friendly" then
+        pvpType = factionName
+    elseif not pvpType or pvpType == "" then
+        pvpType = "normal"
+    end
 
-        if needDisplayUpdate then
-            self:UpdateData()
-        end
+    local zonePVPStatus = MapHandler.GetZonePVPStatus(pvpType)
+    private.DB.ZoneData[MapHandler.Data.MapID] = zonePVPStatus
+
+    MapHandler:SetRGBColor(MapHandler.Data.MapID, zonePVPStatus)
+
+    if needDisplayUpdate then
+        self:UpdateData()
     end
 end
 

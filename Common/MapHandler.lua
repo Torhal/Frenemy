@@ -92,6 +92,7 @@ private.MapHandler = {
     Data = {
         -- The player's current UIMapID
         MapID = nil, ---@type nil|number
+        MapName = UNKNOWN, ---@type string
         -- Populated during travel, and stored in SavedVariables.
         RGBColor = {
             [GARRISON_LOCATION_TOOLTIP] = ZonePVPStatusRGB[ZonePVPStatus.Normal],

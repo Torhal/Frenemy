@@ -76,7 +76,7 @@ local function GenerateData()
             -- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
             -- traveling with the tooltip showing.
             if isOnline and toonName == Player.Name then
-                zoneName = MapHandler.Data.MapID and HereBeDragons:GetLocalizedMap(MapHandler.Data.MapID) or UNKNOWN
+                zoneName = MapHandler.Data.MapName
             end
 
             GuildMemberIndexByName[fullToonName] = index
