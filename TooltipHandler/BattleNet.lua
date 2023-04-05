@@ -195,6 +195,9 @@ end
 ---@param headerLine number
 ---@param noteArrangement NotesArrangement
 local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine, noteArrangement)
+    -- ----------------------------------------------------------------------------
+    -- Section Header
+    -- ----------------------------------------------------------------------------
     tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
     tooltip:SetCell(
         headerLine,
@@ -244,6 +247,9 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
         dataPrefix .. ":GameText"
     )
 
+    -- ----------------------------------------------------------------------------
+    -- Section Body
+    -- ----------------------------------------------------------------------------
     local hasNoteColumn = false
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)

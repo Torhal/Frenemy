@@ -151,6 +151,9 @@ local function DisplaySectionWoWFriends(tooltip)
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
+    -- ----------------------------------------------------------------------------
+    -- Section Header
+    -- ----------------------------------------------------------------------------
     local headerLine = tooltip:AddLine()
     tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
     tooltip:SetCell(
@@ -237,6 +240,9 @@ local function DisplaySectionWoWFriends(tooltip)
         "WoWFriends:RealmName"
     )
 
+    -- ----------------------------------------------------------------------------
+    -- Section Body
+    -- ----------------------------------------------------------------------------
     local addedNoteColumn
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)

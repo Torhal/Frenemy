@@ -241,6 +241,9 @@ local function DisplaySectionGuild(tooltip)
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
+    -- ----------------------------------------------------------------------------
+    -- Section Header
+    -- ----------------------------------------------------------------------------
     local headerLine = tooltip:AddLine()
     tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
     tooltip:SetCell(
@@ -286,6 +289,9 @@ local function DisplaySectionGuild(tooltip)
     )
     tooltip:SetCellScript(headerLine, GuildColumn.ZoneName, "OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
 
+    -- ----------------------------------------------------------------------------
+    -- Section Body
+    -- ----------------------------------------------------------------------------
     local addedPublicNoteColumn
     local addedOfficerNoteColumn
 
