@@ -17,26 +17,9 @@ local HereBeDragons = LibStub("HereBeDragons-2.0")
 -- ----------------------------------------------------------------------------
 -- Events.
 -- ----------------------------------------------------------------------------
-function Frenemy:PLAYER_REGEN_DISABLED()
-    private.inCombat = true
-end
-
-function Frenemy:PLAYER_REGEN_ENABLED()
-    private.inCombat = nil
-
-    if private.needsAreaID then
-        self:HandleZoneChange()
-        private.needsAreaID = nil
-    end
-end
-
-function Frenemy:HandleZoneChange()
-    if private.inCombat then
-        private.needsAreaID = true
-        return
-    end
-
-    local mapID = HereBeDragons:GetPlayerZone()
+---@param callbackName string Unused, but is passed from HereBeDragons so it must be handled in the parameter list.
+---@param mapID number
+function Frenemy:HandleZoneChange(callbackName, mapID)
     local needDisplayUpdate = MapHandler.Data.MapID ~= mapID
     MapHandler.Data.MapID = mapID
 
@@ -81,10 +64,7 @@ function Frenemy:OnEnable()
         "GUILD_ROSTER_UPDATE",
     }, 1, self.UpdateData)
 
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", "HandleZoneChange")
-    self:RegisterEvent("ZONE_CHANGED", "HandleZoneChange")
-    self:RegisterEvent("ZONE_CHANGED_INDOORS", "HandleZoneChange")
-    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "HandleZoneChange")
+    HereBeDragons.RegisterCallback(self, "PlayerZoneChanged", "HandleZoneChange")
 
     self:ScheduleRepeatingTimer(RequestUpdates, RequestUpdateInterval)
 
