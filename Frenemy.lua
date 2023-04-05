@@ -8,7 +8,7 @@ local DataObject = private.DataObject
 local MapHandler = private.MapHandler
 local TooltipHandler = private.TooltipHandler
 
----@class Frenemy: AceAddon, AceAddon-3.0, AceBucket-3.0, AceConsole-3.0, AceEvent-3.0, AceTimer-3.0
+---@class Frenemy: AceAddon, AceBucket-3.0, AceConsole-3.0, AceEvent-3.0, AceTimer-3.0
 local Frenemy =
     LibStub("AceAddon-3.0"):NewAddon(AddOnFolderName, "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 
