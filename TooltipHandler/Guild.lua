@@ -304,7 +304,7 @@ local function DisplaySectionGuild(tooltip)
         tooltip:SetCell(
             line,
             GuildColumn.Class,
-            tooltipIcon[classToken.Female[player.Class] or classToken.Male[player.Class]],
+            tooltipIcon.Class[classToken.Female[player.Class] or classToken.Male[player.Class]],
             nil,
             nil,
             GuildColSpan.Class
