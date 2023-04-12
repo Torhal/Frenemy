@@ -4,7 +4,7 @@
 ## Author: Torhal
 ## Version: @project-version@
 ## X-Date: @project-date-iso@
-## X-Email: jcallahan@curse.com
+## X-Email: darkenelf@gmail.com
 ## OptionalDeps: Ace3, CallbackHandler-1.0, HereBeDragons, LibDBIcon-1.0, LibDialog-1.0, LibQTip-1.0, LibTextDump-1.0
 ## SavedVariables: FrenemyDB
 
