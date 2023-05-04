@@ -304,9 +304,34 @@ local FactionIcon = {
     Neutral = CreateIcon([[Interface\COMMON\Indicator-Gray]], FactionIconSize),
 }
 
--- ----------------------------------------------------------------------------
--- TooltipHandler
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Methods
+--------------------------------------------------------------------------------
+
+---@param tooltip LibQTip-2.0.Tooltip
+---@param titleText string The section title to display in the Cell.
+---@param sectionIsCollapsed boolean
+---@param scriptParameter string
+local function CreateSectionHeader(tooltip, titleText, sectionIsCollapsed, scriptParameter)
+    local fontName = sectionIsCollapsed and "GameFontDisable" or "GameFontNormal"
+    local sectionIcon = sectionIsCollapsed and private.TooltipHandler.Icon.Section.Disabled
+        or private.TooltipHandler.Icon.Section.Enabled
+
+    tooltip
+        :AddLine()
+        :GetCell(1, 0)
+        :SetJustifyH("CENTER")
+        :SetFont(fontName)
+        :SetText(("%s %s %s"):format(sectionIcon, titleText, sectionIcon))
+        :SetScript("OnMouseUp", SectionTitle_OnMouseUp, scriptParameter)
+
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+end
+
+--------------------------------------------------------------------------------
+---- TooltipHandler
+--------------------------------------------------------------------------------
+
 ---@class TooltipHandler
 ---@field BattleNet TooltipHandler.BattleNet
 ---@field Guild TooltipHandler.Guild
@@ -323,6 +348,7 @@ private.TooltipHandler = {
     Helpers = {
         ColorPlayerLevel = ColorPlayerLevel,
         ColumnLabel = ColumnLabel,
+        CreateSectionHeader = CreateSectionHeader,
         IsUnitGrouped = IsUnitGrouped,
     },
     Icon = {
