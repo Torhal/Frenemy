@@ -1,6 +1,7 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@class PrivateNamespace
 
@@ -9,9 +10,10 @@ local SortOrder = private.SortOrder
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
 -- Used to handle duplication between in-game and RealID friends.
 local OnlineFriendsByName = {}
 
@@ -28,9 +30,10 @@ local PlayerLists = {
     WoWFriends = {}, ---@type WoWFriend[]
 }
 
--- ----------------------------------------------------------------------------
--- Data Compilation
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Data Compilation
+--------------------------------------------------------------------------------
+
 ---@param self TooltipHandler
 local function GenerateData(self)
     for _, list in pairs(PlayerLists) do
@@ -53,9 +56,10 @@ local function GenerateData(self)
     end
 end
 
--- ----------------------------------------------------------------------------
--- Helpers
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Helpers
+--------------------------------------------------------------------------------
+
 ---@param level number
 local function ColorPlayerLevel(level)
     if type(level) ~= "number" then
@@ -90,16 +94,18 @@ local function IsUnitGrouped(name)
     return (GetNumSubgroupMembers() > 0 and UnitInParty(name)) or (GetNumGroupMembers() > 0 and UnitInRaid(name))
 end
 
--- ----------------------------------------------------------------------------
--- SectionDropDown
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- SectionDropDown
+--------------------------------------------------------------------------------
+
 local SectionDropDown = CreateFrame("Frame", AddOnFolderName .. "SectionDropDown", UIParent, "UIDropDownMenuTemplate")
 SectionDropDown.displayMode = "MENU"
 SectionDropDown.info = {}
 SectionDropDown.levelAdjust = 0
 
 ---@param currentPosition number
-local function ChangeSectionOrder(self, currentPosition, direction)
+---@param direction "down"|"up"
+local function ChangeSectionOrder(_, currentPosition, direction)
     local sectionEntries = private.DB.Tooltip.SectionDisplayOrders
     local newPosition
 
@@ -179,28 +185,35 @@ end
 
 SectionDropDown.initialize = InitializeSectionDropDown
 
--- ----------------------------------------------------------------------------
--- Cell Scripts
--- ----------------------------------------------------------------------------
-local function BattleNetFriend_OnMouseUp(_, playerEntry, button)
+--------------------------------------------------------------------------------
+---- Cell Scripts
+--------------------------------------------------------------------------------
+
+---@param _ LibQTip-2.0.Cell
+---@param friend BattleNetFriend|WoWFriend
+---@param mouseButton string
+local function BattleNetFriend_OnMouseUp(_, friend, mouseButton)
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
-    if button == "LeftButton" then
-        if IsAltKeyDown() and playerEntry.RealmName == PlayerData.RealmName then
-            C_PartyInfo.InviteUnit(playerEntry.ToonName)
+    if mouseButton == "LeftButton" then
+        if IsAltKeyDown() and friend.RealmName == PlayerData.RealmName then
+            C_PartyInfo.InviteUnit(friend.ToonName)
         elseif IsControlKeyDown() then
-            FriendsFrame.NotesID = playerEntry.PresenceID
-            StaticPopup_Show("SET_BNFRIENDNOTE", playerEntry.PresenceName)
-        elseif not BNIsSelf(playerEntry.PresenceID) then
-            ChatFrame_SendBNetTell(playerEntry.PresenceName)
+            FriendsFrame.NotesID = friend.PresenceID
+            StaticPopup_Show("SET_BNFRIENDNOTE", friend.PresenceName)
+        elseif not BNIsSelf(friend.PresenceID) then
+            ChatFrame_SendBNetTell(friend.PresenceName)
         end
-    elseif button == "RightButton" then
+    elseif mouseButton == "RightButton" then
         private.TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
         CloseDropDownMenus()
-        FriendsFrame_ShowBNDropdown(playerEntry.PresenceName, true, nil, nil, nil, true, playerEntry.PresenceID)
+        FriendsFrame_ShowBNDropdown(friend.PresenceName, true, nil, nil, nil, true, friend.PresenceID)
     end
 end
 
+---@param _ LibQTip-2.0.Cell
+---@param sectionName string
+---@param mouseButton string
 local function SectionTitle_OnMouseUp(_, sectionName, mouseButton)
     if mouseButton == "RightButton" then
         private.TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
@@ -213,6 +226,8 @@ local function SectionTitle_OnMouseUp(_, sectionName, mouseButton)
     ToggleSectionVisibility(nil, sectionName)
 end
 
+---@param _ LibQTip-2.0.Cell
+---@param sortFieldData string
 local function ToggleColumnSortMethod(_, sortFieldData)
     local sectionName, fieldName = strsplit(":", sortFieldData)
 
@@ -241,9 +256,10 @@ local function ToggleColumnSortMethod(_, sortFieldData)
     private.TooltipHandler:Render()
 end
 
--- ----------------------------------------------------------------------------
--- Class Definitions
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Class Definitions
+--------------------------------------------------------------------------------
+
 local ClassData = {
     -- Dictionary of localizedName to class color
     Color = {},
@@ -273,10 +289,12 @@ do
     GenerateColorsAndTokens(LOCALIZED_CLASS_NAMES_MALE, ClassData.Token.Male)
 end -- do-block
 
--- ----------------------------------------------------------------------------
--- Icon Definitions
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Icon Definitions
+--------------------------------------------------------------------------------
+
 local ClassIcon = {}
+
 do
     local textureFormat = [[|TInterface\TargetingFrame\UI-CLASSES-CIRCLES:0:0:0:0:256:256:%d:%d:%d:%d|t]]
     local textureSize = 256
@@ -341,7 +359,6 @@ private.TooltipHandler = {
     GenerateData = GenerateData,
     CellScripts = {
         BattleNetFriend_OnMouseUp = BattleNetFriend_OnMouseUp,
-        SectionTitle_OnMouseUp = SectionTitle_OnMouseUp,
         ToggleColumnSortMethod = ToggleColumnSortMethod,
     },
     Class = ClassData,
@@ -390,7 +407,7 @@ private.TooltipHandler = {
     PlayerLists = PlayerLists,
     Tooltip = {
         AnchorFrame = nil, ---@type Frame|nil
-        Help = nil, ---@type LibQTip.Tooltip|nil
-        Main = nil, ---@type LibQTip.Tooltip|nil
+        Help = nil, ---@type LibQTip-2.0.Tooltip|nil
+        Main = nil, ---@type LibQTip-2.0.Tooltip|nil
     },
 }

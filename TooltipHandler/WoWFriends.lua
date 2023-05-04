@@ -1,6 +1,6 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@class PrivateNamespace
 
@@ -13,23 +13,24 @@ local PlayerLists = private.TooltipHandler.PlayerLists
 local BattleNetFriend_OnMouseUp = private.TooltipHandler.CellScripts.BattleNetFriend_OnMouseUp
 local ColorPlayerLevel = private.TooltipHandler.Helpers.ColorPlayerLevel
 local ColumnLabel = private.TooltipHandler.Helpers.ColumnLabel
+local CreateSectionHeader = private.TooltipHandler.Helpers.CreateSectionHeader
 local IsUnitGrouped = private.TooltipHandler.Helpers.IsUnitGrouped
-local SectionTitle_OnMouseUp = private.TooltipHandler.CellScripts.SectionTitle_OnMouseUp
 local ToggleColumnSortMethod = private.TooltipHandler.CellScripts.ToggleColumnSortMethod
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
 
 -- Used to handle duplication between in-game and RealID friends.
 local WoWFriendIndexByName = {}
 
--- ----------------------------------------------------------------------------
--- Column and ColSpan
--- ----------------------------------------------------------------------------
-local WoWFriendsColumn = {
+--------------------------------------------------------------------------------
+---- Column and ColSpan
+--------------------------------------------------------------------------------
+
+local ColumnID = {
     Level = 1,
     Class = 2,
     PresenceName = 3,
@@ -39,7 +40,7 @@ local WoWFriendsColumn = {
     Note = 7,
 }
 
-local WoWFriendsColSpan = {
+local ColSpan = {
     Level = 1,
     Class = 1,
     PresenceName = 1,
@@ -49,9 +50,10 @@ local WoWFriendsColSpan = {
     Note = 2,
 }
 
--- ----------------------------------------------------------------------------
--- Data Compilation
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Data Compilation
+--------------------------------------------------------------------------------
+
 local function GenerateData()
     table.wipe(WoWFriendIndexByName)
 
@@ -89,13 +91,16 @@ local function GenerateData()
     end
 end
 
--- ----------------------------------------------------------------------------
--- Cell Scripts
--- ----------------------------------------------------------------------------
-local function WoWFriend_OnMouseUp(_, playerEntry, mouseButton)
+--------------------------------------------------------------------------------
+---- Cell Scripts
+--------------------------------------------------------------------------------
+
+---@param _ LibQTip-2.0.Cell
+---@param friend WoWFriend
+local function WoWFriend_OnMouseUp(_, friend, mouseButton)
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
-    local playerName = playerEntry.Realm == Player.RealmName and playerEntry.ToonName or playerEntry.FullToonName
+    local playerName = friend.RealmName == Player.RealmName and friend.ToonName or friend.FullToonName
 
     if mouseButton == "LeftButton" then
         if IsAltKeyDown() then
@@ -109,141 +114,78 @@ local function WoWFriend_OnMouseUp(_, playerEntry, mouseButton)
     elseif mouseButton == "RightButton" then
         private.TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
         CloseDropDownMenus()
-        FriendsFrame_ShowDropdown(playerEntry.FullToonName, true, nil, nil, nil, true)
+        FriendsFrame_ShowDropdown(friend.FullToonName, true, nil, nil, nil, true)
     end
 end
 
--- ----------------------------------------------------------------------------
--- WoW Friends
--- ----------------------------------------------------------------------------
----@param tooltip LibQTip.Tooltip
+--------------------------------------------------------------------------------
+---- WoW Friends
+--------------------------------------------------------------------------------
+
+---@param tooltip LibQTip-2.0.Tooltip
 local function DisplaySectionWoWFriends(tooltip)
     if #PlayerLists.WoWFriends == 0 then
         return
     end
 
     local DB = private.DB
-    local line = tooltip:AddLine()
+    local sectionIsCollapsed = DB.Tooltip.CollapsedSections.WoWFriends
 
-    if DB.Tooltip.CollapsedSections.WoWFriends then
-        tooltip:SetCell(
-            line,
-            1,
-            ("%s%s%s"):format(Icon.Section.Disabled, FRIENDS, Icon.Section.Disabled),
-            GameFontDisable,
-            "CENTER",
-            0
-        )
-        tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "WoWFriends")
+    CreateSectionHeader(tooltip, FRIENDS, sectionIsCollapsed, "WoWFriends")
 
+    if sectionIsCollapsed then
         return
     end
 
-    tooltip:SetCell(
-        line,
-        1,
-        ("%s%s%s"):format(Icon.Section.Enabled, FRIENDS, Icon.Section.Enabled),
-        GameFontNormal,
-        "CENTER",
-        0
-    )
-    tooltip:SetCellScript(line, 1, "OnMouseUp", SectionTitle_OnMouseUp, "WoWFriends")
+    --------------------------------------------------------------------------------
+    ---- Section Header
+    --------------------------------------------------------------------------------
 
-    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
-
-    -- ----------------------------------------------------------------------------
-    -- Section Header
-    -- ----------------------------------------------------------------------------
     local headerLine = tooltip:AddLine()
-    tooltip:SetLineColor(headerLine, 0, 0, 0, 1)
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.Level,
-        ColumnLabel(Icon.Column.Level, "WoWFriends:Level"),
-        nil,
-        nil,
-        WoWFriendsColSpan.Level
-    )
-    tooltip:SetCellScript(headerLine, WoWFriendsColumn.Level, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.Class,
-        ColumnLabel(Icon.Column.Class, "WoWFriends:Class"),
-        nil,
-        nil,
-        WoWFriendsColSpan.Class
-    )
-    tooltip:SetCellScript(headerLine, WoWFriendsColumn.Class, "OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
+    headerLine:SetColor(0, 0, 0, 1)
 
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.PresenceName,
-        ColumnLabel(BATTLENET_FRIEND, "WoWFriends:PresenceName"),
-        nil,
-        nil,
-        WoWFriendsColSpan.PresenceName
-    )
-    tooltip:SetCellScript(
-        headerLine,
-        WoWFriendsColumn.PresenceName,
-        "OnMouseUp",
-        ToggleColumnSortMethod,
-        "WoWFriends:PresenceName"
-    )
+    headerLine
+        :GetCell(ColumnID.Level, ColSpan.Level)
+        :SetJustifyH("LEFT")
+        :SetText(ColumnLabel(Icon.Column.Level, "WoWFriends:Level"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.ToonName,
-        ColumnLabel(NAME, "WoWFriends:ToonName"),
-        nil,
-        nil,
-        WoWFriendsColSpan.ToonName
-    )
-    tooltip:SetCellScript(
-        headerLine,
-        WoWFriendsColumn.ToonName,
-        "OnMouseUp",
-        ToggleColumnSortMethod,
-        "WoWFriends:ToonName"
-    )
+    headerLine
+        :GetCell(ColumnID.Class, ColSpan.Class)
+        :SetText(ColumnLabel(Icon.Column.Class, "WoWFriends:Class"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
 
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.ZoneName,
-        ColumnLabel(ZONE, "WoWFriends:ZoneName"),
-        nil,
-        nil,
-        WoWFriendsColSpan.ZoneName
-    )
-    tooltip:SetCellScript(
-        headerLine,
-        WoWFriendsColumn.ZoneName,
-        "OnMouseUp",
-        ToggleColumnSortMethod,
-        "WoWFriends:ZoneName"
-    )
+    headerLine
+        :GetCell(ColumnID.PresenceName, ColSpan.PresenceName)
+        :SetText(ColumnLabel(BATTLENET_FRIEND, "WoWFriends:PresenceName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
 
-    tooltip:SetCell(
-        headerLine,
-        WoWFriendsColumn.RealmName,
-        ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"),
-        nil,
-        nil,
-        WoWFriendsColSpan.RealmName
-    )
-    tooltip:SetCellScript(
-        headerLine,
-        WoWFriendsColumn.RealmName,
-        "OnMouseUp",
-        ToggleColumnSortMethod,
-        "WoWFriends:RealmName"
-    )
+    headerLine
+        :GetCell(ColumnID.ToonName, ColSpan.ToonName)
+        :SetText(ColumnLabel(NAME, "WoWFriends:ToonName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
 
-    -- ----------------------------------------------------------------------------
-    -- Section Body
-    -- ----------------------------------------------------------------------------
-    local addedNoteColumn
+    headerLine
+        :GetCell(ColumnID.ZoneName, ColSpan.ZoneName)
+        :SetText(ColumnLabel(ZONE, "WoWFriends:ZoneName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
+
+    headerLine
+        :GetCell(ColumnID.RealmName, ColSpan.RealmName)
+        :SetText(ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
+
+    if DB.Tooltip.NotesArrangement.WoWFriends == private.Preferences.Tooltip.NotesArrangement.Column then
+        headerLine
+            :GetCell(ColumnID.Note, ColSpan.Note)
+            :SetText(ColumnLabel(LABEL_NOTE, "WoWFriends:Note"))
+            :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Note")
+    end
+
+    --------------------------------------------------------------------------------
+    ---- Section Body
+    --------------------------------------------------------------------------------
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -251,124 +193,81 @@ local function DisplaySectionWoWFriends(tooltip)
     local tooltipIcon = private.TooltipHandler.Icon
 
     for index = 1, #PlayerLists.WoWFriends do
-        local player = PlayerLists.WoWFriends[index]
-        local groupIndicator = IsUnitGrouped(player.ToonName) and Icon.Player.Group or ""
-        local presenceName = player.PresenceName
-                and ("%s%s|r"):format(FRIENDS_BNET_NAME_COLOR_CODE, player.PresenceName)
+        local friend = PlayerLists.WoWFriends[index]
+        local groupIndicator = IsUnitGrouped(friend.ToonName) and Icon.Player.Group or ""
+        local presenceName = friend.PresenceName
+                and ("%s%s|r"):format(FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName)
             or NOT_APPLICABLE
 
-        line = tooltip:AddLine()
-        tooltip:SetCell(line, WoWFriendsColumn.Level, ColorPlayerLevel(player.Level), nil, nil, WoWFriendsColSpan.Level)
-        tooltip:SetCell(
-            line,
-            WoWFriendsColumn.Class,
-            tooltipIcon.Class[classToken.Female[player.Class] or classToken.Male[player.Class]],
-            nil,
-            nil,
-            WoWFriendsColSpan.Class
-        )
-        tooltip:SetCell(
-            line,
-            WoWFriendsColumn.PresenceName,
-            ("%s%s"):format(player.StatusIcon, presenceName),
-            nil,
-            nil,
-            WoWFriendsColSpan.PresenceName
-        )
-        tooltip:SetCell(
-            line,
-            WoWFriendsColumn.ToonName,
+        local line = tooltip:AddLine()
+
+        line:GetCell(ColumnID.Level, ColSpan.Level):SetText(ColorPlayerLevel(friend.Level))
+
+        line:GetCell(ColumnID.Class, ColSpan.Class)
+            :SetText(tooltipIcon.Class[classToken.Female[friend.Class] or classToken.Male[friend.Class]])
+
+        line:GetCell(ColumnID.PresenceName, ColSpan.PresenceName)
+            :SetText(("%s%s"):format(friend.StatusIcon, presenceName))
+
+        if friend.PresenceID then
+            line:GetCell(ColumnID.PresenceName):SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
+        end
+
+        local toonNameCell = line:GetCell(ColumnID.ToonName, ColSpan.ToonName)
+
+        toonNameCell:SetText(
             ("%s%s%s|r%s"):format(
                 Icon.Player.Faction,
-                private.TooltipHandler.Class.Color[player.Class] or FRIENDS_WOW_NAME_COLOR_CODE,
-                player.ToonName,
+                private.TooltipHandler.Class.Color[friend.Class] or FRIENDS_WOW_NAME_COLOR_CODE,
+                friend.ToonName,
                 groupIndicator
-            ),
-            nil,
-            nil,
-            WoWFriendsColSpan.ToonName
+            )
         )
-        tooltip:SetCell(
-            line,
-            WoWFriendsColumn.ZoneName,
-            private.MapHandler:ColoredZoneName(player.ZoneName),
-            nil,
-            nil,
-            WoWFriendsColSpan.ZoneName
-        )
-        tooltip:SetCell(line, WoWFriendsColumn.RealmName, player.RealmName, nil, nil, WoWFriendsColSpan.RealmName)
 
-        if player.PresenceID then
-            tooltip:SetCellScript(line, WoWFriendsColumn.PresenceName, "OnMouseUp", BattleNetFriend_OnMouseUp, player)
+        if friend.IsLocalFriend then
+            toonNameCell:SetScript("OnMouseUp", WoWFriend_OnMouseUp, friend)
         end
 
-        if player.IsLocalFriend then
-            tooltip:SetCellScript(line, WoWFriendsColumn.ToonName, "OnMouseUp", WoWFriend_OnMouseUp, player)
-        end
+        line:GetCell(ColumnID.ZoneName, ColSpan.ZoneName):SetText(private.MapHandler:ColoredZoneName(friend.ZoneName))
 
-        if player.Note then
-            local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. player.Note .. "|r"
+        line:GetCell(ColumnID.RealmName, ColSpan.RealmName):SetText(friend.RealmName)
+
+        if friend.Note then
+            local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. friend.Note .. "|r"
 
             if DB.Tooltip.NotesArrangement.WoWFriends == private.Preferences.Tooltip.NotesArrangement.Column then
-                if not addedNoteColumn then
-                    tooltip:SetCell(
-                        headerLine,
-                        WoWFriendsColumn.Note,
-                        ColumnLabel(LABEL_NOTE, "WoWFriends:Note"),
-                        nil,
-                        nil,
-                        WoWFriendsColSpan.Note
-                    )
-                    tooltip:SetCellScript(
-                        headerLine,
-                        WoWFriendsColumn.Note,
-                        "OnMouseUp",
-                        ToggleColumnSortMethod,
-                        "WoWFriends:Note"
-                    )
-
-                    addedNoteColumn = true
-                end
-                tooltip:SetCell(line, WoWFriendsColumn.Note, noteText, nil, nil, WoWFriendsColSpan.Note)
+                line:GetCell(ColumnID.Note, ColSpan.Note):SetText(noteText)
             else
-                tooltip:SetCell(
-                    tooltip:AddLine(),
-                    WoWFriendsColumn.Level,
-                    Icon.Status.Note .. noteText,
-                    "GameTooltipTextSmall",
-                    nil,
-                    0
-                )
+                tooltip
+                    :AddLine()
+                    :GetCell(1, 0)
+                    :SetFont("GameTooltipTextSmall")
+                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
             end
         end
 
-        if player.BroadcastText then
-            tooltip:SetCell(
-                tooltip:AddLine(),
-                WoWFriendsColumn.Level,
-                player.BroadcastText,
-                "GameTooltipTextSmall",
-                nil,
-                0
-            )
+        if friend.BroadcastText then
+            tooltip:AddLine():GetCell(1, 0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
         end
     end
 
     tooltip:AddLine(" ")
 end
 
--- ----------------------------------------------------------------------------
--- TooltipHandler Augmentation
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- TooltipHandler Augmentation
+--------------------------------------------------------------------------------
+
 ---@class TooltipHandler.WoWFriends
 private.TooltipHandler.WoWFriends = {
     DisplaySectionWoWFriends = DisplaySectionWoWFriends,
     GenerateData = GenerateData,
 }
 
--- ----------------------------------------------------------------------------
--- Types
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Types
+--------------------------------------------------------------------------------
+
 ---@class WoWFriend
 ---@field BroadcastText string? -- Only set when the WoW friend is also a BattleNet friend
 ---@field Class string?

@@ -5,13 +5,14 @@ local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@class PrivateNamespace
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
-local LibQTip = LibStub("LibQTip-1.0")
+local LibQTip = LibStub("LibQTip-2.0")
 
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
 local MaxTooltipColumns = 10
 
+---@type table<string, table<string, string>>
 local HelpTipDefinitions = {
     [DISPLAY] = {
         [L.LEFT_CLICK] = BINDING_NAME_TOGGLEFRIENDSTAB,
@@ -47,16 +48,18 @@ local function ShowHelpTip(tooltipCell)
 
     if not helpTip then
         helpTip = LibQTip:Acquire(AddOnFolderName .. "HelpTip", 2)
-        helpTip:SetAutoHideDelay(0.1, tooltipCell)
         helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
         helpTip:SetScale(private.DB.Tooltip.Scale)
-        helpTip:SmartAnchorTo(tooltipCell)
-        helpTip:SetScript("OnLeave", function()
-            LibQTip:Release(helpTip)
-        end)
-        helpTip:Clear()
-        helpTip:SetCellMarginH(0)
-        helpTip:SetCellMarginV(1)
+
+        helpTip
+            :SetAutoHideDelay(0.25, tooltipCell)
+            :SmartAnchorTo(tooltipCell)
+            :SetScript("OnLeave", function()
+                LibQTip:Release(helpTip)
+            end)
+            :Clear()
+            :SetCellMarginH(0)
+            :SetCellMarginV(1)
 
         handler.Tooltip.Help = helpTip
     end
@@ -68,15 +71,15 @@ local function ShowHelpTip(tooltipCell)
             helpTip:AddLine(" ")
         end
 
-        local line = helpTip:AddLine()
-
-        helpTip:SetCell(line, 1, entryType, GameFontNormal, "CENTER", 0)
+        helpTip:AddLine():GetCell(1, 0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
+        helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
 
         for keyStroke, description in pairs(data) do
-            line = helpTip:AddLine()
-            helpTip:SetCell(line, 1, keyStroke)
-            helpTip:SetCell(line, 2, description)
+            local line = helpTip:AddLine()
+
+            line:GetCell(1):SetJustifyH("RIGHT"):SetText(keyStroke --[[@as string]])
+            line:GetCell(2):SetJustifyH("LEFT"):SetText(description)
         end
 
         isInitialSection = false
@@ -91,7 +94,8 @@ end
 -- ----------------------------------------------------------------------------
 -- Display rendering
 -- ----------------------------------------------------------------------------
----@param self LibQTip.Tooltip
+
+---@param self LibQTip-2.0.Tooltip
 local function Tooltip_OnRelease(self)
     HideDropDownMenu(1)
     HideHelpTip()
@@ -107,6 +111,7 @@ local TitleFont = CreateFont("FrenemyTitleFont")
 TitleFont:SetTextColor(0.510, 0.773, 1.0)
 TitleFont:SetFontObject("QuestTitleFont")
 
+---@type table<string, fun(tooltip: LibQTip-2.0.Tooltip)>
 local SectionDisplayFunction = {
     WoWFriends = private.TooltipHandler.WoWFriends.DisplaySectionWoWFriends,
     BattleNetGames = private.TooltipHandler.BattleNet.DisplaySectionBattleNetGames,
@@ -131,27 +136,28 @@ function private.TooltipHandler:Render(anchorFrame)
 
     if not tooltip then
         tooltip = LibQTip:Acquire(AddOnFolderName, MaxTooltipColumns)
-        self.Tooltip.Main = tooltip
 
-        tooltip:SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
-        tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
-        tooltip:SetScale(DB.Tooltip.Scale)
-        tooltip:SmartAnchorTo(anchorFrame)
-        tooltip:SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
-        tooltip:SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
+        tooltip
+            :SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
+            :SmartAnchorTo(anchorFrame)
+            :SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
+            :SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
 
         tooltip.OnRelease = Tooltip_OnRelease
+
+        tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
+        tooltip:SetScale(DB.Tooltip.Scale)
+
+        self.Tooltip.Main = tooltip
     end
 
-    tooltip:Clear()
-    tooltip:SetCellMarginH(0)
-    tooltip:SetCellMarginV(1)
+    tooltip:Clear():SetCellMarginH(0):SetCellMarginV(1)
 
-    tooltip:SetCell(tooltip:AddLine(), 1, AddOnFolderName, TitleFont, "CENTER", 0)
+    tooltip:AddLine():GetCell(1, 0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
     local MOTD = self.Guild.MOTD
-    MOTD.LineID = nil
+    MOTD.Line = nil
     MOTD.Text = nil
 
     for index = 1, #DB.Tooltip.SectionDisplayOrders do
@@ -161,28 +167,24 @@ function private.TooltipHandler:Render(anchorFrame)
     tooltip:Show()
 
     -- This must be done after everything else has been added to the tooltip in order to have an accurate width.
-    if MOTD.LineID and MOTD.Text then
-        tooltip:SetCell(
-            MOTD.LineID,
-            1,
-            ("%s%s|r"):format(GREEN_FONT_COLOR_CODE, MOTD.Text),
-            nil,
-            "LEFT",
-            0,
-            nil,
-            0,
-            0,
-            tooltip:GetWidth() - 20
-        )
+    if MOTD.Line and MOTD.Text then
+        MOTD.Line
+            :GetCell(1, 0)
+            :SetJustifyH("LEFT")
+            :SetMaxWidth(tooltip:GetWidth() --[[@as integer]] - 20)
+            :SetText(("%s%s|r"):format(GREEN_FONT_COLOR_CODE, MOTD.Text))
     end
 
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
-    local line = tooltip:AddLine()
-    tooltip:SetCell(line, MaxTooltipColumns, self.Icon.Help, nil, "RIGHT", 0)
-    tooltip:SetCellScript(line, MaxTooltipColumns, "OnEnter", ShowHelpTip)
-    tooltip:SetCellScript(line, MaxTooltipColumns, "OnLeave", HideHelpTip)
-    tooltip:SetCellScript(line, MaxTooltipColumns, "OnMouseDown", HideHelpTip)
+    tooltip
+        :AddLine()
+        :GetCell(MaxTooltipColumns)
+        :SetJustifyH("RIGHT")
+        :SetText(self.Icon.Help)
+        :SetScript("OnEnter", ShowHelpTip)
+        :SetScript("OnLeave", HideHelpTip)
+        :SetScript("OnMouseDown", HideHelpTip)
 
     tooltip:UpdateScrolling()
 end
