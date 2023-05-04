@@ -9,7 +9,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 -- ----------------------------------------------------------------------------
 -- DataObject Options
 -- ----------------------------------------------------------------------------
----@type table
+---@type AceConfig.OptionsTable
 local DataObjectOptions
 
 local function GetOptions()

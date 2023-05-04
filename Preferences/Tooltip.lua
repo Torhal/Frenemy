@@ -53,7 +53,7 @@ end
 -- ----------------------------------------------------------------------------
 -- Tooltip Options
 -- ----------------------------------------------------------------------------
----@type table
+---@type AceConfig.OptionsTable
 local TooltipOptions
 
 local function GetOptions()
