@@ -381,7 +381,7 @@ private.TooltipHandler = {
                 Busy = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat-BusyMobile]]),
                 Online = CreateIcon([[Interface\ChatFrame\UI-ChatIcon-ArmoryChat]]),
             },
-            Note = CreateIcon(FRIENDS_TEXTURE_OFFLINE),
+            Note = CreateIcon([[Interface\BUTTONS\UI-GuildButton-PublicNote-Up]]),
             Online = CreateIcon(FRIENDS_TEXTURE_ONLINE),
         },
     },
