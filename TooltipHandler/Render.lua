@@ -71,7 +71,7 @@ local function ShowHelpTip(tooltipCell)
             helpTip:AddLine(" ")
         end
 
-        helpTip:AddLine():GetCell(1, 0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
+        helpTip:AddLine():GetCell(1):SetColSpan(0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -153,7 +153,7 @@ function private.TooltipHandler:Render(anchorFrame)
 
     tooltip:Clear():SetCellMarginH(0):SetCellMarginV(1)
 
-    tooltip:AddLine():GetCell(1, 0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
+    tooltip:AddLine():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
     local MOTD = self.Guild.MOTD
@@ -169,7 +169,8 @@ function private.TooltipHandler:Render(anchorFrame)
     -- This must be done after everything else has been added to the tooltip in order to have an accurate width.
     if MOTD.Line and MOTD.Text then
         MOTD.Line
-            :GetCell(1, 0)
+            :GetCell(1)
+            :SetColSpan(0)
             :SetJustifyH("LEFT")
             :SetMaxWidth(tooltip:GetWidth() --[[@as integer]] - 20)
             :SetText(("%s%s|r"):format(GREEN_FONT_COLOR_CODE, MOTD.Text))

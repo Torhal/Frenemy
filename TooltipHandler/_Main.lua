@@ -337,7 +337,8 @@ local function CreateSectionHeader(tooltip, titleText, sectionIsCollapsed, scrip
 
     tooltip
         :AddLine()
-        :GetCell(1, 0)
+        :GetCell(1)
+        :SetColSpan(0)
         :SetJustifyH("CENTER")
         :SetFont(fontName)
         :SetText(("%s %s %s"):format(sectionIcon, titleText, sectionIcon))

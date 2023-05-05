@@ -208,23 +208,27 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
 
     headerLine
         :SetColor(0, 0, 0, 1)
-        :GetCell(ColumnID.PresenceName, ColSpan.PresenceName)
+        :GetCell(ColumnID.PresenceName)
+        :SetColSpan(ColSpan.PresenceName)
         :SetText(ColumnLabel(BATTLENET_FRIEND, ("%s:PresenceName"):format(dataPrefix)))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:PresenceName"):format(dataPrefix))
 
     headerLine
-        :GetCell(ColumnID.ToonName, ColSpan.ToonName)
+        :GetCell(ColumnID.ToonName)
+        :SetColSpan(ColSpan.ToonName)
         :SetText(ColumnLabel(NAME, ("%s:ToonName"):format(dataPrefix)))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:ToonName"):format(dataPrefix))
 
     headerLine
-        :GetCell(ColumnID.GameText, ColSpan.GameText)
+        :GetCell(ColumnID.GameText)
+        :SetColSpan(ColSpan.GameText)
         :SetText(ColumnLabel(INFO, ("%s:GameText"):format(dataPrefix)))
         :SetScript("OnMouseDown", ToggleColumnSortMethod, ("%s:GameText"):format(dataPrefix))
 
     if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
         headerLine
-            :GetCell(ColumnID.Note, ColSpan.Note)
+            :GetCell(ColumnID.Note)
+            :SetColSpan(ColSpan.Note)
             :SetText(ColumnLabel(LABEL_NOTE, ("%s:Note"):format(dataPrefix)))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:Note"):format(dataPrefix))
     end
@@ -239,33 +243,36 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
         local friend = playerList[index]
         local line = tooltip:AddLine()
 
-        line:GetCell(ColumnID.ClientIcon, ColSpan.ClientIcon):SetText(friend.ClientIcon)
+        line:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
 
-        line:GetCell(ColumnID.PresenceName, ColSpan.PresenceName)
+        line:GetCell(ColumnID.PresenceName)
+            :SetColSpan(ColSpan.PresenceName)
             :SetText(("%s%s%s|r"):format(friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName))
             :SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
 
-        line:GetCell(ColumnID.ToonName, ColSpan.ToonName)
+        line:GetCell(ColumnID.ToonName)
+            :SetColSpan(ColSpan.ToonName)
             :SetText(("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName))
 
-        line:GetCell(ColumnID.GameText, ColSpan.GameText):SetText(friend.GameText)
+        line:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
 
         if friend.Note then
             local noteText = ("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.Note)
 
             if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
-                line:GetCell(ColumnID.Note, ColSpan.Note):SetText(noteText)
+                line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
             else
                 tooltip
                     :AddLine()
-                    :GetCell(1, 0)
+                    :GetCell(1)
+                    :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
                     :SetText(("%s %s"):format(Icon.Status.Note, noteText))
             end
         end
 
         if friend.BroadcastText then
-            tooltip:AddLine():GetCell(1, 0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
+            tooltip:AddLine():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
         end
     end
 
