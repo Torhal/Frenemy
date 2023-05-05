@@ -3,18 +3,21 @@
 --------------------------------------------------------------------------------
 
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
 local Icon = private.TooltipHandler.Icon
 local OnlineFriendsByName = private.TooltipHandler.OnlineFriendsByName
 local People = private.People
-local Player = private.TooltipHandler.Player
-local PlayerLists = private.TooltipHandler.PlayerLists
 
-local BattleNetFriend_OnMouseUp = private.TooltipHandler.CellScripts.BattleNetFriend_OnMouseUp
-local ColumnLabel = private.TooltipHandler.Helpers.ColumnLabel
-local CreateSectionHeader = private.TooltipHandler.Helpers.CreateSectionHeader
-local ToggleColumnSortMethod = private.TooltipHandler.CellScripts.ToggleColumnSortMethod
+local TooltipHandler = private.TooltipHandler
+local Player = TooltipHandler.Player
+local PlayerLists = TooltipHandler.PlayerLists
+
+local BattleNetFriend_OnMouseUp = TooltipHandler.CellScripts.BattleNetFriend_OnMouseUp
+local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
+
+---@class TooltipHandler.BattleNetSection
+local BattleNetSection = TooltipHandler.BattleNetSection
 
 --------------------------------------------------------------------------------
 ---- Constants
@@ -73,10 +76,6 @@ local BattleNetNonGameClient = {
 -- Used to handle duplication between in-game and RealID friends.
 local OnlineFriendsByPresenceName = {}
 
---------------------------------------------------------------------------------
----- Column and ColSpan
---------------------------------------------------------------------------------
-
 local ColumnID = {
     ClientIcon = 1,
     PresenceName = 2,
@@ -94,10 +93,157 @@ local ColSpan = {
 }
 
 --------------------------------------------------------------------------------
----- Data Compilation
+---- Helpers
 --------------------------------------------------------------------------------
 
-local function GenerateData()
+---@param tooltip LibQTip-2.0.Tooltip
+---@param playerList BattleNetFriend[]
+---@param dataPrefix "BattleNetApp"|"BattleNetGames"
+---@param headerLine LibQTip-2.0.Line
+---@param noteArrangement NotesArrangement
+local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine, noteArrangement)
+    --------------------------------------------------------------------------------
+    ---- Section Header
+    --------------------------------------------------------------------------------
+
+    headerLine
+        :SetColor(0, 0, 0, 1)
+        :GetCell(ColumnID.PresenceName)
+        :SetColSpan(ColSpan.PresenceName)
+        :SetText(TooltipHandler:ColumnLabel(BATTLENET_FRIEND, ("%s:PresenceName"):format(dataPrefix)))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:PresenceName"):format(dataPrefix))
+
+    headerLine
+        :GetCell(ColumnID.ToonName)
+        :SetColSpan(ColSpan.ToonName)
+        :SetText(TooltipHandler:ColumnLabel(NAME, ("%s:ToonName"):format(dataPrefix)))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:ToonName"):format(dataPrefix))
+
+    headerLine
+        :GetCell(ColumnID.GameText)
+        :SetColSpan(ColSpan.GameText)
+        :SetText(TooltipHandler:ColumnLabel(INFO, ("%s:GameText"):format(dataPrefix)))
+        :SetScript("OnMouseDown", ToggleColumnSortMethod, ("%s:GameText"):format(dataPrefix))
+
+    if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
+        headerLine
+            :GetCell(ColumnID.Note)
+            :SetColSpan(ColSpan.Note)
+            :SetText(TooltipHandler:ColumnLabel(LABEL_NOTE, ("%s:Note"):format(dataPrefix)))
+            :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:Note"):format(dataPrefix))
+    end
+
+    --------------------------------------------------------------------------------
+    ---- Section Body
+    --------------------------------------------------------------------------------
+
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
+    for index = 1, #playerList do
+        local friend = playerList[index]
+        local line = tooltip:AddLine()
+
+        line:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
+
+        line:GetCell(ColumnID.PresenceName)
+            :SetColSpan(ColSpan.PresenceName)
+            :SetText(("%s%s%s|r"):format(friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName))
+            :SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
+
+        line:GetCell(ColumnID.ToonName)
+            :SetColSpan(ColSpan.ToonName)
+            :SetText(("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName))
+
+        line:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
+
+        if friend.Note then
+            local noteText = ("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.Note)
+
+            if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
+                line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
+            else
+                tooltip
+                    :AddLine()
+                    :GetCell(1)
+                    :SetColSpan(0)
+                    :SetFont("GameTooltipTextSmall")
+                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
+            end
+        end
+
+        if friend.BroadcastText then
+            tooltip:AddLine():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
+        end
+    end
+
+    tooltip:AddLine(" ")
+end
+
+--------------------------------------------------------------------------------
+---- Methods
+--------------------------------------------------------------------------------
+
+---@param tooltip LibQTip-2.0.Tooltip
+function BattleNetSection:DisplayApps(tooltip)
+    if #PlayerLists.BattleNetApp == 0 then
+        return
+    end
+
+    local DB = private.DB
+    local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetApp
+
+    TooltipHandler:CreateSectionHeader(tooltip, BATTLENET_OPTIONS_LABEL, sectionIsCollapsed, "BattleNetApp")
+
+    if sectionIsCollapsed then
+        return
+    end
+
+    RenderBattleNetLines(
+        tooltip,
+        PlayerLists.BattleNetApp,
+        "BattleNetApp",
+        tooltip:AddLine(),
+        DB.Tooltip.NotesArrangement.BattleNetApp
+    )
+end
+
+---@param tooltip LibQTip-2.0.Tooltip
+function BattleNetSection:DisplayGames(tooltip)
+    if #PlayerLists.BattleNetGames == 0 then
+        return
+    end
+
+    local DB = private.DB
+    local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetGames
+
+    TooltipHandler:CreateSectionHeader(
+        tooltip,
+        ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
+        sectionIsCollapsed,
+        "BattleNetGames"
+    )
+
+    if sectionIsCollapsed then
+        return
+    end
+
+    local headerLine = tooltip:AddLine()
+
+    headerLine
+        :GetCell(ColumnID.ClientIcon)
+        :SetText(TooltipHandler:ColumnLabel(Icon.Column.Game, "BattleNetGames:ClientIndex"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
+
+    RenderBattleNetLines(
+        tooltip,
+        PlayerLists.BattleNetGames,
+        "BattleNetGames",
+        headerLine,
+        DB.Tooltip.NotesArrangement.BattleNetGames
+    )
+end
+
+function BattleNetSection:GenerateData()
     table.wipe(OnlineFriendsByPresenceName)
 
     if People.BattleNet.Total == 0 then
@@ -191,172 +337,6 @@ local function GenerateData()
         end
     end
 end
-
---------------------------------------------------------------------------------
----- Helpers
---------------------------------------------------------------------------------
-
----@param tooltip LibQTip-2.0.Tooltip
----@param playerList BattleNetFriend[]
----@param dataPrefix "BattleNetApp"|"BattleNetGames"
----@param headerLine LibQTip-2.0.Line
----@param noteArrangement NotesArrangement
-local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine, noteArrangement)
-    --------------------------------------------------------------------------------
-    ---- Section Header
-    --------------------------------------------------------------------------------
-
-    headerLine
-        :SetColor(0, 0, 0, 1)
-        :GetCell(ColumnID.PresenceName)
-        :SetColSpan(ColSpan.PresenceName)
-        :SetText(ColumnLabel(BATTLENET_FRIEND, ("%s:PresenceName"):format(dataPrefix)))
-        :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:PresenceName"):format(dataPrefix))
-
-    headerLine
-        :GetCell(ColumnID.ToonName)
-        :SetColSpan(ColSpan.ToonName)
-        :SetText(ColumnLabel(NAME, ("%s:ToonName"):format(dataPrefix)))
-        :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:ToonName"):format(dataPrefix))
-
-    headerLine
-        :GetCell(ColumnID.GameText)
-        :SetColSpan(ColSpan.GameText)
-        :SetText(ColumnLabel(INFO, ("%s:GameText"):format(dataPrefix)))
-        :SetScript("OnMouseDown", ToggleColumnSortMethod, ("%s:GameText"):format(dataPrefix))
-
-    if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
-        headerLine
-            :GetCell(ColumnID.Note)
-            :SetColSpan(ColSpan.Note)
-            :SetText(ColumnLabel(LABEL_NOTE, ("%s:Note"):format(dataPrefix)))
-            :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:Note"):format(dataPrefix))
-    end
-
-    --------------------------------------------------------------------------------
-    ---- Section Body
-    --------------------------------------------------------------------------------
-
-    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
-
-    for index = 1, #playerList do
-        local friend = playerList[index]
-        local line = tooltip:AddLine()
-
-        line:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
-
-        line:GetCell(ColumnID.PresenceName)
-            :SetColSpan(ColSpan.PresenceName)
-            :SetText(("%s%s%s|r"):format(friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName))
-            :SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
-
-        line:GetCell(ColumnID.ToonName)
-            :SetColSpan(ColSpan.ToonName)
-            :SetText(("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName))
-
-        line:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
-
-        if friend.Note then
-            local noteText = ("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.Note)
-
-            if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
-                line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
-            else
-                tooltip
-                    :AddLine()
-                    :GetCell(1)
-                    :SetColSpan(0)
-                    :SetFont("GameTooltipTextSmall")
-                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
-            end
-        end
-
-        if friend.BroadcastText then
-            tooltip:AddLine():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
-        end
-    end
-
-    tooltip:AddLine(" ")
-end
-
---------------------------------------------------------------------------------
----- BattleNet In-Game Friends
---------------------------------------------------------------------------------
-
----@param tooltip LibQTip-2.0.Tooltip
-local function DisplaySectionBattleNetGames(tooltip)
-    if #PlayerLists.BattleNetGames == 0 then
-        return
-    end
-
-    local DB = private.DB
-    local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetGames
-
-    CreateSectionHeader(
-        tooltip,
-        ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
-        sectionIsCollapsed,
-        "BattleNetGames"
-    )
-
-    if sectionIsCollapsed then
-        return
-    end
-
-    local headerLine = tooltip:AddLine()
-
-    headerLine
-        :GetCell(ColumnID.ClientIcon)
-        :SetText(ColumnLabel(Icon.Column.Game, "BattleNetGames:ClientIndex"))
-        :SetScript("OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
-
-    RenderBattleNetLines(
-        tooltip,
-        PlayerLists.BattleNetGames,
-        "BattleNetGames",
-        headerLine,
-        DB.Tooltip.NotesArrangement.BattleNetGames
-    )
-end
-
---------------------------------------------------------------------------------
----- BattleNet Friends
---------------------------------------------------------------------------------
-
----@param tooltip LibQTip-2.0.Tooltip
-local function DisplaySectionBattleNetApp(tooltip)
-    if #PlayerLists.BattleNetApp == 0 then
-        return
-    end
-
-    local DB = private.DB
-    local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetApp
-
-    CreateSectionHeader(tooltip, BATTLENET_OPTIONS_LABEL, sectionIsCollapsed, "BattleNetApp")
-
-    if sectionIsCollapsed then
-        return
-    end
-
-    RenderBattleNetLines(
-        tooltip,
-        PlayerLists.BattleNetApp,
-        "BattleNetApp",
-        tooltip:AddLine(),
-        DB.Tooltip.NotesArrangement.BattleNetApp
-    )
-end
-
---------------------------------------------------------------------------------
----- TooltipHandler Augmentation
---------------------------------------------------------------------------------
-
----@class TooltipHandler.BattleNet
-private.TooltipHandler.BattleNet = {
-    DisplaySectionBattleNetApp = DisplaySectionBattleNetApp,
-    DisplaySectionBattleNetGames = DisplaySectionBattleNetGames,
-    GenerateData = GenerateData,
-}
 
 --------------------------------------------------------------------------------
 ---- Types

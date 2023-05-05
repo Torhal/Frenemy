@@ -2,10 +2,13 @@
 -- AddOn Namespace
 -- ----------------------------------------------------------------------------
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 local LibQTip = LibStub("LibQTip-2.0")
+
+---@class TooltipHandler
+local TooltipHandler = private.TooltipHandler
 
 -- ----------------------------------------------------------------------------
 -- Constants
@@ -32,19 +35,16 @@ local HelpTipDefinitions = {
 -- Cell Scripts
 -- ----------------------------------------------------------------------------
 local function HideHelpTip()
-    local handler = private.TooltipHandler
-
-    if handler.Tooltip.Help then
-        LibQTip:Release(handler.Tooltip.Help)
-        handler.Tooltip.Help = nil
+    if TooltipHandler.Tooltip.Help then
+        LibQTip:Release(TooltipHandler.Tooltip.Help)
+        TooltipHandler.Tooltip.Help = nil
     end
 
-    handler.Tooltip.Main:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
+    TooltipHandler.Tooltip.Main:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
 end
 
 local function ShowHelpTip(tooltipCell)
-    local handler = private.TooltipHandler
-    local helpTip = handler.Tooltip.Help
+    local helpTip = TooltipHandler.Tooltip.Help
 
     if not helpTip then
         helpTip = LibQTip:Acquire(AddOnFolderName .. "HelpTip", 2)
@@ -61,7 +61,7 @@ local function ShowHelpTip(tooltipCell)
             :SetCellMarginH(0)
             :SetCellMarginV(1)
 
-        handler.Tooltip.Help = helpTip
+        TooltipHandler.Tooltip.Help = helpTip
     end
 
     local isInitialSection = true
@@ -87,7 +87,7 @@ local function ShowHelpTip(tooltipCell)
 
     HideDropDownMenu(1)
 
-    handler.Tooltip.Main:SetFrameStrata("DIALOG")
+    TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
     helpTip:Show()
 end
 
@@ -102,26 +102,24 @@ local function Tooltip_OnRelease(self)
 
     self:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
 
-    local handler = private.TooltipHandler
-    handler.Tooltip.AnchorFrame = nil
-    handler.Tooltip.Main = nil
+    TooltipHandler.Tooltip.AnchorFrame = nil
+    TooltipHandler.Tooltip.Main = nil
 end
 
 local TitleFont = CreateFont("FrenemyTitleFont")
 TitleFont:SetTextColor(0.510, 0.773, 1.0)
 TitleFont:SetFontObject("QuestTitleFont")
 
----@type table<string, fun(tooltip: LibQTip-2.0.Tooltip)>
 local SectionDisplayFunction = {
-    WoWFriends = private.TooltipHandler.WoWFriends.DisplaySectionWoWFriends,
-    BattleNetGames = private.TooltipHandler.BattleNet.DisplaySectionBattleNetGames,
-    BattleNetApp = private.TooltipHandler.BattleNet.DisplaySectionBattleNetApp,
-    Guild = private.TooltipHandler.Guild.DisplaySectionGuild,
+    WoWFriends = TooltipHandler.WoWFriendSection.Display,
+    BattleNetGames = TooltipHandler.BattleNetSection.DisplayGames,
+    BattleNetApp = TooltipHandler.BattleNetSection.DisplayApps,
+    Guild = TooltipHandler.GuildSection.Display,
 }
 
 ---@param self TooltipHandler
 ---@param anchorFrame? Frame Anchor frame for the tooltip display
-function private.TooltipHandler:Render(anchorFrame)
+function TooltipHandler:Render(anchorFrame)
     anchorFrame = anchorFrame or self.Tooltip.AnchorFrame
 
     if not anchorFrame then
@@ -156,12 +154,12 @@ function private.TooltipHandler:Render(anchorFrame)
     tooltip:AddLine():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
-    local MOTD = self.Guild.MOTD
+    local MOTD = self.GuildSection.MOTD
     MOTD.Line = nil
     MOTD.Text = nil
 
     for index = 1, #DB.Tooltip.SectionDisplayOrders do
-        SectionDisplayFunction[DB.Tooltip.SectionDisplayOrders[index]](tooltip)
+        SectionDisplayFunction[DB.Tooltip.SectionDisplayOrders[index]](nil, tooltip)
     end
 
     tooltip:Show()

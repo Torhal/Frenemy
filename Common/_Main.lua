@@ -6,9 +6,12 @@ local AddOnFolderName = ... ---@type string
 
 ---@class PrivateNamespace
 ---@field MapHandler MapHandler
+---@field People table
+---@field TooltipHandler TooltipHandler
 local private = select(2, ...)
 
 private.MapHandler = {}
+private.TooltipHandler = {}
 
 -- ----------------------------------------------------------------------------
 -- Statistics: Populated and maintained in UpdateStatistics()

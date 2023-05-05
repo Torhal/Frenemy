@@ -2,30 +2,35 @@
 -- AddOn Namespace
 -- ----------------------------------------------------------------------------
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
-local Icon = private.TooltipHandler.Icon
 local MapHandler = private.MapHandler
-local Player = private.TooltipHandler.Player
-local PlayerLists = private.TooltipHandler.PlayerLists
 
-local ColorPlayerLevel = private.TooltipHandler.Helpers.ColorPlayerLevel
-local ColumnLabel = private.TooltipHandler.Helpers.ColumnLabel
-local CreateSectionHeader = private.TooltipHandler.Helpers.CreateSectionHeader
-local IsUnitGrouped = private.TooltipHandler.Helpers.IsUnitGrouped
-local ToggleColumnSortMethod = private.TooltipHandler.CellScripts.ToggleColumnSortMethod
+local TooltipHandler = private.TooltipHandler
+local Icon = TooltipHandler.Icon
+local Player = TooltipHandler.Player
+local PlayerLists = TooltipHandler.PlayerLists
+
+local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
 
 local Dialog = LibStub("LibDialog-1.0")
+
+---@class TooltipHandler.GuildSection
+local GuildSection = TooltipHandler.GuildSection
+
+---@class TooltipHandler.GuildSection.MOTD
+---@field Line LibQTip-2.0.Line|nil
+---@field Text string|nil
+GuildSection.MOTD = {
+    Line = nil,
+    Text = nil,
+}
 
 -- ----------------------------------------------------------------------------
 -- Constants
 -- ----------------------------------------------------------------------------
 -- Used to handle duplication between in-game and RealID friends.
 local GuildMemberIndexByName = {}
-
--- ----------------------------------------------------------------------------
--- Column and ColSpan
--- ----------------------------------------------------------------------------
 
 local ColumnID = {
     Level = 1,
@@ -46,65 +51,6 @@ local ColSpan = {
     PublicNote = 2,
     OfficerNote = 2,
 }
-
--- ----------------------------------------------------------------------------
--- Data Compilation
--- ----------------------------------------------------------------------------
-local function GenerateData()
-    table.wipe(GuildMemberIndexByName)
-
-    if not IsInGuild() then
-        return
-    end
-
-    for index = 1, GetNumGuildMembers() do
-        local fullToonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, awayStatus, _, _, _, isMobile =
-            GetGuildRosterInfo(index)
-
-        if isOnline or isMobile then
-            local toonName, realmName = strsplit("-", fullToonName)
-
-            local statusIcon
-            if awayStatus == 0 then
-                statusIcon = isOnline and Icon.Status.Online or Icon.Status.Mobile.Online
-            elseif awayStatus == 1 then
-                statusIcon = isOnline and Icon.Status.AFK or Icon.Status.Mobile.Away
-            elseif awayStatus == 2 then
-                statusIcon = isOnline and Icon.Status.DND or Icon.Status.Mobile.Busy
-            end
-
-            -- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
-            -- traveling with the tooltip showing.
-            if isOnline and toonName == Player.Name then
-                zoneName = MapHandler.Data.MapName
-            end
-
-            GuildMemberIndexByName[fullToonName] = index
-            GuildMemberIndexByName[toonName] = index
-
-            table.insert(
-                PlayerLists.Guild,
-                ---@type GuildMember
-                {
-                    Class = class,
-                    FullToonName = fullToonName,
-                    IsMobile = isMobile,
-                    Level = level,
-                    OfficerNote = officerNote ~= "" and officerNote or nil,
-                    PublicNote = note ~= "" and note or nil,
-                    Rank = rank,
-                    RankIndex = rankIndex,
-                    RealmName = realmName or Player.RealmName,
-                    StatusIcon = statusIcon,
-                    ToonName = toonName,
-                    ZoneName = isMobile
-                            and (isOnline and ("%s %s"):format(zoneName or UNKNOWN, PARENS_TEMPLATE:format(REMOTE_CHAT)) or REMOTE_CHAT)
-                        or (zoneName or UNKNOWN),
-                }
-            )
-        end
-    end
-end
 
 -- ----------------------------------------------------------------------------
 -- Dialogs
@@ -165,7 +111,7 @@ local function GuildMember_OnMouseUp(_, playerEntry, button)
             SetGuildRosterSelection(GuildMemberIndexByName[playerName])
             StaticPopup_Show("SET_GUILDOFFICERNOTE")
         else
-            private.TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
+            TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
             CloseDropDownMenus()
             GuildRoster_ShowMemberDropDown(playerName, true, playerEntry.IsMobile)
         end
@@ -203,11 +149,12 @@ local function PercentColorGradient(min, max)
         blue_low + (blue_mid - blue_low) * fractional
 end
 
--- ----------------------------------------------------------------------------
--- Guild
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Methods
+--------------------------------------------------------------------------------
+
 ---@param tooltip LibQTip-2.0.Tooltip
-local function DisplaySectionGuild(tooltip)
+function GuildSection:Display(tooltip)
     if #PlayerLists.Guild == 0 then
         return
     end
@@ -215,7 +162,7 @@ local function DisplaySectionGuild(tooltip)
     local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.Guild
 
-    CreateSectionHeader(tooltip, GetGuildInfo("player"), sectionIsCollapsed, "Guild")
+    TooltipHandler:CreateSectionHeader(tooltip, GetGuildInfo("player"), sectionIsCollapsed, "Guild")
 
     if sectionIsCollapsed then
         return
@@ -230,38 +177,38 @@ local function DisplaySectionGuild(tooltip)
         :SetColor(0, 0, 0, 1)
         :GetCell(ColumnID.Level)
         :SetColSpan(ColSpan.Level)
-        :SetText(ColumnLabel(Icon.Column.Level, "Guild:Level"))
+        :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "Guild:Level"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
 
     headerLine
         :GetCell(ColumnID.Class)
         :SetColSpan(ColSpan.Class)
-        :SetText(ColumnLabel(Icon.Column.Class, "Guild:Class"))
+        :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "Guild:Class"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Class")
 
     headerLine
         :GetCell(ColumnID.ToonName)
         :SetColSpan(ColSpan.ToonName)
-        :SetText(ColumnLabel(NAME, "Guild:ToonName"))
+        :SetText(TooltipHandler:ColumnLabel(NAME, "Guild:ToonName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
 
     headerLine
         :GetCell(ColumnID.Rank)
         :SetColSpan(ColSpan.Rank)
-        :SetText(ColumnLabel(RANK, "Guild:RankIndex"))
+        :SetText(TooltipHandler:ColumnLabel(RANK, "Guild:RankIndex"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
 
     headerLine
         :GetCell(ColumnID.ZoneName)
         :SetColSpan(ColSpan.ZoneName)
-        :SetText(ColumnLabel(ZONE, "Guild:ZoneName"))
+        :SetText(TooltipHandler:ColumnLabel(ZONE, "Guild:ZoneName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
 
     if DB.Tooltip.NotesArrangement.Guild == private.Preferences.Tooltip.NotesArrangement.Column then
         headerLine
             :GetCell(ColumnID.PublicNote)
             :SetColSpan(ColSpan.PublicNote)
-            :SetText(ColumnLabel(NOTE, "Guild:PublicNote"))
+            :SetText(TooltipHandler:ColumnLabel(NOTE, "Guild:PublicNote"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:PublicNote")
     end
 
@@ -269,7 +216,7 @@ local function DisplaySectionGuild(tooltip)
         headerLine
             :GetCell(ColumnID.OfficerNote)
             :SetColSpan(ColSpan.OfficerNote)
-            :SetText(ColumnLabel(GUILD_OFFICERNOTES_LABEL, "Guild:OfficerNote"))
+            :SetText(TooltipHandler:ColumnLabel(GUILD_OFFICERNOTES_LABEL, "Guild:OfficerNote"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:OfficerNote")
     end
 
@@ -280,9 +227,7 @@ local function DisplaySectionGuild(tooltip)
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
     local numGuildRanks = GuildControlGetNumRanks()
-
-    local classToken = private.TooltipHandler.Class.Token
-    local tooltipIcon = private.TooltipHandler.Icon
+    local classToken = TooltipHandler.Class.Token
 
     for index = 1, #PlayerLists.Guild do
         local guildMate = PlayerLists.Guild[index]
@@ -292,20 +237,20 @@ local function DisplaySectionGuild(tooltip)
         line:GetCell(ColumnID.Level)
             :SetColSpan(ColSpan.Level)
             :SetJustifyH("LEFT")
-            :SetText(ColorPlayerLevel(guildMate.Level))
+            :SetText(TooltipHandler:ColorPlayerLevel(guildMate.Level))
 
         line:GetCell(ColumnID.Class)
             :SetColSpan(ColSpan.Class)
-            :SetText(tooltipIcon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
+            :SetText(Icon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
 
         line:GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)
             :SetText(
                 ("%s%s%s|r%s"):format(
                     guildMate.StatusIcon,
-                    private.TooltipHandler.Class.Color[guildMate.Class] or "|cffffff",
+                    TooltipHandler.Class.Color[guildMate.Class] or "|cffffff",
                     guildMate.ToonName,
-                    IsUnitGrouped(guildMate.ToonName) and Icon.Player.Group or ""
+                    TooltipHandler:IsUnitGrouped(guildMate.ToonName) and Icon.Player.Group or ""
                 )
             )
             :SetScript("OnMouseUp", GuildMember_OnMouseUp, guildMate)
@@ -351,7 +296,7 @@ local function DisplaySectionGuild(tooltip)
         end
     end
 
-    local MOTD = private.TooltipHandler.Guild.MOTD
+    local MOTD = GuildSection.MOTD
     MOTD.Text = GetGuildRosterMOTD()
 
     if not MOTD.Text or MOTD.Text == "" then
@@ -373,25 +318,66 @@ local function DisplaySectionGuild(tooltip)
     tooltip:AddLine(" ")
 end
 
--- ----------------------------------------------------------------------------
--- TooltipHandler Augmentation
--- ----------------------------------------------------------------------------
----@class TooltipHandler.Guild
-private.TooltipHandler.Guild = {
-    DisplaySectionGuild = DisplaySectionGuild,
-    GenerateData = GenerateData,
-    ---@class TooltipHandler.Guild.MOTD
-    ---@field Line LibQTip-2.0.Line|nil
-    ---@field Text string|nil
-    MOTD = {
-        Line = nil,
-        Text = nil,
-    },
-}
+function GuildSection:GenerateData()
+    table.wipe(GuildMemberIndexByName)
 
--- ----------------------------------------------------------------------------
--- Types
--- ----------------------------------------------------------------------------
+    if not IsInGuild() then
+        return
+    end
+
+    for index = 1, GetNumGuildMembers() do
+        local fullToonName, rank, rankIndex, level, class, zoneName, note, officerNote, isOnline, awayStatus, _, _, _, isMobile =
+            GetGuildRosterInfo(index)
+
+        if isOnline or isMobile then
+            local toonName, realmName = strsplit("-", fullToonName)
+
+            local statusIcon
+            if awayStatus == 0 then
+                statusIcon = isOnline and Icon.Status.Online or Icon.Status.Mobile.Online
+            elseif awayStatus == 1 then
+                statusIcon = isOnline and Icon.Status.AFK or Icon.Status.Mobile.Away
+            elseif awayStatus == 2 then
+                statusIcon = isOnline and Icon.Status.DND or Icon.Status.Mobile.Busy
+            end
+
+            -- Don't rely on the zoneName from GetGuildRosterInfo - it can be slow, and the player should see their own zone change instantaneously if
+            -- traveling with the tooltip showing.
+            if isOnline and toonName == Player.Name then
+                zoneName = MapHandler.Data.MapName
+            end
+
+            GuildMemberIndexByName[fullToonName] = index
+            GuildMemberIndexByName[toonName] = index
+
+            table.insert(
+                PlayerLists.Guild,
+                ---@type GuildMember
+                {
+                    Class = class,
+                    FullToonName = fullToonName,
+                    IsMobile = isMobile,
+                    Level = level,
+                    OfficerNote = officerNote ~= "" and officerNote or nil,
+                    PublicNote = note ~= "" and note or nil,
+                    Rank = rank,
+                    RankIndex = rankIndex,
+                    RealmName = realmName or Player.RealmName,
+                    StatusIcon = statusIcon,
+                    ToonName = toonName,
+                    ZoneName = isMobile
+                            and (isOnline and ("%s %s"):format(zoneName or UNKNOWN, PARENS_TEMPLATE:format(REMOTE_CHAT)) or REMOTE_CHAT)
+                        or (zoneName or UNKNOWN),
+                }
+            )
+        end
+    end
+end
+
+--------------------------------------------------------------------------------
+---- Types
+--------------------------------------------------------------------------------
+
 ---@class GuildMember
 ---@field Class string
 ---@field FullToonName string
