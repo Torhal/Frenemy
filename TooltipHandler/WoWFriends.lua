@@ -100,7 +100,7 @@ end
 local function WoWFriend_OnMouseUp(_, friend, mouseButton)
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
-    local playerName = friend.RealmName == Player.RealmName and friend.ToonName or friend.FullToonName
+    local playerName = friend.RealmName == Player.RealmName and friend.ToonName or friend.FullToonName or ""
 
     if mouseButton == "LeftButton" then
         if IsAltKeyDown() then
