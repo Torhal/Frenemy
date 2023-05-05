@@ -5,11 +5,11 @@
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
-local Icon = private.TooltipHandler.Icon
-local OnlineFriendsByName = private.TooltipHandler.OnlineFriendsByName
 local People = private.People
 
 local TooltipHandler = private.TooltipHandler
+local Icon = TooltipHandler.Icon
+local OnlineFriendsByName = TooltipHandler.OnlineFriendsByName
 local Player = TooltipHandler.Player
 local PlayerLists = TooltipHandler.PlayerLists
 
