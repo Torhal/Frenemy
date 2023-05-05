@@ -1,8 +1,14 @@
--- ----------------------------------------------------------------------------
--- AddOn namespace.
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+
+---@class PrivateNamespace
+---@field MapHandler MapHandler
+local private = select(2, ...)
+
+private.MapHandler = {}
 
 -- ----------------------------------------------------------------------------
 -- Statistics: Populated and maintained in UpdateStatistics()
@@ -24,9 +30,10 @@ local People = {
 
 private.People = People
 
--- ----------------------------------------------------------------------------
--- Helpers
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Helpers
+--------------------------------------------------------------------------------
+
 function private.UpdateStatistics()
     People.BattleNet.Total, People.BattleNet.Online = BNGetNumFriends()
     People.Friends.Total = C_FriendList.GetNumFriends()

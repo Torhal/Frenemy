@@ -1,14 +1,28 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
 local HereBeDragons = LibStub("HereBeDragons-2.0")
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
+---@class MapHandler
+local MapHandler = private.MapHandler
+
+---@class MapHandler.Data
+---@field MapID? number The player's current UIMapID
+---@field MapName string The name of the map for the UIMapID
+---@field RGBColor table Populated during travel, and stored in SavedVariables
+MapHandler.Data = {
+    MapID = nil,
+    MapName = UNKNOWN,
+}
+
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
 ---@enum ZonePVPStatus
 local ZonePVPStatus = {
     Alliance = 1,
@@ -30,9 +44,10 @@ local ZonePVPStatusByLabel = {
     SANCTUARY = ZonePVPStatus.Sanctuary,
 }
 
--- ----------------------------------------------------------------------------
--- Color Data
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Color Data
+--------------------------------------------------------------------------------
+
 local function GetRGBForFaction(factionName)
     if factionName == UnitFactionGroup("player") then
         return { r = 0.1, g = 1.0, b = 0.1 }
@@ -51,13 +66,17 @@ local ZonePVPStatusRGB = {
     [ZonePVPStatus.Sanctuary] = { r = 0.41, g = 0.8, b = 0.94 },
 }
 
--- ----------------------------------------------------------------------------
--- Helpers
--- ----------------------------------------------------------------------------
----@param self MapHandler
+MapHandler.Data.RGBColor = {
+    [GARRISON_LOCATION_TOOLTIP] = ZonePVPStatusRGB[ZonePVPStatus.Normal],
+}
+
+--------------------------------------------------------------------------------
+---- Methods
+--------------------------------------------------------------------------------
+
 ---@param zoneName string The name of the zone
 ---@return string coloredZoneName
-local function ColoredZoneName(self, zoneName)
+function MapHandler:ColoredZoneName(zoneName)
     local color = self.Data.RGBColor[zoneName:gsub(" %b()", "")] or GRAY_FONT_COLOR
 
     return ("|cff%02x%02x%02x%s|r"):format(color.r * 255, color.g * 255, color.b * 255, zoneName or UNKNOWN)
@@ -65,14 +84,13 @@ end
 
 ---@param pvpType string
 ---@return ZonePVPStatus zonePVPStatus
-local function GetZonePVPStatus(pvpType)
+function MapHandler:GetZonePVPStatus(pvpType)
     return ZonePVPStatusByLabel[pvpType:upper()]
 end
 
----@param self MapHandler
 ---@param mapID number
 ---@param zonePVPStatus ZonePVPStatus
-local function SetRGBColor(self, mapID, zonePVPStatus)
+function MapHandler:SetRGBColor(mapID, zonePVPStatus)
     local mapName = HereBeDragons:GetLocalizedMap(mapID)
 
     if not mapName then
@@ -83,22 +101,3 @@ local function SetRGBColor(self, mapID, zonePVPStatus)
 
     self.Data.RGBColor[mapName] = ZonePVPStatusRGB[zonePVPStatus]
 end
-
--- ----------------------------------------------------------------------------
--- Map
--- ----------------------------------------------------------------------------
----@class MapHandler
-private.MapHandler = {
-    Data = {
-        -- The player's current UIMapID
-        MapID = nil, ---@type nil|number
-        MapName = UNKNOWN, ---@type string
-        -- Populated during travel, and stored in SavedVariables.
-        RGBColor = {
-            [GARRISON_LOCATION_TOOLTIP] = ZonePVPStatusRGB[ZonePVPStatus.Normal],
-        },
-    },
-    ColoredZoneName = ColoredZoneName,
-    GetZonePVPStatus = GetZonePVPStatus,
-    SetRGBColor = SetRGBColor,
-}

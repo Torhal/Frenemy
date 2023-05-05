@@ -17,9 +17,9 @@ local HereBeDragons = LibStub("HereBeDragons-2.0")
 -- ----------------------------------------------------------------------------
 -- Events.
 -- ----------------------------------------------------------------------------
----@param callbackName string Unused, but is passed from HereBeDragons so it must be handled in the parameter list.
+---@param _ string Callback name. Unused, but is passed from HereBeDragons so it must be handled in the parameter list.
 ---@param mapID number
-function Frenemy:HandleZoneChange(callbackName, mapID)
+function Frenemy:HandleZoneChange(_, mapID)
     local needDisplayUpdate = MapHandler.Data.MapID ~= mapID
     MapHandler.Data.MapID = mapID
 
@@ -38,7 +38,7 @@ function Frenemy:HandleZoneChange(callbackName, mapID)
         pvpType = "normal"
     end
 
-    local zonePVPStatus = MapHandler.GetZonePVPStatus(pvpType)
+    local zonePVPStatus = MapHandler:GetZonePVPStatus(pvpType)
     private.DB.ZoneData[MapHandler.Data.MapID] = zonePVPStatus
 
     MapHandler:SetRGBColor(MapHandler.Data.MapID, zonePVPStatus)
