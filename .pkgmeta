@@ -34,7 +34,7 @@ externals:
     url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
   Libs/LibDialog-1.0:
     url: https://repos.curseforge.com/wow/libdialog-1-0
-  Libs/LibQTip-1.0:
-    url: https://repos.curseforge.com/wow/libqtip-1-0
+  Libs/LibQTip-2.0:
+    url: https://repos.curseforge.com/wow/libqtip-2-0
   Libs/LibTextDump-1.0:
     url: https://repos.curseforge.com/wow/libtextdump-1-0
