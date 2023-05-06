@@ -264,8 +264,8 @@ function BattleNetSection:GenerateData()
         for toonIndex = 1, numToons do
             local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(battleNetIndex, toonIndex) or {}
             local clientProgram = gameAccountInfo.clientProgram
-            local gameText = gameAccountInfo.richPresence
-            local toonName = gameAccountInfo.characterName
+            local gameText = gameAccountInfo.richPresence or ""
+            local toonName = gameAccountInfo.characterName or UNKNOWN
             local characterName = BNet_GetValidatedCharacterName(toonName, friendInfo.battleTag, clientProgram)
 
             ---@type BattleNetFriend
