@@ -265,8 +265,8 @@ function BattleNetSection:GenerateData()
             local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(battleNetIndex, toonIndex) or {}
             local clientProgram = gameAccountInfo.clientProgram
             local gameText = gameAccountInfo.richPresence or ""
-            local toonName = gameAccountInfo.characterName or UNKNOWN
-            local characterName = BNet_GetValidatedCharacterName(toonName, friendInfo.battleTag, clientProgram)
+            local characterName =
+                BNet_GetValidatedCharacterName(gameAccountInfo.characterName, friendInfo.battleTag, clientProgram)
 
             ---@type BattleNetFriend
             local bNetFriendData = {
@@ -293,7 +293,7 @@ function BattleNetSection:GenerateData()
             }
 
             if clientProgram == BNET_CLIENT_WOW and gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
-                local existingFriend = OnlineFriendsByName[toonName]
+                local existingFriend = OnlineFriendsByName[characterName]
                 local realmName = gameAccountInfo.realmName
 
                 if existingFriend and realmName == Player.RealmName then
