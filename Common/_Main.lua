@@ -6,17 +6,14 @@ local AddOnFolderName = ... ---@type string
 
 ---@class PrivateNamespace
 ---@field MapHandler MapHandler
----@field People table
+---@field People FriendStatistics Populated and maintained in UpdateStatistics()
+---@field Preferences Preferences
 ---@field TooltipHandler TooltipHandler
 local private = select(2, ...)
 
 private.MapHandler = {}
-private.TooltipHandler = {}
 
--- ----------------------------------------------------------------------------
--- Statistics: Populated and maintained in UpdateStatistics()
--- ----------------------------------------------------------------------------
-local People = {
+private.People = {
     BattleNet = {
         Online = 0,
         Total = 0,
@@ -31,13 +28,15 @@ local People = {
     },
 }
 
-private.People = People
+private.Preferences = {}
+private.TooltipHandler = {}
 
 --------------------------------------------------------------------------------
 ---- Helpers
 --------------------------------------------------------------------------------
 
 function private.UpdateStatistics()
+    local People = private.People
     People.BattleNet.Total, People.BattleNet.Online = BNGetNumFriends()
     People.Friends.Total = C_FriendList.GetNumFriends()
     People.Friends.Online = C_FriendList.GetNumOnlineFriends()
@@ -47,3 +46,16 @@ function private.UpdateStatistics()
         People.GuildMembers.Total, _, People.GuildMembers.Online = GetNumGuildMembers()
     end
 end
+
+--------------------------------------------------------------------------------
+---- Types
+--------------------------------------------------------------------------------
+
+---@class FriendStatistics
+---@field BattleNet FriendStatisticsValues
+---@field Friends FriendStatisticsValues
+---@field GuildMembers FriendStatisticsValues
+
+---@class FriendStatisticsValues
+---@field Online number
+---@field Total number

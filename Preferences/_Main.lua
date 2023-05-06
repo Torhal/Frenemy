@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
 --------------------------------------------------------------------------------
 ---- Initialization
@@ -37,13 +37,16 @@ local Options
 ---@field DefaultValues AceDB.Schema
 ---@field Tooltip Preferences.Tooltip
 ---@field OptionsFrame Frame
-local Preferences = {
-    DefaultValues = {
-        global = {
-            ZoneData = {}, -- Populated during travel.
-        },
+local Preferences = private.Preferences
+
+Preferences.DataObject = {}
+Preferences.DefaultValues = {
+    global = {
+        ZoneData = {}, -- Populated during travel.
     },
 }
+
+Preferences.Tooltip = {}
 
 ---@return AceConfig.OptionsTable
 function Preferences:GetOptions()
@@ -53,8 +56,8 @@ function Preferences:GetOptions()
             type = "group",
             childGroups = "tab",
             args = {
-                dataObject = private.Preferences.DataObject.GetOptions(),
-                tooltip = private.Preferences.Tooltip.GetOptions(),
+                dataObject = Preferences.DataObject:GetOptions(),
+                tooltip = Preferences.Tooltip:GetOptions(),
             },
         }
     end
@@ -71,5 +74,3 @@ function Preferences:SetupOptions()
 
     self.OptionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(AddOnFolderName)
 end
-
-private.Preferences = Preferences

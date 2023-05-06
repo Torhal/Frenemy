@@ -7,12 +7,13 @@ local private = select(2, ...) ---@class PrivateNamespace
 -- ----------------------------------------------------------------------------
 -- Enumerations and Data
 -- ----------------------------------------------------------------------------
+
 local SortOrderEnum = {
     Ascending = 1,
     Descending = 2,
 }
 
-local SortOrder = {
+private.SortOrder = {
     Enum = SortOrderEnum,
     Name = {
         [SortOrderEnum.Ascending] = "Ascending",
@@ -20,9 +21,10 @@ local SortOrder = {
     },
 }
 
-private.SortOrder = SortOrder
+local SortOrder = private.SortOrder
 
-local Sorting = {
+---@class Sorting
+private.Sorting = {
     FieldIDs = {},
     FieldNames = {},
     --- Changing the order will cause SavedVariables to no longer map appropriately.
@@ -62,7 +64,7 @@ local Sorting = {
     Functions = {},
 }
 
-private.Sorting = Sorting
+local Sorting = private.Sorting
 
 for sectionName, fieldNameList in pairs(Sorting.Fields) do
     local IDList = {}

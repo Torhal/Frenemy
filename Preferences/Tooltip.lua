@@ -1,8 +1,9 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
-local private = select(2, ...) ---@class PrivateNamespace
+local private = select(2, ...) ---@type PrivateNamespace
 
 local Sorting = private.Sorting
 local SortOrder = private.SortOrder
@@ -10,14 +11,23 @@ local SortOrder = private.SortOrder
 ---@type Localizations
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
----@enum NotesArrangement
+---@class Preferences.Tooltip
+---@field NotesArrangement NotesArrangement
+local TooltipPreferences = private.Preferences.Tooltip
+
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
+---@class NotesArrangement
+---@field Column integer
+---@field Row integer
 local NotesArrangement = {
     Column = 1,
     Row = 2,
 }
+
+private.Preferences.Tooltip.NotesArrangement = NotesArrangement
 
 ---@type Array<string>
 local NotesArrangementValues = {
@@ -25,9 +35,10 @@ local NotesArrangementValues = {
     [NotesArrangement.Row] = L.NOTES_ARRANGEMENT_ROW,
 }
 
--- ----------------------------------------------------------------------------
--- Helpers
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Helpers
+--------------------------------------------------------------------------------
+
 ---@param optionsTable table
 ---@param entryName string
 ---@param label string
@@ -50,17 +61,18 @@ local function BuildNotesEntry(optionsTable, entryName, label, order)
     }
 end
 
--- ----------------------------------------------------------------------------
--- Tooltip Options
--- ----------------------------------------------------------------------------
----@type AceConfig.OptionsTable
-local TooltipOptions
+--------------------------------------------------------------------------------
+---- Tooltip Options
+--------------------------------------------------------------------------------
 
-local function GetOptions()
-    if not TooltipOptions then
+---@type AceConfig.OptionsTable
+local Options
+
+function TooltipPreferences:GetOptions()
+    if not Options then
         local DB = private.DB
 
-        TooltipOptions = {
+        Options = {
             order = 2,
             name = DISPLAY,
             type = "group",
@@ -105,34 +117,29 @@ local function GetOptions()
             },
         }
 
-        BuildNotesEntry(TooltipOptions.args, "BattleNetApp", BATTLENET_OPTIONS_LABEL, 4)
+        BuildNotesEntry(Options.args, "BattleNetApp", BATTLENET_OPTIONS_LABEL, 4)
         BuildNotesEntry(
-            TooltipOptions.args,
+            Options.args,
             "BattleNetGames",
             ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
             5
         )
-        BuildNotesEntry(TooltipOptions.args, "Guild", GetGuildInfo("player") or GUILD, 6)
+        BuildNotesEntry(Options.args, "Guild", GetGuildInfo("player") or GUILD, 6)
         BuildNotesEntry(
-            TooltipOptions.args,
+            Options.args,
             "GuildOfficer",
             ("%s %s"):format(GetGuildInfo("player") or GUILD, PARENS_TEMPLATE:format(OFFICER)),
             7
         )
-        BuildNotesEntry(TooltipOptions.args, "WoWFriends", FRIENDS, 8)
+        BuildNotesEntry(Options.args, "WoWFriends", FRIENDS, 8)
     end
 
-    return TooltipOptions
+    return Options
 end
 
--- ----------------------------------------------------------------------------
--- Preferences Augmentation
--- ----------------------------------------------------------------------------
----@class Preferences.Tooltip
-private.Preferences.Tooltip = {
-    GetOptions = GetOptions,
-    NotesArrangement = NotesArrangement,
-}
+--------------------------------------------------------------------------------
+---- Preferences Augmentation
+--------------------------------------------------------------------------------
 
 private.Preferences.DefaultValues.global.Tooltip = {
     CollapsedSections = {
