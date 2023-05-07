@@ -9,21 +9,30 @@ local private = select(2, ...) ---@type PrivateNamespace
 ---- Initialization
 --------------------------------------------------------------------------------
 
-local metaVersion = GetAddOnMetadata(AddOnFolderName, "Version")
-local isDevelopmentVersion = false
-local isAlphaVersion = false
+---@return string
+local function GetBuildVersion()
+    local metaVersion = GetAddOnMetadata(AddOnFolderName, "Version")
+    local isDevelopmentVersion = false
+    local isAlphaVersion = false
 
---@debug@
-isDevelopmentVersion = true
---@end-debug@
+    --@debug@
+    isDevelopmentVersion = true
+    --@end-debug@
 
---@alpha@
-isAlphaVersion = true
---@end-alpha@
+    if isDevelopmentVersion then
+        return "Development Version"
+    end
 
-local buildVersion = isDevelopmentVersion and "Development Version"
-    or (isAlphaVersion and ("%s-Alpha"):format(metaVersion))
-    or metaVersion
+    --@alpha@
+    isAlphaVersion = true
+    --@end-alpha@
+
+    if isAlphaVersion then
+        return ("%s-Alpha"):format(metaVersion)
+    end
+
+    return metaVersion or UNKNOWN
+end
 
 --------------------------------------------------------------------------------
 ---- Preferences
@@ -52,7 +61,7 @@ Preferences.Tooltip = {}
 function Preferences:GetOptions()
     if not Options then
         Options = {
-            name = ("%s - %s"):format(AddOnFolderName, buildVersion),
+            name = ("%s - %s"):format(AddOnFolderName, GetBuildVersion()),
             type = "group",
             childGroups = "tab",
             args = {
