@@ -33,15 +33,11 @@ local DataObject = LibStub("LibDataBroker-1.1"):NewDataObject(AddOnFolderName, {
             else
                 ToggleFriendsFrame(FRIENDS_FRAME_TAB_TOGGLES.FRIENDS)
             end
-        else
-            local settingsPanel = SettingsPanel
 
-            if settingsPanel:IsVisible() then
-                settingsPanel:Hide()
-            else
-                Settings.OpenToCategory(private.Preferences.OptionsFrame)
-            end
+            return
         end
+
+        private.Preferences:ToggleOptionsVisibility()
     end,
     OnEnter = function(displayFrame)
         TooltipHandler:Render(displayFrame)

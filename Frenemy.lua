@@ -143,14 +143,10 @@ do
             if func then
                 func(arguments or "")
             end
-        else
-            local settingsPanel = SettingsPanel
 
-            if settingsPanel:IsVisible() then
-                settingsPanel:Hide()
-            else
-                Settings.OpenToCategory(private.Preferences.OptionsFrame)
-            end
+            return
         end
+
+        private.Preferences:ToggleOptionsVisibility()
     end
 end -- do-block

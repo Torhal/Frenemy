@@ -74,3 +74,20 @@ function Preferences:SetupOptions()
 
     self.OptionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(AddOnFolderName)
 end
+
+function Preferences:ToggleOptionsVisibility()
+    local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+    if AceConfigDialog.OpenFrames[AddOnFolderName] then
+        AceConfigDialog:Close(AddOnFolderName)
+    else
+        AceConfigDialog:Open(AddOnFolderName)
+    end
+end
+
+--------------------------------------------------------------------------------
+---- Type Augmentation
+--------------------------------------------------------------------------------
+
+---@class AceConfigDialog-3.0
+---@field OpenFrames table<string, unknown>
