@@ -6,6 +6,7 @@ local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
 local People = private.People
+local Preferences = private.Preferences
 
 local TooltipHandler = private.TooltipHandler
 local Icon = TooltipHandler.Icon
@@ -125,7 +126,7 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
         :SetText(TooltipHandler:ColumnLabel(INFO, ("%s:GameText"):format(dataPrefix)))
         :SetScript("OnMouseDown", ToggleColumnSortMethod, ("%s:GameText"):format(dataPrefix))
 
-    if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
+    if noteArrangement == Preferences.Tooltip.NotesArrangement.Column then
         headerLine
             :GetCell(ColumnID.Note)
             :SetColSpan(ColSpan.Note)
@@ -159,7 +160,7 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
         if friend.Note then
             local noteText = ("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.Note)
 
-            if noteArrangement == private.Preferences.Tooltip.NotesArrangement.Column then
+            if noteArrangement == Preferences.Tooltip.NotesArrangement.Column then
                 line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
             else
                 tooltip

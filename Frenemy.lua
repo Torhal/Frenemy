@@ -6,6 +6,7 @@ local private = select(2, ...) ---@class PrivateNamespace
 
 local DataObject = private.DataObject
 local MapHandler = private.MapHandler
+local Preferences = private.Preferences
 local TooltipHandler = private.TooltipHandler
 
 ---@class Frenemy: AceAddon, AceBucket-3.0, AceConsole-3.0, AceEvent-3.0, AceTimer-3.0
@@ -77,7 +78,7 @@ function Frenemy:OnEnable()
 end
 
 function Frenemy:OnInitialize()
-    local DB = private.Preferences:InitializeDatabase()
+    local DB = Preferences:InitializeDatabase()
 
     private.DB = DB
 
@@ -86,7 +87,7 @@ function Frenemy:OnInitialize()
         LDBIcon:Register(AddOnFolderName, DataObject, DB.DataObject.MinimapIcon)
     end
 
-    private.Preferences:SetupOptions()
+    Preferences:SetupOptions()
 
     self:RegisterChatCommand("frenemy", "ChatCommand")
 
@@ -147,6 +148,6 @@ do
             return
         end
 
-        private.Preferences:ToggleOptionsVisibility()
+        Preferences:ToggleOptionsVisibility()
     end
 end -- do-block

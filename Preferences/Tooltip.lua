@@ -5,6 +5,7 @@
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
+local Preferences = private.Preferences
 local Sorting = private.Sorting
 local SortOrder = private.SortOrder
 
@@ -13,7 +14,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 
 ---@class Preferences.Tooltip
 ---@field NotesArrangement NotesArrangement
-local TooltipPreferences = private.Preferences.Tooltip
+local TooltipPreferences = Preferences.Tooltip
 
 --------------------------------------------------------------------------------
 ---- Constants
@@ -27,7 +28,7 @@ local NotesArrangement = {
     Row = 2,
 }
 
-private.Preferences.Tooltip.NotesArrangement = NotesArrangement
+Preferences.Tooltip.NotesArrangement = NotesArrangement
 
 ---@type Array<string>
 local NotesArrangementValues = {
@@ -141,7 +142,7 @@ end
 ---- Preferences Augmentation
 --------------------------------------------------------------------------------
 
-private.Preferences.DefaultValues.global.Tooltip = {
+Preferences.DefaultValues.global.Tooltip = {
     CollapsedSections = {
         BattleNetApp = false,
         BattleNetGames = false,

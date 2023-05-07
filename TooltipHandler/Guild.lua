@@ -1,10 +1,12 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
 local MapHandler = private.MapHandler
+local Preferences = private.Preferences
 
 local TooltipHandler = private.TooltipHandler
 local Icon = TooltipHandler.Icon
@@ -26,9 +28,10 @@ GuildSection.MOTD = {
     Text = nil,
 }
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
 -- Used to handle duplication between in-game and RealID friends.
 local GuildMemberIndexByName = {}
 
@@ -52,9 +55,10 @@ local ColSpan = {
     OfficerNote = 2,
 }
 
--- ----------------------------------------------------------------------------
--- Dialogs
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Dialogs
+--------------------------------------------------------------------------------
+
 Dialog:Register("FrenemySetGuildMOTD", {
     editboxes = {
         {
@@ -84,9 +88,10 @@ Dialog:Register("FrenemySetGuildMOTD", {
     width = 400,
 })
 
--- ----------------------------------------------------------------------------
--- Cell Scripts
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Cell Scripts
+--------------------------------------------------------------------------------
+
 ---@param button "LeftButton"|"RightButton"
 local function GuildMember_OnMouseUp(_, playerEntry, button)
     if not IsAddOnLoaded("Blizzard_GuildUI") then
@@ -122,9 +127,10 @@ local function GuildMOTD_OnMouseUp()
     Dialog:Spawn("FrenemySetGuildMOTD")
 end
 
--- ----------------------------------------------------------------------------
--- Helpers
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Helper Functions
+--------------------------------------------------------------------------------
+
 local function PercentColorGradient(min, max)
     local red_low, green_low, blue_low = 1, 0.10, 0.10
     local red_mid, green_mid, blue_mid = 1, 1, 0
@@ -168,9 +174,10 @@ function GuildSection:Display(tooltip)
         return
     end
 
-    -- ----------------------------------------------------------------------------
-    -- Section Header
-    -- ----------------------------------------------------------------------------
+    --------------------------------------------------------------------------------
+    ---- Section Header
+    --------------------------------------------------------------------------------
+
     local headerLine = tooltip:AddLine()
 
     headerLine
@@ -204,7 +211,7 @@ function GuildSection:Display(tooltip)
         :SetText(TooltipHandler:ColumnLabel(ZONE, "Guild:ZoneName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
 
-    if DB.Tooltip.NotesArrangement.Guild == private.Preferences.Tooltip.NotesArrangement.Column then
+    if DB.Tooltip.NotesArrangement.Guild == Preferences.Tooltip.NotesArrangement.Column then
         headerLine
             :GetCell(ColumnID.PublicNote)
             :SetColSpan(ColSpan.PublicNote)
@@ -212,7 +219,7 @@ function GuildSection:Display(tooltip)
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:PublicNote")
     end
 
-    if DB.Tooltip.NotesArrangement.GuildOfficer == private.Preferences.Tooltip.NotesArrangement.Column then
+    if DB.Tooltip.NotesArrangement.GuildOfficer == Preferences.Tooltip.NotesArrangement.Column then
         headerLine
             :GetCell(ColumnID.OfficerNote)
             :SetColSpan(ColSpan.OfficerNote)
@@ -220,9 +227,9 @@ function GuildSection:Display(tooltip)
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:OfficerNote")
     end
 
-    -- ----------------------------------------------------------------------------
-    -- Section Body
-    -- ----------------------------------------------------------------------------
+    --------------------------------------------------------------------------------
+    ---- Section Body
+    --------------------------------------------------------------------------------
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -268,7 +275,7 @@ function GuildSection:Display(tooltip)
         if guildMate.PublicNote then
             local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. guildMate.PublicNote .. "|r"
 
-            if DB.Tooltip.NotesArrangement.Guild == private.Preferences.Tooltip.NotesArrangement.Column then
+            if DB.Tooltip.NotesArrangement.Guild == Preferences.Tooltip.NotesArrangement.Column then
                 line:GetCell(ColumnID.PublicNote):SetColSpan(ColSpan.PublicNote):SetText(noteText)
             else
                 tooltip
@@ -283,7 +290,7 @@ function GuildSection:Display(tooltip)
         if guildMate.OfficerNote then
             local noteText = ("%s%s|r"):format(ORANGE_FONT_COLOR_CODE, guildMate.OfficerNote)
 
-            if DB.Tooltip.NotesArrangement.GuildOfficer == private.Preferences.Tooltip.NotesArrangement.Column then
+            if DB.Tooltip.NotesArrangement.GuildOfficer == Preferences.Tooltip.NotesArrangement.Column then
                 line:GetCell(ColumnID.OfficerNote):SetColSpan(ColSpan.OfficerNote):SetText(noteText)
             else
                 tooltip
