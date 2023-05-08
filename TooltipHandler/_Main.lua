@@ -339,17 +339,16 @@ function TooltipHandler:ColorPlayerLevel(level)
 end
 
 ---@param label string
----@param data string
-function TooltipHandler:ColumnLabel(label, data)
-    local sectionName, fieldName = strsplit(":", data)
+---@param sectionFieldToken string
+---@return string
+function TooltipHandler:ColumnLabel(label, sectionFieldToken)
+    local sectionName, fieldName = strsplit(":", sectionFieldToken)
     local DB = private.DB
 
     if DB.Tooltip.Sorting[sectionName].Field == Sorting.FieldIDs[sectionName][fieldName] then
-        local Icon = self.Icon
-
         return (
-            DB.Tooltip.Sorting[sectionName].Order == SortOrder.Enum.Ascending and Icon.Sort.Ascending
-            or Icon.Sort.Descending
+            DB.Tooltip.Sorting[sectionName].Order == SortOrder.Enum.Ascending and self.Icon.Sort.Ascending
+            or self.Icon.Sort.Descending
         ) .. label
     end
 
