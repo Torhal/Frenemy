@@ -1,6 +1,7 @@
--- ----------------------------------------------------------------------------
--- AddOn Namespace
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- AddOn Namespace
+--------------------------------------------------------------------------------
+
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
@@ -10,9 +11,10 @@ local LibQTip = LibStub("LibQTip-2.0")
 ---@class TooltipHandler
 local TooltipHandler = private.TooltipHandler
 
--- ----------------------------------------------------------------------------
--- Constants
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
 local MaxTooltipColumns = 10
 
 ---@type table<string, table<string, string>>
@@ -31,9 +33,10 @@ local HelpTipDefinitions = {
     },
 }
 
--- ----------------------------------------------------------------------------
--- Cell Scripts
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Cell Scripts
+--------------------------------------------------------------------------------
+
 local function HideHelpTip()
     if TooltipHandler.Tooltip.Help then
         LibQTip:Release(TooltipHandler.Tooltip.Help)
@@ -43,6 +46,7 @@ local function HideHelpTip()
     TooltipHandler.Tooltip.Main:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
 end
 
+---@param tooltipCell LibQTip-2.0.Cell
 local function ShowHelpTip(tooltipCell)
     local helpTip = TooltipHandler.Tooltip.Help
 
@@ -78,7 +82,7 @@ local function ShowHelpTip(tooltipCell)
         for keyStroke, description in pairs(data) do
             local line = helpTip:AddLine()
 
-            line:GetCell(1):SetJustifyH("RIGHT"):SetText(keyStroke --[[@as string]])
+            line:GetCell(1):SetJustifyH("RIGHT"):SetText(STAT_FORMAT --[[@as string]]:format(keyStroke))
             line:GetCell(2):SetJustifyH("LEFT"):SetText(description)
         end
 
@@ -91,9 +95,9 @@ local function ShowHelpTip(tooltipCell)
     helpTip:Show()
 end
 
--- ----------------------------------------------------------------------------
--- Display rendering
--- ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Display Rendering
+--------------------------------------------------------------------------------
 
 ---@param self LibQTip-2.0.Tooltip
 local function Tooltip_OnRelease(self)
