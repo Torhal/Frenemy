@@ -100,34 +100,34 @@ local ColSpan = {
 ---@param tooltip LibQTip-2.0.Tooltip
 ---@param playerList BattleNetFriend[]
 ---@param dataPrefix "BattleNetApp"|"BattleNetGames"
----@param headerLine LibQTip-2.0.Line
+---@param headerRow LibQTip-2.0.Row
 ---@param noteArrangement NotesArrangement
-local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine, noteArrangement)
+local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, noteArrangement)
     --------------------------------------------------------------------------------
     ---- Section Header
     --------------------------------------------------------------------------------
 
-    headerLine
+    headerRow
         :SetColor(0, 0, 0, 1)
         :GetCell(ColumnID.PresenceName)
         :SetColSpan(ColSpan.PresenceName)
         :SetText(TooltipHandler:ColumnLabel(BATTLENET_FRIEND, ("%s:PresenceName"):format(dataPrefix)))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:PresenceName"):format(dataPrefix))
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.ToonName)
         :SetColSpan(ColSpan.ToonName)
         :SetText(TooltipHandler:ColumnLabel(NAME, ("%s:ToonName"):format(dataPrefix)))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:ToonName"):format(dataPrefix))
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.GameText)
         :SetColSpan(ColSpan.GameText)
         :SetText(TooltipHandler:ColumnLabel(INFO, ("%s:GameText"):format(dataPrefix)))
         :SetScript("OnMouseDown", ToggleColumnSortMethod, ("%s:GameText"):format(dataPrefix))
 
     if noteArrangement == Preferences.Tooltip.NotesArrangement.Column then
-        headerLine
+        headerRow
             :GetCell(ColumnID.Note)
             :SetColSpan(ColSpan.Note)
             :SetText(TooltipHandler:ColumnLabel(LABEL_NOTE, ("%s:Note"):format(dataPrefix)))
@@ -142,29 +142,29 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
 
     for index = 1, #playerList do
         local friend = playerList[index]
-        local line = tooltip:AddLine()
+        local row = tooltip:AddRow()
 
-        line:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
+        row:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
 
-        line:GetCell(ColumnID.PresenceName)
+        row:GetCell(ColumnID.PresenceName)
             :SetColSpan(ColSpan.PresenceName)
             :SetText(("%s%s%s|r"):format(friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName))
             :SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
 
-        line:GetCell(ColumnID.ToonName)
+        row:GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)
             :SetText(("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName))
 
-        line:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
+        row:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
 
         if friend.Note then
             local noteText = ("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.Note)
 
             if noteArrangement == Preferences.Tooltip.NotesArrangement.Column then
-                line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
+                row:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
             else
                 tooltip
-                    :AddLine()
+                    :AddRow()
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
@@ -173,11 +173,11 @@ local function RenderBattleNetLines(tooltip, playerList, dataPrefix, headerLine,
         end
 
         if friend.BroadcastText then
-            tooltip:AddLine():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
+            tooltip:AddRow():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
         end
     end
 
-    tooltip:AddLine(" ")
+    tooltip:AddRow(" ")
 end
 
 --------------------------------------------------------------------------------
@@ -204,11 +204,11 @@ function BattleNetSection:DisplayApps(tooltip)
         return
     end
 
-    RenderBattleNetLines(
+    RenderBattleNetRows(
         tooltip,
         PlayerLists.BattleNetApp,
         "BattleNetApp",
-        tooltip:AddLine(),
+        tooltip:AddRow(),
         DB.Tooltip.NotesArrangement.BattleNetApp
     )
 end
@@ -236,18 +236,18 @@ function BattleNetSection:DisplayGames(tooltip)
         return
     end
 
-    local headerLine = tooltip:AddLine()
+    local headerRow = tooltip:AddRow()
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.ClientIcon)
         :SetText(TooltipHandler:ColumnLabel(Icon.Column.Game, "BattleNetGames:ClientIndex"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "BattleNetGames:ClientIndex")
 
-    RenderBattleNetLines(
+    RenderBattleNetRows(
         tooltip,
         PlayerLists.BattleNetGames,
         "BattleNetGames",
-        headerLine,
+        headerRow,
         DB.Tooltip.NotesArrangement.BattleNetGames
     )
 end

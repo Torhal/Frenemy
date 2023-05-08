@@ -72,18 +72,18 @@ local function ShowHelpTip(tooltipCell)
 
     for entryType, data in pairs(HelpTipDefinitions) do
         if not isInitialSection then
-            helpTip:AddLine(" ")
+            helpTip:AddRow(" ")
         end
 
-        helpTip:AddLine():GetCell(1):SetColSpan(0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
+        helpTip:AddRow():GetCell(1):SetColSpan(0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
 
         for keyStroke, description in pairs(data) do
-            local line = helpTip:AddLine()
+            local row = helpTip:AddRow()
 
-            line:GetCell(1):SetJustifyH("RIGHT"):SetText(STAT_FORMAT --[[@as string]]:format(keyStroke))
-            line:GetCell(2):SetJustifyH("LEFT"):SetText(description)
+            row:GetCell(1):SetJustifyH("RIGHT"):SetText(STAT_FORMAT --[[@as string]]:format(keyStroke))
+            row:GetCell(2):SetJustifyH("LEFT"):SetText(description)
         end
 
         isInitialSection = false
@@ -157,7 +157,7 @@ function TooltipHandler:Render(anchorFrame)
         :Clear()
         :SetCellMarginH(0)
         :SetCellMarginV(1)
-        :AddLine()
+        :AddRow()
         :GetCell(1)
         :SetColSpan(0)
         :SetJustifyH("CENTER")
@@ -167,7 +167,7 @@ function TooltipHandler:Render(anchorFrame)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
     local MOTD = self.GuildSection.MOTD
-    MOTD.Line = nil
+    MOTD.Row = nil
     MOTD.Text = nil
 
     for index = 1, #DB.Tooltip.SectionDisplayOrders do
@@ -177,8 +177,8 @@ function TooltipHandler:Render(anchorFrame)
     tooltip:Show()
 
     -- This must be done after everything else has been added to the tooltip in order to have an accurate width.
-    if MOTD.Line and MOTD.Text then
-        MOTD.Line
+    if MOTD.Row and MOTD.Text then
+        MOTD.Row
             :GetCell(1)
             :SetColSpan(0)
             :SetJustifyH("LEFT")
@@ -189,7 +189,7 @@ function TooltipHandler:Render(anchorFrame)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
     tooltip
-        :AddLine()
+        :AddRow()
         :GetCell(MaxTooltipColumns)
         :SetJustifyH("RIGHT")
         :SetText(self.Icon.Help)

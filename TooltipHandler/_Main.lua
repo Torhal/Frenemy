@@ -380,7 +380,7 @@ do
         local sectionIcon = sectionIsCollapsed and self.Icon.Section.Disabled or self.Icon.Section.Enabled
 
         tooltip
-            :AddLine()
+            :AddRow()
             :GetCell(1)
             :SetColSpan(0)
             :SetJustifyH("CENTER")

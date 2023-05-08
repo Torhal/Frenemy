@@ -100,49 +100,49 @@ do
         ---- Section Header
         --------------------------------------------------------------------------------
 
-        local headerLine = tooltip:AddLine()
+        local headerRow = tooltip:AddRow()
 
-        headerLine:SetColor(0, 0, 0, 1)
+        headerRow:SetColor(0, 0, 0, 1)
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.Level)
             :SetColSpan(ColSpan.Level)
             :SetJustifyH("LEFT")
             :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "WoWFriends:Level"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.Class)
             :SetColSpan(ColSpan.Class)
             :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "WoWFriends:Class"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.PresenceName)
             :SetColSpan(ColSpan.PresenceName)
             :SetText(TooltipHandler:ColumnLabel(BATTLENET_FRIEND, "WoWFriends:PresenceName"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:PresenceName")
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)
             :SetText(TooltipHandler:ColumnLabel(NAME, "WoWFriends:ToonName"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ToonName")
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.ZoneName)
             :SetColSpan(ColSpan.ZoneName)
             :SetText(TooltipHandler:ColumnLabel(ZONE, "WoWFriends:ZoneName"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:ZoneName")
 
-        headerLine
+        headerRow
             :GetCell(ColumnID.RealmName)
             :SetColSpan(ColSpan.RealmName)
             :SetText(TooltipHandler:ColumnLabel(L.COLUMN_LABEL_REALM, "WoWFriends:RealmName"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:RealmName")
 
         if DB.Tooltip.NotesArrangement.WoWFriends == private.Preferences.Tooltip.NotesArrangement.Column then
-            headerLine
+            headerRow
                 :GetCell(ColumnID.Note)
                 :SetColSpan(ColSpan.Note)
                 :SetText(TooltipHandler:ColumnLabel(LABEL_NOTE, "WoWFriends:Note"))
@@ -164,25 +164,23 @@ do
                     and ("%s%s|r"):format(FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName)
                 or NOT_APPLICABLE
 
-            local line = tooltip:AddLine()
+            local row = tooltip:AddRow()
 
-            line:GetCell(ColumnID.Level)
-                :SetColSpan(ColSpan.Level)
-                :SetText(TooltipHandler:ColorPlayerLevel(friend.Level))
+            row:GetCell(ColumnID.Level):SetColSpan(ColSpan.Level):SetText(TooltipHandler:ColorPlayerLevel(friend.Level))
 
-            line:GetCell(ColumnID.Class)
+            row:GetCell(ColumnID.Class)
                 :SetColSpan(ColSpan.Class)
                 :SetText(Icon.Class[classToken.Female[friend.Class] or classToken.Male[friend.Class]])
 
-            line:GetCell(ColumnID.PresenceName)
+            row:GetCell(ColumnID.PresenceName)
                 :SetColSpan(ColSpan.PresenceName)
                 :SetText(("%s%s"):format(friend.StatusIcon, presenceName))
 
             if friend.PresenceID then
-                line:GetCell(ColumnID.PresenceName):SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
+                row:GetCell(ColumnID.PresenceName):SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
             end
 
-            local toonNameCell = line:GetCell(ColumnID.ToonName):SetColSpan(ColSpan.ToonName)
+            local toonNameCell = row:GetCell(ColumnID.ToonName):SetColSpan(ColSpan.ToonName)
 
             toonNameCell:SetText(
                 ("%s%s%s|r%s"):format(
@@ -197,20 +195,20 @@ do
                 toonNameCell:SetScript("OnMouseUp", WoWFriend_OnMouseUp, friend)
             end
 
-            line:GetCell(ColumnID.ZoneName)
+            row:GetCell(ColumnID.ZoneName)
                 :SetColSpan(ColSpan.ZoneName)
                 :SetText(private.MapHandler:ColoredZoneName(friend.ZoneName))
 
-            line:GetCell(ColumnID.RealmName):SetColSpan(ColSpan.RealmName):SetText(friend.RealmName)
+            row:GetCell(ColumnID.RealmName):SetColSpan(ColSpan.RealmName):SetText(friend.RealmName)
 
             if friend.Note then
                 local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. friend.Note .. "|r"
 
                 if DB.Tooltip.NotesArrangement.WoWFriends == private.Preferences.Tooltip.NotesArrangement.Column then
-                    line:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
+                    row:GetCell(ColumnID.Note):SetColSpan(ColSpan.Note):SetText(noteText)
                 else
                     tooltip
-                        :AddLine()
+                        :AddRow()
                         :GetCell(1)
                         :SetColSpan(0)
                         :SetFont("GameTooltipTextSmall")
@@ -219,11 +217,11 @@ do
             end
 
             if friend.BroadcastText then
-                tooltip:AddLine():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
+                tooltip:AddRow():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
             end
         end
 
-        tooltip:AddLine(" ")
+        tooltip:AddRow(" ")
     end
 end
 

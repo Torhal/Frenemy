@@ -21,10 +21,10 @@ local Dialog = LibStub("LibDialog-1.0")
 local GuildSection = TooltipHandler.GuildSection
 
 ---@class TooltipHandler.GuildSection.MOTD
----@field Line LibQTip-2.0.Line|nil
+---@field Row LibQTip-2.0.Row|nil
 ---@field Text string|nil
 GuildSection.MOTD = {
-    Line = nil,
+    Row = nil,
     Text = nil,
 }
 
@@ -183,41 +183,41 @@ function GuildSection:Display(tooltip)
     ---- Section Header
     --------------------------------------------------------------------------------
 
-    local headerLine = tooltip:AddLine()
+    local headerRow = tooltip:AddRow()
 
-    headerLine
+    headerRow
         :SetColor(0, 0, 0, 1)
         :GetCell(ColumnID.Level)
         :SetColSpan(ColSpan.Level)
         :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "Guild:Level"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.Class)
         :SetColSpan(ColSpan.Class)
         :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "Guild:Class"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Class")
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.ToonName)
         :SetColSpan(ColSpan.ToonName)
         :SetText(TooltipHandler:ColumnLabel(NAME, "Guild:ToonName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.Rank)
         :SetColSpan(ColSpan.Rank)
         :SetText(TooltipHandler:ColumnLabel(RANK, "Guild:RankIndex"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
 
-    headerLine
+    headerRow
         :GetCell(ColumnID.ZoneName)
         :SetColSpan(ColSpan.ZoneName)
         :SetText(TooltipHandler:ColumnLabel(ZONE, "Guild:ZoneName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
 
     if DB.Tooltip.NotesArrangement.Guild == Preferences.Tooltip.NotesArrangement.Column then
-        headerLine
+        headerRow
             :GetCell(ColumnID.PublicNote)
             :SetColSpan(ColSpan.PublicNote)
             :SetText(TooltipHandler:ColumnLabel(NOTE, "Guild:PublicNote"))
@@ -225,7 +225,7 @@ function GuildSection:Display(tooltip)
     end
 
     if DB.Tooltip.NotesArrangement.GuildOfficer == Preferences.Tooltip.NotesArrangement.Column then
-        headerLine
+        headerRow
             :GetCell(ColumnID.OfficerNote)
             :SetColSpan(ColSpan.OfficerNote)
             :SetText(TooltipHandler:ColumnLabel(GUILD_OFFICERNOTES_LABEL, "Guild:OfficerNote"))
@@ -244,18 +244,18 @@ function GuildSection:Display(tooltip)
     for index = 1, #PlayerLists.Guild do
         local guildMate = PlayerLists.Guild[index]
 
-        local line = tooltip:AddLine()
+        local row = tooltip:AddRow()
 
-        line:GetCell(ColumnID.Level)
+        row:GetCell(ColumnID.Level)
             :SetColSpan(ColSpan.Level)
             :SetJustifyH("LEFT")
             :SetText(TooltipHandler:ColorPlayerLevel(guildMate.Level))
 
-        line:GetCell(ColumnID.Class)
+        row:GetCell(ColumnID.Class)
             :SetColSpan(ColSpan.Class)
             :SetText(Icon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
 
-        line:GetCell(ColumnID.ToonName)
+        row:GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)
             :SetText(
                 ("%s%s%s|r%s"):format(
@@ -269,11 +269,11 @@ function GuildSection:Display(tooltip)
 
         -- The higher the rank index, the lower the priviledge; guild leader is rank 1.
         local r, g, b = PercentColorGradient(guildMate.RankIndex, numGuildRanks)
-        line:GetCell(ColumnID.Rank)
+        row:GetCell(ColumnID.Rank)
             :SetColSpan(ColSpan.Rank)
             :SetText(("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, guildMate.Rank))
 
-        line:GetCell(ColumnID.ZoneName)
+        row:GetCell(ColumnID.ZoneName)
             :SetColSpan(ColSpan.ZoneName)
             :SetText(MapHandler:ColoredZoneName(guildMate.ZoneName))
 
@@ -281,10 +281,10 @@ function GuildSection:Display(tooltip)
             local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. guildMate.PublicNote .. "|r"
 
             if DB.Tooltip.NotesArrangement.Guild == Preferences.Tooltip.NotesArrangement.Column then
-                line:GetCell(ColumnID.PublicNote):SetColSpan(ColSpan.PublicNote):SetText(noteText)
+                row:GetCell(ColumnID.PublicNote):SetColSpan(ColSpan.PublicNote):SetText(noteText)
             else
                 tooltip
-                    :AddLine()
+                    :AddRow()
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
@@ -296,10 +296,10 @@ function GuildSection:Display(tooltip)
             local noteText = ("%s%s|r"):format(ORANGE_FONT_COLOR_CODE, guildMate.OfficerNote)
 
             if DB.Tooltip.NotesArrangement.GuildOfficer == Preferences.Tooltip.NotesArrangement.Column then
-                line:GetCell(ColumnID.OfficerNote):SetColSpan(ColSpan.OfficerNote):SetText(noteText)
+                row:GetCell(ColumnID.OfficerNote):SetColSpan(ColSpan.OfficerNote):SetText(noteText)
             else
                 tooltip
-                    :AddLine()
+                    :AddRow()
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
@@ -312,22 +312,22 @@ function GuildSection:Display(tooltip)
     MOTD.Text = GetGuildRosterMOTD()
 
     if not MOTD.Text or MOTD.Text == "" then
-        tooltip:AddLine(" ")
+        tooltip:AddRow(" ")
 
         return
     end
 
-    tooltip:AddLine(" ")
+    tooltip:AddRow(" ")
 
-    tooltip:AddLine():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetText(GUILD_MOTD_TEMPLATE:gsub('"%%s"', ""))
+    tooltip:AddRow():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetText(GUILD_MOTD_TEMPLATE:gsub('"%%s"', ""))
 
-    MOTD.Line = tooltip:AddLine()
+    MOTD.Row = tooltip:AddRow()
 
     if CanEditMOTD() then
-        MOTD.Line:GetCell(1):SetScript("OnMouseUp", GuildMOTD_OnMouseUp)
+        MOTD.Row:GetCell(1):SetScript("OnMouseUp", GuildMOTD_OnMouseUp)
     end
 
-    tooltip:AddLine(" ")
+    tooltip:AddRow(" ")
 end
 
 function GuildSection:GenerateData()
