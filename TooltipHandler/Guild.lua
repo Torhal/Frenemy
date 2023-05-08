@@ -168,7 +168,12 @@ function GuildSection:Display(tooltip)
     local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.Guild
 
-    TooltipHandler:CreateSectionHeader(tooltip, GetGuildInfo("player"), sectionIsCollapsed, "Guild")
+    TooltipHandler:CreateSectionHeader(
+        tooltip,
+        ("%s %s"):format(GetGuildInfo("player"), PARENS_TEMPLATE:format(#PlayerLists.Guild)),
+        sectionIsCollapsed,
+        "Guild"
+    )
 
     if sectionIsCollapsed then
         return

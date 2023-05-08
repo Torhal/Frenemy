@@ -85,7 +85,12 @@ do
         local DB = private.DB
         local sectionIsCollapsed = DB.Tooltip.CollapsedSections.WoWFriends
 
-        TooltipHandler:CreateSectionHeader(tooltip, FRIENDS, sectionIsCollapsed, "WoWFriends")
+        TooltipHandler:CreateSectionHeader(
+            tooltip,
+            ("%s %s"):format(FRIENDS, PARENS_TEMPLATE:format(#PlayerLists.WoWFriends)),
+            sectionIsCollapsed,
+            "WoWFriends"
+        )
 
         if sectionIsCollapsed then
             return

@@ -193,7 +193,12 @@ function BattleNetSection:DisplayApps(tooltip)
     local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetApp
 
-    TooltipHandler:CreateSectionHeader(tooltip, BATTLENET_OPTIONS_LABEL, sectionIsCollapsed, "BattleNetApp")
+    TooltipHandler:CreateSectionHeader(
+        tooltip,
+        ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(#PlayerLists.BattleNetApp)),
+        sectionIsCollapsed,
+        "BattleNetApp"
+    )
 
     if sectionIsCollapsed then
         return
@@ -219,7 +224,10 @@ function BattleNetSection:DisplayGames(tooltip)
 
     TooltipHandler:CreateSectionHeader(
         tooltip,
-        ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
+        ("%s %s"):format(
+            ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
+            PARENS_TEMPLATE:format(#PlayerLists.BattleNetGames)
+        ),
         sectionIsCollapsed,
         "BattleNetGames"
     )
