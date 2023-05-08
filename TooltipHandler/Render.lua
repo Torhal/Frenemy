@@ -153,9 +153,17 @@ function TooltipHandler:Render(anchorFrame)
         self.Tooltip.Main = tooltip
     end
 
-    tooltip:Clear():SetCellMarginH(0):SetCellMarginV(1)
+    tooltip
+        :Clear()
+        :SetCellMarginH(0)
+        :SetCellMarginV(1)
+        :AddLine()
+        :GetCell(1)
+        :SetColSpan(0)
+        :SetJustifyH("CENTER")
+        :SetFont(TitleFont)
+        :SetText(AddOnFolderName)
 
-    tooltip:AddLine():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
     local MOTD = self.GuildSection.MOTD
