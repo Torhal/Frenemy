@@ -165,6 +165,9 @@ function GuildSection:Display(tooltip)
         return
     end
 
+    local MOTD = GuildSection.MOTD
+    MOTD.Row = nil
+
     local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.Guild
 
@@ -308,8 +311,6 @@ function GuildSection:Display(tooltip)
         end
     end
 
-    local MOTD = GuildSection.MOTD
-    MOTD.Row = nil
     MOTD.Text = GetGuildRosterMOTD()
 
     if not MOTD.Text or MOTD.Text == "" then
