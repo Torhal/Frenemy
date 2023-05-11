@@ -324,6 +324,34 @@ TooltipHandler.Icon = {
 }
 
 --------------------------------------------------------------------------------
+---- SectionHeaderCell
+--------------------------------------------------------------------------------
+
+local QTip = LibStub("LibQTip-2.0")
+local SectionHeaderCellProvider,
+    SectionHeaderCell, ---@class Frenemy.SectionHeaderCell: LibQTip-2.0.Cell
+    BaseCell =
+    QTip:CreateCellProvider(QTip.DefaultCellProvider)
+
+function SectionHeaderCell:GetContentHeight()
+    return 24
+end
+
+function SectionHeaderCell:OnCreation()
+    BaseCell.OnCreation(self)
+
+    if not self.BackgroundAtlas then
+        local background = self:CreateTexture(nil, "ARTWORK")
+        background:SetBlendMode("ADD")
+        background:SetAtlas("Objective-Header", true)
+        background:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 14)
+        background:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 14)
+
+        self.BackgroundAtlas = background
+    end
+end
+
+--------------------------------------------------------------------------------
 ---- Methods
 --------------------------------------------------------------------------------
 
@@ -379,18 +407,14 @@ do
         local fontName = sectionIsCollapsed and "GameFontDisableMed3" or "GameTooltipHeaderText"
         local sectionIcon = sectionIsCollapsed and self.Icon.Section.Disabled or self.Icon.Section.Enabled
 
-        tooltip:AddSeparator()
-
         tooltip
             :AddRow()
-            :GetCell(1)
+            :GetCell(1, SectionHeaderCellProvider)
             :SetColSpan(0)
             :SetJustifyH("CENTER")
             :SetFont(fontName)
             :SetText(("%s %s %s"):format(sectionIcon, titleText, sectionIcon))
             :SetScript("OnMouseUp", SectionTitle_OnMouseUp, scriptParameter)
-
-        tooltip:AddSeparator()
     end
 end
 
