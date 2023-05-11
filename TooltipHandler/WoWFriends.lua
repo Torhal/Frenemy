@@ -100,6 +100,8 @@ do
         ---- Section Header
         --------------------------------------------------------------------------------
 
+        tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
         local headerRow = tooltip:AddRow()
 
         headerRow:SetColor(0, 0, 0, 1)
@@ -149,11 +151,11 @@ do
                 :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Note")
         end
 
+        tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
         --------------------------------------------------------------------------------
         ---- Section Body
         --------------------------------------------------------------------------------
-
-        tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
         local classToken = TooltipHandler.Class.Token
 

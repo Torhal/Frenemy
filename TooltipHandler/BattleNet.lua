@@ -134,11 +134,11 @@ local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, n
             :SetScript("OnMouseUp", ToggleColumnSortMethod, ("%s:Note"):format(dataPrefix))
     end
 
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
     --------------------------------------------------------------------------------
     ---- Section Body
     --------------------------------------------------------------------------------
-
-    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
     for index = 1, #playerList do
         local friend = playerList[index]
@@ -204,6 +204,8 @@ function BattleNetSection:DisplayApps(tooltip)
         return
     end
 
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
     RenderBattleNetRows(
         tooltip,
         PlayerLists.BattleNetApp,
@@ -232,6 +234,8 @@ function BattleNetSection:DisplayGames(tooltip)
     if sectionIsCollapsed then
         return
     end
+
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
     local headerRow = tooltip:AddRow()
 

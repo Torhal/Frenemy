@@ -186,6 +186,8 @@ function GuildSection:Display(tooltip)
     ---- Section Header
     --------------------------------------------------------------------------------
 
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
     local headerRow = tooltip:AddRow()
 
     headerRow
@@ -235,11 +237,11 @@ function GuildSection:Display(tooltip)
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:OfficerNote")
     end
 
+    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+
     --------------------------------------------------------------------------------
     ---- Section Body
     --------------------------------------------------------------------------------
-
-    tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
     local numGuildRanks = GuildControlGetNumRanks()
     local classToken = TooltipHandler.Class.Token
