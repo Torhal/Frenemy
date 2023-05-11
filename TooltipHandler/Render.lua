@@ -153,16 +153,7 @@ function TooltipHandler:Render(anchorFrame)
         self.Tooltip.Main = tooltip
     end
 
-    tooltip
-        :Clear()
-        :SetCellMarginH(0)
-        :SetCellMarginV(1)
-        :AddRow()
-        :GetCell(1)
-        :SetColSpan(0)
-        :SetJustifyH("CENTER")
-        :SetFont(TitleFont)
-        :SetText(AddOnFolderName)
+    tooltip:Clear():AddRow():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
 
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
