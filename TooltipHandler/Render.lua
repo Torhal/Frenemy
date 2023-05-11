@@ -157,18 +157,16 @@ function TooltipHandler:Render(anchorFrame)
 
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
-    local MOTD = self.GuildSection.MOTD
-    MOTD.Row = nil
-    MOTD.Text = nil
-
     for index = 1, #DB.Tooltip.SectionDisplayOrders do
         SectionDisplayFunction[DB.Tooltip.SectionDisplayOrders[index]](nil, tooltip)
     end
 
     tooltip:Show()
 
-    -- This must be done after everything else has been added to the tooltip in order to have an accurate width.
-    if MOTD.Row and MOTD.Text then
+    -- In order to have an accurate width, this must be added after everything else has been added and the tooltip is visible.
+    local MOTD = self.GuildSection.MOTD
+
+    if MOTD.Row and (MOTD.Text and MOTD.Text ~= "") then
         MOTD.Row
             :GetCell(1)
             :SetColSpan(0)

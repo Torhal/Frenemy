@@ -309,6 +309,7 @@ function GuildSection:Display(tooltip)
     end
 
     local MOTD = GuildSection.MOTD
+    MOTD.Row = nil
     MOTD.Text = GetGuildRosterMOTD()
 
     if not MOTD.Text or MOTD.Text == "" then
