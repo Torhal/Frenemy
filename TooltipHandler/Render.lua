@@ -186,5 +186,5 @@ function TooltipHandler:Render(anchorFrame)
         :SetScript("OnLeave", HideHelpTip)
         :SetScript("OnMouseDown", HideHelpTip)
 
-    tooltip:UpdateScrolling()
+    -- tooltip:UpdateScrolling()
 end
