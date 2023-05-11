@@ -376,8 +376,10 @@ do
     ---@param sectionIsCollapsed boolean
     ---@param scriptParameter string
     function TooltipHandler:CreateSectionHeader(tooltip, titleText, sectionIsCollapsed, scriptParameter)
-        local fontName = sectionIsCollapsed and "GameFontDisable" or "GameFontNormal"
+        local fontName = sectionIsCollapsed and "GameFontDisableMed3" or "GameTooltipHeaderText"
         local sectionIcon = sectionIsCollapsed and self.Icon.Section.Disabled or self.Icon.Section.Enabled
+
+        tooltip:AddSeparator()
 
         tooltip
             :AddRow()
@@ -388,7 +390,7 @@ do
             :SetText(("%s %s %s"):format(sectionIcon, titleText, sectionIcon))
             :SetScript("OnMouseUp", SectionTitle_OnMouseUp, scriptParameter)
 
-        tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
+        tooltip:AddSeparator()
     end
 end
 
