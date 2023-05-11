@@ -224,10 +224,7 @@ function BattleNetSection:DisplayGames(tooltip)
 
     TooltipHandler:CreateSectionHeader(
         tooltip,
-        ("%s %s"):format(
-            ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
-            PARENS_TEMPLATE:format(#PlayerLists.BattleNetGames)
-        ),
+        ("%s %s"):format(GAMES, PARENS_TEMPLATE:format(#PlayerLists.BattleNetGames)),
         sectionIsCollapsed,
         "BattleNetGames"
     )
