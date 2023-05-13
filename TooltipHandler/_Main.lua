@@ -443,3 +443,16 @@ end
 function TooltipHandler:IsUnitGrouped(name)
     return (GetNumSubgroupMembers() > 0 and UnitInParty(name)) or (GetNumGroupMembers() > 0 and UnitInRaid(name))
 end
+
+---@param _ LibQTip-2.0.EventName
+---@param tooltip LibQTip-2.0.Tooltip
+function TooltipHandler:OnReleaseTooltip(_, tooltip)
+    if tooltip == self.Tooltip.Main then
+        HideDropDownMenu(1)
+
+        self.Tooltip.AnchorFrame = nil
+        self.Tooltip.Main = nil
+    elseif tooltip == self.Tooltip.Help then
+        self.Tooltip.Help = nil
+    end
+end

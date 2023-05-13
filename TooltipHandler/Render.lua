@@ -37,21 +37,12 @@ local HelpTipDefinitions = {
 ---- Cell Scripts
 --------------------------------------------------------------------------------
 
-local function HideHelpTip()
-    if TooltipHandler.Tooltip.Help then
-        LibQTip:Release(TooltipHandler.Tooltip.Help)
-        TooltipHandler.Tooltip.Help = nil
-    end
-
-    TooltipHandler.Tooltip.Main:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
-end
-
 ---@param tooltipCell LibQTip-2.0.Cell
 local function ShowHelpTip(tooltipCell)
     local helpTip = TooltipHandler.Tooltip.Help
 
     if not helpTip then
-        helpTip = LibQTip:Acquire(AddOnFolderName .. "HelpTip", 2)
+        helpTip = LibQTip:Acquire(("%sHelpTip"):format(AddOnFolderName), 2)
         helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
         helpTip:SetScale(private.DB.Tooltip.Scale)
 
@@ -99,17 +90,6 @@ end
 ---- Display Rendering
 --------------------------------------------------------------------------------
 
----@param self LibQTip-2.0.Tooltip
-local function Tooltip_OnRelease(self)
-    HideDropDownMenu(1)
-    HideHelpTip()
-
-    self:SetFrameStrata("TOOLTIP") -- This can be set to DIALOG by various functions.
-
-    TooltipHandler.Tooltip.AnchorFrame = nil
-    TooltipHandler.Tooltip.Main = nil
-end
-
 local TitleFont = CreateFont("FrenemyTitleFont")
 TitleFont:SetTextColor(0.510, 0.773, 1.0)
 TitleFont:SetFontObject("QuestTitleFont")
@@ -145,7 +125,7 @@ function TooltipHandler:Render(anchorFrame)
             :SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
             :SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
 
-        tooltip.OnRelease = Tooltip_OnRelease
+        LibQTip.RegisterCallback(self, "OnReleaseTooltip", "OnReleaseTooltip")
 
         tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
         tooltip:SetScale(DB.Tooltip.Scale)
@@ -183,6 +163,4 @@ function TooltipHandler:Render(anchorFrame)
         :SetJustifyH("RIGHT")
         :SetText(self.Icon.Help)
         :SetScript("OnEnter", ShowHelpTip)
-        :SetScript("OnLeave", HideHelpTip)
-        :SetScript("OnMouseDown", HideHelpTip)
 end
