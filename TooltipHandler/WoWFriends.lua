@@ -236,30 +236,33 @@ function WoWFriendSection:GenerateData()
 
     for friendIndex = 1, People.Friends.Online do
         local friendInfo = C_FriendList.GetFriendInfoByIndex(friendIndex)
-        local fullToonName = friendInfo.name
-        local toonName, realmName = strsplit("-", fullToonName)
-        local zoneName = friendInfo.area
 
-        WoWFriendIndexByName[fullToonName] = friendIndex
-        WoWFriendIndexByName[toonName] = friendIndex
+        if friendInfo.connected then
+            local fullToonName = friendInfo.name
+            local toonName, realmName = strsplit("-", fullToonName)
+            local zoneName = friendInfo.area
 
-        if not OnlineFriendsByName[toonName] then
-            ---@type WoWFriend
-            local friendData = {
-                Class = friendInfo.className,
-                FullToonName = fullToonName,
-                IsLocalFriend = true,
-                Level = friendInfo.level,
-                Note = friendInfo.notes,
-                RealmName = realmName or Player.RealmName,
-                StatusIcon = friendInfo.afk and Icon.Status.AFK
-                    or (friendInfo.dnd and Icon.Status.DND or Icon.Status.Online),
-                ToonName = toonName,
-                ZoneName = zoneName ~= "" and zoneName or UNKNOWN,
-            }
+            WoWFriendIndexByName[fullToonName] = friendIndex
+            WoWFriendIndexByName[toonName] = friendIndex
 
-            table.insert(PlayerLists.WoWFriends, friendData)
-            OnlineFriendsByName[toonName] = friendData
+            if not OnlineFriendsByName[toonName] then
+                ---@type WoWFriend
+                local friendData = {
+                    Class = friendInfo.className,
+                    FullToonName = fullToonName,
+                    IsLocalFriend = true,
+                    Level = friendInfo.level,
+                    Note = friendInfo.notes,
+                    RealmName = realmName or Player.RealmName,
+                    StatusIcon = friendInfo.afk and Icon.Status.AFK
+                        or (friendInfo.dnd and Icon.Status.DND or Icon.Status.Online),
+                    ToonName = toonName,
+                    ZoneName = zoneName ~= "" and zoneName or UNKNOWN,
+                }
+
+                table.insert(PlayerLists.WoWFriends, friendData)
+                OnlineFriendsByName[toonName] = friendData
+            end
         end
     end
 end
