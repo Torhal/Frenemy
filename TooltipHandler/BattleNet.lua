@@ -269,10 +269,10 @@ function BattleNetSection:GenerateData()
         local messageText = friendInfo.customMessage
         local noteText = friendInfo.note
 
-        local numToons = C_BattleNet.GetFriendNumGameAccounts(battleNetIndex)
+        local numGameAccounts = C_BattleNet.GetFriendNumGameAccounts(battleNetIndex)
 
-        for toonIndex = 1, numToons do
-            local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(battleNetIndex, toonIndex) or {}
+        for accountIndex = 1, numGameAccounts do
+            local gameAccountInfo = C_BattleNet.GetFriendGameAccountInfo(battleNetIndex, accountIndex) or {}
             local clientProgram = gameAccountInfo.clientProgram
             local gameText = gameAccountInfo.richPresence or ""
             local characterName =
