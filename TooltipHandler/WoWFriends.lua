@@ -78,11 +78,12 @@ do
 
     ---@param tooltip LibQTip-2.0.Tooltip
     function WoWFriendSection:Display(tooltip)
-        if #PlayerLists.WoWFriends == 0 then
+        local DB = private.DB
+
+        if DB.Tooltip.DisabledSections.WoWFriends or #PlayerLists.WoWFriends == 0 then
             return
         end
 
-        local DB = private.DB
         local sectionIsCollapsed = DB.Tooltip.CollapsedSections.WoWFriends
 
         TooltipHandler:CreateSectionHeader(

@@ -61,12 +61,12 @@ Preferences.Tooltip = {}
 function Preferences:GetOptions()
     if not Options then
         Options = {
+            childGroups = "tree",
             name = ("%s - %s"):format(AddOnFolderName, GetBuildVersion()),
             type = "group",
-            childGroups = "tab",
             args = {
-                dataObject = Preferences.DataObject:GetOptions(),
-                tooltip = Preferences.Tooltip:GetOptions(),
+                DataObject = Preferences.DataObject:GetOptions(),
+                Tooltip = Preferences.Tooltip:GetOptions(),
             },
         }
     end
@@ -75,7 +75,7 @@ function Preferences:GetOptions()
 end
 
 function Preferences:InitializeDatabase()
-    return LibStub("AceDB-3.0"):New(AddOnFolderName .. "DB", self.DefaultValues, true).global
+    return LibStub("AceDB-3.0"):New(("%sDB"):format(AddOnFolderName), self.DefaultValues, true).global
 end
 
 function Preferences:SetupOptions()

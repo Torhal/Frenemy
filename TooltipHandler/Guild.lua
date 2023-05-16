@@ -161,14 +161,15 @@ end
 
 ---@param tooltip LibQTip-2.0.Tooltip
 function GuildSection:Display(tooltip)
-    if #PlayerLists.Guild == 0 then
+    local DB = private.DB
+
+    if DB.Tooltip.DisabledSections.Guild or #PlayerLists.Guild == 0 then
         return
     end
 
     local MOTD = GuildSection.MOTD
     MOTD.Row = nil
 
-    local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.Guild
 
     TooltipHandler:CreateSectionHeader(

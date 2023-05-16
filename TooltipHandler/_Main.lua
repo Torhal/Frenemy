@@ -266,6 +266,7 @@ do
     for index = 1, #CLASS_SORT_ORDER do
         local className = CLASS_SORT_ORDER[index]
         local left, right, top, bottom = unpack(CLASS_ICON_TCOORDS[className])
+
         ClassIcon[className] =
             textureFormat:format(left * textureSize, right * textureSize, top * textureSize, bottom * textureSize)
     end

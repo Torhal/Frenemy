@@ -37,102 +37,140 @@ local NotesArrangementValues = {
 }
 
 --------------------------------------------------------------------------------
----- Helpers
---------------------------------------------------------------------------------
-
----@param optionsTable table
----@param entryName string
----@param label string
----@param order number
-local function BuildNotesEntry(optionsTable, entryName, label, order)
-    local DB = private.DB
-
-    optionsTable["notesArrangement" .. entryName] = {
-        order = order,
-        type = "select",
-        style = "radio",
-        name = label,
-        values = NotesArrangementValues,
-        get = function(info)
-            return DB.Tooltip.NotesArrangement[entryName]
-        end,
-        set = function(info, value)
-            DB.Tooltip.NotesArrangement[entryName] = value
-        end,
-    }
-end
-
---------------------------------------------------------------------------------
 ---- Tooltip Options
 --------------------------------------------------------------------------------
 
----@type AceConfig.OptionsTable
+---@class TooltipOptionsTable: AceConfig.OptionsTable
 local Options
+
+---@param entryName string
+---@param order number
+---@return AceConfig.OptionsTable
+local function BuildEnableCheckButton(entryName, order)
+    local disabledSections = private.DB.Tooltip.DisabledSections
+
+    return {
+        get = function()
+            return not disabledSections[entryName]
+        end,
+        name = ENABLE,
+        order = order,
+        set = function()
+            disabledSections[entryName] = not disabledSections[entryName]
+        end,
+        type = "toggle",
+        width = "full",
+    }
+end
+
+---@param entryName string
+---@param label string
+---@param order number
+---@return AceConfig.OptionsTable
+local function BuildNoteTypeSelect(entryName, label, order)
+    local notesArrangement = private.DB.Tooltip.NotesArrangement
+
+    return {
+        get = function(info)
+            return notesArrangement[entryName]
+        end,
+        name = ("%s %s"):format(label, PARENS_TEMPLATE:format(TYPE)),
+        order = order,
+        set = function(info, value)
+            notesArrangement[entryName] = value
+        end,
+        style = "radio",
+        type = "select",
+        values = NotesArrangementValues,
+    }
+end
 
 function TooltipPreferences:GetOptions()
     if not Options then
         local DB = private.DB
 
         Options = {
-            order = 2,
+            order = 1,
             name = DISPLAY,
             type = "group",
             args = {
-                hideDelay = {
+                General = {
+                    name = GENERAL_LABEL,
                     order = 1,
-                    type = "range",
-                    width = "full",
-                    name = L.TOOLTIP_HIDEDELAY_LABEL,
-                    desc = L.TOOLTIP_HIDEDELAY_DESC,
-                    min = 0.10,
-                    max = 2,
-                    step = 0.05,
-                    get = function()
-                        return DB.Tooltip.HideDelay
-                    end,
-                    set = function(info, value)
-                        DB.Tooltip.HideDelay = value
-                    end,
+                    type = "group",
+                    args = {
+                        TooltipHideDelay = {
+                            desc = L.TOOLTIP_HIDEDELAY_DESC,
+                            get = function()
+                                return DB.Tooltip.HideDelay
+                            end,
+                            max = 2,
+                            min = 0.10,
+                            name = L.TOOLTIP_HIDEDELAY_LABEL,
+                            order = 1,
+                            type = "range",
+                            set = function(info, value)
+                                DB.Tooltip.HideDelay = value
+                            end,
+                            step = 0.05,
+                            width = "normal",
+                        },
+                        TooltipScale = {
+                            get = function()
+                                return DB.Tooltip.Scale
+                            end,
+                            max = 2,
+                            min = 0.5,
+                            name = L.TOOLTIP_SCALE_LABEL,
+                            order = 2,
+                            set = function(info, value)
+                                DB.Tooltip.Scale = value
+                            end,
+                            step = 0.01,
+                            type = "range",
+                            width = "normal",
+                        },
+                    },
                 },
-                scale = {
+                BattleNetApp = {
+                    name = BATTLENET_OPTIONS_LABEL,
                     order = 2,
-                    type = "range",
-                    width = "full",
-                    name = L.TOOLTIP_SCALE_LABEL,
-                    min = 0.5,
-                    max = 2,
-                    step = 0.01,
-                    get = function()
-                        return DB.Tooltip.Scale
-                    end,
-                    set = function(info, value)
-                        DB.Tooltip.Scale = value
-                    end,
+                    type = "group",
+                    args = {
+                        Enable = BuildEnableCheckButton("BattleNetApp", 1),
+                        NotesArrangement = BuildNoteTypeSelect("BattleNetApp", LABEL_NOTE, 2),
+                    },
                 },
-                notesArrangementHeader = {
-                    name = LABEL_NOTE,
+                BattleNetGames = {
+                    name = GAMES,
                     order = 3,
-                    type = "header",
-                    width = "full",
+                    type = "group",
+                    args = {
+                        Enable = BuildEnableCheckButton("BattleNetGames", 1),
+                        NotesArrangement = BuildNoteTypeSelect("BattleNetGames", LABEL_NOTE, 2),
+                    },
+                },
+                Guild = {
+                    name = GetGuildInfo("player") or GUILD,
+                    order = 4,
+                    type = "group",
+                    args = {
+                        Enable = BuildEnableCheckButton("Guild", 1),
+                        NotesArrangement = BuildNoteTypeSelect("Guild", LABEL_NOTE, 2),
+                        NotesArrangementGuildOfficer = BuildNoteTypeSelect("GuildOfficer", GUILD_OFFICER_NOTE, 3),
+                    },
+                },
+                WoWFriends = {
+                    name = FRIENDS,
+                    order = 5,
+                    type = "group",
+                    args = {
+                        Enable = BuildEnableCheckButton("WoWFriends", 1),
+                        NotesArrangement = BuildNoteTypeSelect("WoWFriends", LABEL_NOTE, 2),
+                    },
                 },
             },
         }
-
-        BuildNotesEntry(Options.args, "BattleNetApp", BATTLENET_OPTIONS_LABEL, 4)
-        BuildNotesEntry(
-            Options.args,
-            "BattleNetGames",
-            ("%s %s"):format(BATTLENET_OPTIONS_LABEL, PARENS_TEMPLATE:format(GAME)),
-            5
-        )
-        BuildNotesEntry(Options.args, "Guild", GetGuildInfo("player") or GUILD, 6)
-        BuildNotesEntry(
-            Options.args,
-            "GuildOfficer",
-            ("%s %s"):format(GetGuildInfo("player") or GUILD, PARENS_TEMPLATE:format(OFFICER)),
-            7
-        )
-        BuildNotesEntry(Options.args, "WoWFriends", FRIENDS, 8)
     end
 
     return Options
@@ -144,6 +182,12 @@ end
 
 Preferences.DefaultValues.global.Tooltip = {
     CollapsedSections = {
+        BattleNetApp = false,
+        BattleNetGames = false,
+        Guild = false,
+        WoWFriends = false,
+    },
+    DisabledSections = {
         BattleNetApp = false,
         BattleNetGames = false,
         Guild = false,

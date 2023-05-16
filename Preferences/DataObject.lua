@@ -23,14 +23,14 @@ function DataObjectPreferences:GetOptions()
         local LDBIcon = LibStub("LibDBIcon-1.0")
 
         Options = {
-            order = 1,
+            order = 2,
             name = INFO,
             type = "group",
             args = {},
         }
 
         if LDBIcon then
-            Options.args.miniMap = {
+            Options.args.MiniMap = {
                 order = 1,
                 type = "toggle",
                 name = MINIMAP_LABEL,

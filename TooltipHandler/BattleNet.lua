@@ -186,11 +186,12 @@ end
 
 ---@param tooltip LibQTip-2.0.Tooltip
 function BattleNetSection:DisplayApps(tooltip)
-    if #PlayerLists.BattleNetApp == 0 then
+    local DB = private.DB
+
+    if DB.Tooltip.DisabledSections.BattleNetApp or #PlayerLists.BattleNetApp == 0 then
         return
     end
 
-    local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetApp
 
     TooltipHandler:CreateSectionHeader(
@@ -217,11 +218,12 @@ end
 
 ---@param tooltip LibQTip-2.0.Tooltip
 function BattleNetSection:DisplayGames(tooltip)
-    if #PlayerLists.BattleNetGames == 0 then
+    local DB = private.DB
+
+    if DB.Tooltip.DisabledSections.BattleNetGames or #PlayerLists.BattleNetGames == 0 then
         return
     end
 
-    local DB = private.DB
     local sectionIsCollapsed = DB.Tooltip.CollapsedSections.BattleNetGames
 
     TooltipHandler:CreateSectionHeader(
