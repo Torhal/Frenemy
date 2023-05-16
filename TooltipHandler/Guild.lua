@@ -38,8 +38,8 @@ local GuildMemberIndexByName = {}
 local ColumnID = {
     Level = 1,
     Class = 2,
-    ToonName = 3,
-    Rank = 4,
+    Rank = 3,
+    ToonName = 4,
     ZoneName = 5,
     PublicNote = 6,
     OfficerNote = 8,
@@ -183,7 +183,7 @@ function GuildSection:Display(tooltip)
     end
 
     --------------------------------------------------------------------------------
-    ---- Section Header
+    ---- Column Header
     --------------------------------------------------------------------------------
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
@@ -204,16 +204,16 @@ function GuildSection:Display(tooltip)
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Class")
 
     headerRow
-        :GetCell(ColumnID.ToonName)
-        :SetColSpan(ColSpan.ToonName)
-        :SetText(TooltipHandler:ColumnLabel(NAME, "Guild:ToonName"))
-        :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
-
-    headerRow
         :GetCell(ColumnID.Rank)
         :SetColSpan(ColSpan.Rank)
         :SetText(TooltipHandler:ColumnLabel(RANK, "Guild:RankIndex"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:RankIndex")
+
+    headerRow
+        :GetCell(ColumnID.ToonName)
+        :SetColSpan(ColSpan.ToonName)
+        :SetText(TooltipHandler:ColumnLabel(NAME, "Guild:ToonName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ToonName")
 
     headerRow
         :GetCell(ColumnID.ZoneName)
