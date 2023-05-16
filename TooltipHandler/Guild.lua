@@ -36,8 +36,8 @@ GuildSection.MOTD = {
 local GuildMemberIndexByName = {}
 
 local ColumnID = {
-    Level = 1,
-    Class = 2,
+    Class = 1,
+    Level = 2,
     Rank = 3,
     ToonName = 4,
     ZoneName = 5,
@@ -46,8 +46,8 @@ local ColumnID = {
 }
 
 local ColSpan = {
-    Level = 1,
     Class = 1,
+    Level = 1,
     ToonName = 1,
     Rank = 1,
     ZoneName = 1,
@@ -189,20 +189,19 @@ function GuildSection:Display(tooltip)
 
     tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-    local headerRow = tooltip:AddRow()
-
-    headerRow
-        :SetColor(0, 0, 0, 1)
-        :GetCell(ColumnID.Level)
-        :SetColSpan(ColSpan.Level)
-        :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "Guild:Level"))
-        :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
+    local headerRow = tooltip:AddRow():SetColor(0, 0, 0, 1)
 
     headerRow
         :GetCell(ColumnID.Class)
         :SetColSpan(ColSpan.Class)
         :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "Guild:Class"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Class")
+
+    headerRow
+        :GetCell(ColumnID.Level)
+        :SetColSpan(ColSpan.Level)
+        :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "Guild:Level"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:Level")
 
     headerRow
         :GetCell(ColumnID.Rank)
@@ -252,14 +251,14 @@ function GuildSection:Display(tooltip)
 
         local row = tooltip:AddRow()
 
+        row:GetCell(ColumnID.Class)
+            :SetColSpan(ColSpan.Class)
+            :SetText(Icon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
+
         row:GetCell(ColumnID.Level)
             :SetColSpan(ColSpan.Level)
             :SetJustifyH("LEFT")
             :SetText(TooltipHandler:ColorPlayerLevel(guildMate.Level))
-
-        row:GetCell(ColumnID.Class)
-            :SetColSpan(ColSpan.Class)
-            :SetText(Icon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
 
         row:GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)

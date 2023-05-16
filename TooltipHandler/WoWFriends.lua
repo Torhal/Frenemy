@@ -29,8 +29,8 @@ local WoWFriendSection = TooltipHandler.WoWFriendSection
 local WoWFriendIndexByName = {}
 
 local ColumnID = {
-    Level = 1,
-    Class = 2,
+    Class = 1,
+    Level = 2,
     PresenceName = 3,
     ToonName = 4,
     ZoneName = 5,
@@ -39,8 +39,8 @@ local ColumnID = {
 }
 
 local ColSpan = {
-    Level = 1,
     Class = 1,
+    Level = 1,
     PresenceName = 1,
     ToonName = 1,
     ZoneName = 1,
@@ -103,9 +103,13 @@ do
 
         tooltip:AddSeparator(1, 0.5, 0.5, 0.5)
 
-        local headerRow = tooltip:AddRow()
+        local headerRow = tooltip:AddRow():SetColor(0, 0, 0, 1)
 
-        headerRow:SetColor(0, 0, 0, 1)
+        headerRow
+            :GetCell(ColumnID.Class)
+            :SetColSpan(ColSpan.Class)
+            :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "WoWFriends:Class"))
+            :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
 
         headerRow
             :GetCell(ColumnID.Level)
@@ -113,12 +117,6 @@ do
             :SetJustifyH("LEFT")
             :SetText(TooltipHandler:ColumnLabel(Icon.Column.Level, "WoWFriends:Level"))
             :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Level")
-
-        headerRow
-            :GetCell(ColumnID.Class)
-            :SetColSpan(ColSpan.Class)
-            :SetText(TooltipHandler:ColumnLabel(Icon.Column.Class, "WoWFriends:Class"))
-            :SetScript("OnMouseUp", ToggleColumnSortMethod, "WoWFriends:Class")
 
         headerRow
             :GetCell(ColumnID.PresenceName)
@@ -169,11 +167,11 @@ do
 
             local row = tooltip:AddRow()
 
-            row:GetCell(ColumnID.Level):SetColSpan(ColSpan.Level):SetText(TooltipHandler:ColorPlayerLevel(friend.Level))
-
             row:GetCell(ColumnID.Class)
                 :SetColSpan(ColSpan.Class)
                 :SetText(Icon.Class[classToken.Female[friend.Class] or classToken.Male[friend.Class]])
+
+            row:GetCell(ColumnID.Level):SetColSpan(ColSpan.Level):SetText(TooltipHandler:ColorPlayerLevel(friend.Level))
 
             row:GetCell(ColumnID.PresenceName)
                 :SetColSpan(ColSpan.PresenceName)
