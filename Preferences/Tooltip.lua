@@ -156,8 +156,20 @@ function TooltipPreferences:GetOptions()
                     type = "group",
                     args = {
                         Enable = BuildEnableCheckButton("Guild", 1),
-                        NotesArrangement = BuildNoteTypeSelect("Guild", LABEL_NOTE, 2),
-                        NotesArrangementGuildOfficer = BuildNoteTypeSelect("GuildOfficer", GUILD_OFFICER_NOTE, 3),
+                        MOTD = {
+                            get = function()
+                                return private.DB.Tooltip.ShowGuildMOTD
+                            end,
+                            name = GUILD_MOTD,
+                            order = 2,
+                            set = function()
+                                private.DB.Tooltip.ShowGuildMOTD = not private.DB.Tooltip.ShowGuildMOTD
+                            end,
+                            type = "toggle",
+                            width = "full",
+                        },
+                        NotesArrangement = BuildNoteTypeSelect("Guild", LABEL_NOTE, 3),
+                        NotesArrangementGuildOfficer = BuildNoteTypeSelect("GuildOfficer", GUILD_OFFICER_NOTE, 4),
                     },
                 },
                 WoWFriends = {
@@ -208,6 +220,7 @@ Preferences.DefaultValues.global.Tooltip = {
         "Guild",
     },
     Scale = 1,
+    ShowGuildMOTD = false,
     Sorting = {
         BattleNetApp = {
             Field = Sorting.FieldIDs.BattleNetApp.PresenceName,

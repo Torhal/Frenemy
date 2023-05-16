@@ -314,7 +314,7 @@ function GuildSection:Display(tooltip)
         end
     end
 
-    MOTD.Text = GetGuildRosterMOTD()
+    MOTD.Text = DB.Tooltip.ShowGuildMOTD and GetGuildRosterMOTD() or ""
 
     if not MOTD.Text or MOTD.Text == "" then
         tooltip:AddRow(" ")
