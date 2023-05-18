@@ -6,7 +6,7 @@ local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@type PrivateNamespace
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
-local LibQTip = LibStub("LibQTip-2.0")
+local QTip = LibStub("LibQTip-2.0")
 
 ---@class TooltipHandler
 local TooltipHandler = private.TooltipHandler
@@ -42,7 +42,7 @@ local function ShowHelpTip(tooltipCell)
     local helpTip = TooltipHandler.Tooltip.Help
 
     if not helpTip then
-        helpTip = LibQTip:Acquire(("%sHelpTip"):format(AddOnFolderName), 2)
+        helpTip = QTip:AcquireTooltip(("%sHelpTip"):format(AddOnFolderName), 2)
         helpTip:SetBackdropColor(0.05, 0.05, 0.05, 1)
         helpTip:SetScale(private.DB.Tooltip.Scale)
 
@@ -50,7 +50,7 @@ local function ShowHelpTip(tooltipCell)
             :SetAutoHideDelay(0.25, tooltipCell)
             :SmartAnchorTo(tooltipCell)
             :SetScript("OnLeave", function()
-                LibQTip:Release(helpTip)
+                QTip:ReleaseTooltip(helpTip)
             end)
             :Clear()
             :SetCellMarginH(0)
@@ -117,7 +117,7 @@ function TooltipHandler:Render(anchorFrame)
     local tooltip = self.Tooltip.Main
 
     if not tooltip then
-        tooltip = LibQTip:Acquire(AddOnFolderName, MaxTooltipColumns)
+        tooltip = QTip:AcquireTooltip(AddOnFolderName, MaxTooltipColumns)
 
         tooltip
             :SetAutoHideDelay(DB.Tooltip.HideDelay, anchorFrame)
@@ -125,7 +125,7 @@ function TooltipHandler:Render(anchorFrame)
             :SetHighlightTexture([[Interface\ClassTrainerFrame\TrainerTextures]])
             :SetHighlightTexCoord(0.00195313, 0.57421875, 0.75390625, 0.84570313)
 
-        LibQTip.RegisterCallback(self, "OnReleaseTooltip", "OnReleaseTooltip")
+        QTip.RegisterCallback(self, "OnReleaseTooltip", "OnReleaseTooltip")
 
         tooltip:SetBackdropColor(0.05, 0.05, 0.05, 1)
         tooltip:SetScale(DB.Tooltip.Scale)
