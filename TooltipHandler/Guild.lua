@@ -15,7 +15,8 @@ local PlayerLists = TooltipHandler.PlayerLists
 
 local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
 
-local Dialog = LibStub("LibDialog-1.0")
+local Dialog = LibStub:GetLibrary("LibDialog-1.0")
+local QTip = LibStub:GetLibrary("LibQTip-2.0")
 
 ---@class TooltipHandler.GuildSection
 local GuildSection = TooltipHandler.GuildSection
@@ -251,9 +252,10 @@ function GuildSection:Display(tooltip)
 
         local row = tooltip:AddRow()
 
-        row:GetCell(ColumnID.Class)
-            :SetColSpan(ColSpan.Class)
-            :SetText(Icon.Class[classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class]])
+        row
+            :GetCell(ColumnID.Class, QTip:GetCellProvider("LibQTip-2.0 Class Icon"))
+            :SetColSpan(ColSpan.Class) --[[@as LibQTip-2.0.ClassIconCell]]
+            :SetIconTexture(classToken.Female[guildMate.Class] or classToken.Male[guildMate.Class])
 
         row:GetCell(ColumnID.Level)
             :SetColSpan(ColSpan.Level)

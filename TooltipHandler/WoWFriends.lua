@@ -17,6 +17,7 @@ local BattleNetFriend_OnMouseUp = TooltipHandler.CellScripts.BattleNetFriend_OnM
 local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
+local QTip = LibStub:GetLibrary("LibQTip-2.0")
 
 ---@class TooltipHandler.WoWFriendSection
 local WoWFriendSection = TooltipHandler.WoWFriendSection
@@ -167,9 +168,10 @@ do
 
             local row = tooltip:AddRow()
 
-            row:GetCell(ColumnID.Class)
-                :SetColSpan(ColSpan.Class)
-                :SetText(Icon.Class[classToken.Female[friend.Class] or classToken.Male[friend.Class]])
+            row
+                :GetCell(ColumnID.Class, QTip:GetCellProvider("LibQTip-2.0 Class Icon"))
+                :SetColSpan(ColSpan.Class) --[[@as LibQTip-2.0.ClassIconCell]]
+                :SetIconTexture(classToken.Female[friend.Class] or classToken.Male[friend.Class])
 
             row:GetCell(ColumnID.Level):SetColSpan(ColSpan.Level):SetText(TooltipHandler:ColorPlayerLevel(friend.Level))
 
