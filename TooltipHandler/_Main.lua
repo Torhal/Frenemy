@@ -378,8 +378,15 @@ do
     ---@param sectionIsCollapsed boolean
     ---@param scriptParameter string
     function TooltipHandler:CreateSectionHeader(tooltip, titleText, sectionIsCollapsed, scriptParameter)
-        local fontName = sectionIsCollapsed and "GameFontDisableMed3" or "GameTooltipHeaderText"
-        local sectionIcon = sectionIsCollapsed and self.Icon.Section.Disabled or self.Icon.Section.Enabled
+        local fontName, sectionIcon
+
+        if sectionIsCollapsed then
+            fontName = "GameFontDisableMed3"
+            sectionIcon = self.Icon.Section.Disabled
+        else
+            fontName = "GameTooltipHeaderText"
+            sectionIcon = self.Icon.Section.Enabled
+        end
 
         tooltip
             :AddRow()
