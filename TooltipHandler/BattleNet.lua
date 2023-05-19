@@ -17,6 +17,8 @@ local PlayerLists = TooltipHandler.PlayerLists
 local BattleNetFriend_OnMouseUp = TooltipHandler.CellScripts.BattleNetFriend_OnMouseUp
 local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
 
+local QTip = LibStub:GetLibrary("LibQTip-2.0")
+
 ---@class TooltipHandler.BattleNetSection
 local BattleNetSection = TooltipHandler.BattleNetSection
 
@@ -144,7 +146,10 @@ local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, n
         local friend = playerList[index]
         local row = tooltip:AddRow()
 
-        row:GetCell(ColumnID.ClientIcon):SetColSpan(ColSpan.ClientIcon):SetText(friend.ClientIcon)
+        row
+            :GetCell(ColumnID.ClientIcon, QTip:GetCellProvider("LibQTip-2.0 Game Icon"))
+            :SetColSpan(ColSpan.ClientIcon) --[[@as LibQTip-2.0.GameIconCell]]
+            :SetIconTexture(friend.Client)
 
         row:GetCell(ColumnID.PresenceName)
             :SetColSpan(ColSpan.PresenceName)
