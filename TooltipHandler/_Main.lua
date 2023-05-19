@@ -9,6 +9,7 @@ local Sorting = private.Sorting
 local SortOrder = private.SortOrder
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
+local QTip = LibStub("LibQTip-2.0")
 
 ---@class TooltipHandler
 ---@field BattleNetSection TooltipHandler.BattleNetSection
@@ -325,34 +326,6 @@ TooltipHandler.Icon = {
 }
 
 --------------------------------------------------------------------------------
----- SectionHeaderCell
---------------------------------------------------------------------------------
-
-local QTip = LibStub("LibQTip-2.0")
-local SectionHeaderCellProvider,
-    SectionHeaderCell, ---@class Frenemy.SectionHeaderCell: LibQTip-2.0.Cell
-    BaseCell =
-    QTip:CreateCellProvider(QTip.DefaultCellProvider)
-
-function SectionHeaderCell:GetContentHeight()
-    return 24
-end
-
-function SectionHeaderCell:OnCreation()
-    BaseCell.OnCreation(self)
-
-    if not self.BackgroundAtlas then
-        local background = self:CreateTexture(nil, "ARTWORK")
-        background:SetBlendMode("ADD")
-        background:SetAtlas("Objective-Header", true)
-        background:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 14)
-        background:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 14)
-
-        self.BackgroundAtlas = background
-    end
-end
-
---------------------------------------------------------------------------------
 ---- Methods
 --------------------------------------------------------------------------------
 
@@ -410,7 +383,7 @@ do
 
         tooltip
             :AddRow()
-            :GetCell(1, SectionHeaderCellProvider)
+            :GetCell(1, QTip:GetCellProvider("Frenemy Section Header"))
             :SetColSpan(0)
             :SetJustifyH("CENTER")
             :SetFont(fontName)
