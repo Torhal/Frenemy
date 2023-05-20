@@ -308,10 +308,8 @@ TooltipHandler.Icon = {
         Disabled = CreateIcon([[Interface\COMMON\Indicator-Red]]),
         Enabled = CreateIcon([[Interface\COMMON\Indicator-Green]]),
     },
-    Sort = {
-        Ascending = CreateIcon([[Interface\Buttons\Arrow-Up-Up]]),
-        Descending = CreateIcon([[Interface\Buttons\Arrow-Down-Up]]),
-    },
+    SortAscending = CreateIcon([[Interface\Buttons\Arrow-Up-Up]]),
+    SortDescending = CreateIcon([[Interface\Buttons\Arrow-Down-Up]]),
     Status = {
         AFK = CreateIcon(FRIENDS_TEXTURE_AFK),
         DND = CreateIcon(FRIENDS_TEXTURE_DND),
@@ -349,8 +347,8 @@ function TooltipHandler:ColumnLabel(label, sectionFieldToken)
 
     if DB.Tooltip.Sorting[sectionName].Field == Sorting.FieldIDs[sectionName][fieldName] then
         return (
-            DB.Tooltip.Sorting[sectionName].Order == SortOrder.Enum.Ascending and self.Icon.Sort.Ascending
-            or self.Icon.Sort.Descending
+            DB.Tooltip.Sorting[sectionName].Order == SortOrder.Enum.Ascending and self.Icon.SortAscending
+            or self.Icon.SortDescending
         ) .. label
     end
 
