@@ -153,12 +153,12 @@ local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, n
 
         row:GetCell(ColumnID.PresenceName)
             :SetColSpan(ColSpan.PresenceName)
-            :SetText(("%s%s%s|r"):format(friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName))
+            :SetFormattedText("%s%s%s|r", friend.StatusIcon, FRIENDS_BNET_NAME_COLOR_CODE, friend.PresenceName)
             :SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
 
         row:GetCell(ColumnID.ToonName)
             :SetColSpan(ColSpan.ToonName)
-            :SetText(("%s%s|r"):format(FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName))
+            :SetFormattedText("%s%s|r", FRIENDS_OTHER_NAME_COLOR_CODE, friend.ToonName)
 
         row:GetCell(ColumnID.GameText):SetColSpan(ColSpan.GameText):SetText(friend.GameText)
 
@@ -173,7 +173,7 @@ local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, n
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
-                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
+                    :SetFormattedText("%s %s", Icon.Status.Note, noteText)
             end
         end
 

@@ -177,7 +177,7 @@ do
 
             row:GetCell(ColumnID.PresenceName)
                 :SetColSpan(ColSpan.PresenceName)
-                :SetText(("%s%s"):format(friend.StatusIcon, presenceName))
+                :SetFormattedText("%s%s", friend.StatusIcon, presenceName)
 
             if friend.PresenceID then
                 row:GetCell(ColumnID.PresenceName):SetScript("OnMouseUp", BattleNetFriend_OnMouseUp, friend)
@@ -215,7 +215,7 @@ do
                         :GetCell(1)
                         :SetColSpan(0)
                         :SetFont("GameTooltipTextSmall")
-                        :SetText(("%s %s"):format(Icon.Status.Note, noteText))
+                        :SetFormattedText("%s %s", Icon.Status.Note, noteText)
                 end
             end
 

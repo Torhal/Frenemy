@@ -152,7 +152,7 @@ function TooltipHandler:Render(anchorFrame)
             :SetColSpan(0)
             :SetJustifyH("LEFT")
             :SetMaxWidth(tooltip:GetWidth() --[[@as integer]] - 20)
-            :SetText(("%s%s|r"):format(GREEN_FONT_COLOR_CODE, MOTD.Text))
+            :SetFormattedText("%s%s|r", GREEN_FONT_COLOR_CODE, MOTD.Text)
     end
 
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)

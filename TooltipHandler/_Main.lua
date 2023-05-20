@@ -392,7 +392,7 @@ do
             :SetColSpan(0)
             :SetJustifyH("CENTER")
             :SetFont(fontName)
-            :SetText(("%s %s %s"):format(sectionIcon, titleText, sectionIcon))
+            :SetFormattedText("%s %s %s", sectionIcon, titleText, sectionIcon)
             :SetScript("OnMouseUp", SectionTitle_OnMouseUp, scriptParameter)
     end
 end

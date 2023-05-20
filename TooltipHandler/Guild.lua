@@ -278,7 +278,7 @@ function GuildSection:Display(tooltip)
         local r, g, b = PercentColorGradient(guildMate.RankIndex, numGuildRanks)
         row:GetCell(ColumnID.Rank)
             :SetColSpan(ColSpan.Rank)
-            :SetText(("|cff%02x%02x%02x%s|r"):format(r * 255, g * 255, b * 255, guildMate.Rank))
+            :SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, guildMate.Rank)
 
         row:GetCell(ColumnID.ZoneName)
             :SetColSpan(ColSpan.ZoneName)
@@ -295,7 +295,7 @@ function GuildSection:Display(tooltip)
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
-                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
+                    :SetFormattedText("%s %s", Icon.Status.Note, noteText)
             end
         end
 
@@ -310,7 +310,7 @@ function GuildSection:Display(tooltip)
                     :GetCell(1)
                     :SetColSpan(0)
                     :SetFont("GameTooltipTextSmall")
-                    :SetText(("%s %s"):format(Icon.Status.Note, noteText))
+                    :SetFormattedText("%s %s", Icon.Status.Note, noteText)
             end
         end
     end
