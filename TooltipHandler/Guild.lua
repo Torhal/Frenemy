@@ -16,6 +16,7 @@ local PlayerLists = TooltipHandler.PlayerLists
 local ToggleColumnSortMethod = TooltipHandler.CellScripts.ToggleColumnSortMethod
 
 local Dialog = LibStub:GetLibrary("LibDialog-1.0")
+local L = LibStub("AceLocale-3.0"):GetLocale(AddOnFolderName)
 local QTip = LibStub:GetLibrary("LibQTip-2.0")
 
 ---@class TooltipHandler.GuildSection
@@ -42,8 +43,9 @@ local ColumnID = {
     Rank = 3,
     ToonName = 4,
     ZoneName = 5,
-    PublicNote = 6,
-    OfficerNote = 8,
+    RealmName = 6,
+    PublicNote = 7,
+    OfficerNote = 9,
 }
 
 local ColSpan = {
@@ -52,6 +54,7 @@ local ColSpan = {
     ToonName = 1,
     Rank = 1,
     ZoneName = 1,
+    RealmName = 1,
     PublicNote = 2,
     OfficerNote = 2,
 }
@@ -222,6 +225,12 @@ function GuildSection:Display(tooltip)
         :SetText(TooltipHandler:ColumnLabel(ZONE, "Guild:ZoneName"))
         :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:ZoneName")
 
+    headerRow
+        :GetCell(ColumnID.RealmName)
+        :SetColSpan(ColSpan.RealmName)
+        :SetText(TooltipHandler:ColumnLabel(L.COLUMN_LABEL_REALM, "Guild:RealmName"))
+        :SetScript("OnMouseUp", ToggleColumnSortMethod, "Guild:RealmName")
+
     if DB.Tooltip.NotesArrangement.Guild == Preferences.Tooltip.NotesArrangement.Column then
         headerRow
             :GetCell(ColumnID.PublicNote)
@@ -283,6 +292,8 @@ function GuildSection:Display(tooltip)
         row:GetCell(ColumnID.ZoneName)
             :SetColSpan(ColSpan.ZoneName)
             :SetText(MapHandler:ColoredZoneName(guildMate.ZoneName))
+
+        row:GetCell(ColumnID.RealmName):SetColSpan(ColSpan.RealmName):SetText(guildMate.RealmName)
 
         if guildMate.PublicNote then
             local noteText = FRIENDS_OTHER_NAME_COLOR_CODE .. guildMate.PublicNote .. "|r"

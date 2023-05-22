@@ -50,6 +50,7 @@ private.Sorting = {
             "PublicNote",
             "OfficerNote",
             "Class",
+            "RealmName",
         },
         WoWFriends = {
             "Level",
@@ -61,6 +62,7 @@ private.Sorting = {
             "Class",
         },
     },
+    ---@type table<string, fun(a?: BattleNetFriend|GuildMember|WoWFriend, b?: BattleNetFriend|GuildMember|WoWFriend): boolean>
     Functions = {},
 }
 
