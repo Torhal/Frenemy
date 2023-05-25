@@ -59,7 +59,6 @@ local function BuildEnableCheckButton(entryName, order)
             disabledSections[entryName] = not disabledSections[entryName]
         end,
         type = "toggle",
-        width = "full",
     }
 end
 
@@ -99,6 +98,12 @@ function TooltipPreferences:GetOptions()
                     order = 1,
                     type = "group",
                     args = {
+                        Header = {
+                            name = GENERAL_LABEL,
+                            order = 1,
+                            type = "header",
+                            width = "full",
+                        },
                         TooltipHideDelay = {
                             desc = L.TOOLTIP_HIDEDELAY_DESC,
                             get = function()
@@ -107,7 +112,7 @@ function TooltipPreferences:GetOptions()
                             max = 2,
                             min = 0.10,
                             name = L.TOOLTIP_HIDEDELAY_LABEL,
-                            order = 1,
+                            order = 2,
                             type = "range",
                             set = function(info, value)
                                 DB.Tooltip.HideDelay = value
@@ -122,7 +127,7 @@ function TooltipPreferences:GetOptions()
                             max = 2,
                             min = 0.5,
                             name = L.TOOLTIP_SCALE_LABEL,
-                            order = 2,
+                            order = 3,
                             set = function(info, value)
                                 DB.Tooltip.Scale = value
                             end,
@@ -137,8 +142,14 @@ function TooltipPreferences:GetOptions()
                     order = 2,
                     type = "group",
                     args = {
-                        Enable = BuildEnableCheckButton("BattleNetApp", 1),
-                        NotesArrangement = BuildNoteTypeSelect("BattleNetApp", LABEL_NOTE, 2),
+                        Header = {
+                            name = BATTLENET_OPTIONS_LABEL,
+                            order = 1,
+                            type = "header",
+                            width = "full",
+                        },
+                        Enable = BuildEnableCheckButton("BattleNetApp", 2),
+                        NotesArrangement = BuildNoteTypeSelect("BattleNetApp", LABEL_NOTE, 3),
                     },
                 },
                 BattleNetGames = {
@@ -146,8 +157,14 @@ function TooltipPreferences:GetOptions()
                     order = 3,
                     type = "group",
                     args = {
-                        Enable = BuildEnableCheckButton("BattleNetGames", 1),
-                        NotesArrangement = BuildNoteTypeSelect("BattleNetGames", LABEL_NOTE, 2),
+                        Header = {
+                            name = GAMES,
+                            order = 1,
+                            type = "header",
+                            width = "full",
+                        },
+                        Enable = BuildEnableCheckButton("BattleNetGames", 2),
+                        NotesArrangement = BuildNoteTypeSelect("BattleNetGames", LABEL_NOTE, 3),
                     },
                 },
                 Guild = {
@@ -155,18 +172,23 @@ function TooltipPreferences:GetOptions()
                     order = 4,
                     type = "group",
                     args = {
-                        Enable = BuildEnableCheckButton("Guild", 1),
+                        Header = {
+                            name = GetGuildInfo("player") or GUILD,
+                            order = 1,
+                            type = "header",
+                            width = "full",
+                        },
+                        Enable = BuildEnableCheckButton("Guild", 2),
                         MOTD = {
                             get = function()
                                 return private.DB.Tooltip.ShowGuildMOTD
                             end,
                             name = GUILD_MOTD,
-                            order = 2,
+                            order = 3,
                             set = function()
                                 private.DB.Tooltip.ShowGuildMOTD = not private.DB.Tooltip.ShowGuildMOTD
                             end,
                             type = "toggle",
-                            width = "full",
                         },
                         NotesArrangement = BuildNoteTypeSelect("Guild", LABEL_NOTE, 3),
                         NotesArrangementGuildOfficer = BuildNoteTypeSelect("GuildOfficer", GUILD_OFFICER_NOTE, 4),
@@ -177,8 +199,14 @@ function TooltipPreferences:GetOptions()
                     order = 5,
                     type = "group",
                     args = {
-                        Enable = BuildEnableCheckButton("WoWFriends", 1),
-                        NotesArrangement = BuildNoteTypeSelect("WoWFriends", LABEL_NOTE, 2),
+                        Header = {
+                            name = FRIENDS,
+                            order = 1,
+                            type = "header",
+                            width = "full",
+                        },
+                        Enable = BuildEnableCheckButton("WoWFriends", 2),
+                        NotesArrangement = BuildNoteTypeSelect("WoWFriends", LABEL_NOTE, 3),
                     },
                 },
             },
