@@ -95,6 +95,14 @@ local ColSpan = {
     Note = 2,
 }
 
+local RegionNames = {
+    [1] = NORTH_AMERICA,
+    [2] = KOREA,
+    [3] = EUROPE,
+    [4] = TAIWAN,
+    [5] = CHINA,
+}
+
 --------------------------------------------------------------------------------
 ---- Helpers
 --------------------------------------------------------------------------------
@@ -311,7 +319,7 @@ function BattleNetSection:GenerateData()
 
             if clientProgram == BNET_CLIENT_WOW and gameAccountInfo.wowProjectID == WOW_PROJECT_ID then
                 local existingFriend = OnlineFriendsByName[characterName]
-                local realmName = gameAccountInfo.realmName
+                local realmName = gameAccountInfo.realmName or RegionNames[gameAccountInfo.regionID]
 
                 if existingFriend and realmName == Player.RealmName then
                     for key, value in pairs(bNetFriendData) do
