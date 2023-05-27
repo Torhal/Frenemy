@@ -91,6 +91,7 @@ function Preferences:ToggleOptionsVisibility()
         AceConfigDialog:Close(AddOnFolderName)
     else
         AceConfigDialog:Open(AddOnFolderName)
+        AceConfigDialog:SelectGroup(AddOnFolderName, "Tooltip", "General")
     end
 end
 
