@@ -391,7 +391,7 @@ do
             :GetCell(1, QTip:GetCellProvider("Frenemy Section Header"))
             :SetColSpan(0)
             :SetJustifyH("CENTER")
-            :SetFont(fontName)
+            :SetFontObject(fontName)
             :SetFormattedText("%s %s %s", sectionIcon, titleText, sectionIcon)
             :SetScript("OnMouseUp", SectionTitle_OnMouseUp, scriptParameter)
     end

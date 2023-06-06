@@ -305,7 +305,7 @@ function GuildSection:Display(tooltip)
                     :AddRow()
                     :GetCell(1)
                     :SetColSpan(0)
-                    :SetFont("GameTooltipTextSmall")
+                    :SetFontObject("GameTooltipTextSmall")
                     :SetFormattedText("%s %s", Icon.Status.Note, noteText)
             end
         end
@@ -320,7 +320,7 @@ function GuildSection:Display(tooltip)
                     :AddRow()
                     :GetCell(1)
                     :SetColSpan(0)
-                    :SetFont("GameTooltipTextSmall")
+                    :SetFontObject("GameTooltipTextSmall")
                     :SetFormattedText("%s %s", Icon.Status.Note, noteText)
             end
         end

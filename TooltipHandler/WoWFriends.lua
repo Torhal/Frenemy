@@ -214,13 +214,18 @@ do
                         :AddRow()
                         :GetCell(1)
                         :SetColSpan(0)
-                        :SetFont("GameTooltipTextSmall")
+                        :SetFontObject("GameTooltipTextSmall")
                         :SetFormattedText("%s %s", Icon.Status.Note, noteText)
                 end
             end
 
             if friend.BroadcastText then
-                tooltip:AddRow():GetCell(1):SetColSpan(0):SetFont("GameTooltipTextSmall"):SetText(friend.BroadcastText)
+                tooltip
+                    :AddRow()
+                    :GetCell(1)
+                    :SetColSpan(0)
+                    :SetFontObject("GameTooltipTextSmall")
+                    :SetText(friend.BroadcastText)
             end
         end
 

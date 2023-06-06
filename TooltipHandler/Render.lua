@@ -66,7 +66,7 @@ local function ShowHelpTip(tooltipCell)
             helpTip:AddRow(" ")
         end
 
-        helpTip:AddRow():GetCell(1):SetColSpan(0):SetFont(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
+        helpTip:AddRow():GetCell(1):SetColSpan(0):SetFontObject(GameFontNormal):SetJustifyH("CENTER"):SetText(entryType)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
         helpTip:AddSeparator(1, 0.5, 0.5, 0.5)
 
@@ -133,7 +133,14 @@ function TooltipHandler:Render(anchorFrame)
         self.Tooltip.Main = tooltip
     end
 
-    tooltip:Clear():AddRow():GetCell(1):SetColSpan(0):SetJustifyH("CENTER"):SetFont(TitleFont):SetText(AddOnFolderName)
+    tooltip
+        :Clear()
+        :AddRow()
+        :GetCell(1)
+        :SetColSpan(0)
+        :SetJustifyH("CENTER")
+        :SetFontObject(TitleFont)
+        :SetText(AddOnFolderName)
 
     tooltip:AddSeparator(1, 0.510, 0.773, 1.0)
 
