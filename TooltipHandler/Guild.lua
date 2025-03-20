@@ -98,8 +98,8 @@ Dialog:Register("FrenemySetGuildMOTD", {
 
 ---@param button "LeftButton"|"RightButton"
 local function GuildMember_OnMouseUp(_, playerEntry, button)
-    if not IsAddOnLoaded("Blizzard_GuildUI") then
-        LoadAddOn("Blizzard_GuildUI")
+    if not C_AddOns.IsAddOnLoaded("Blizzard_GuildUI") then
+        C_AddOns.LoadAddOn("Blizzard_GuildUI")
     end
 
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
