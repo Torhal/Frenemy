@@ -408,7 +408,6 @@
     "TRADESKILL_RECIPE_LEVEL_TOOLTIP_HIGHEST_RANK_EXPLANATION",
     "TRADESKILL_RECIPE_LEVEL_MAXIMUM",
     "GENERIC_FRACTION_STRING",
-    "GetText",
     "MoneyFrame_Update",
     "FONT_COLOR_CODE_CLOSE",
     "GameTooltip_ShowHyperlink",
@@ -509,7 +508,6 @@
     "RUNEFORGE_LEGENDARY_ERROR_INSUFFICIENT_NO_UPGRADE_ITEM_AVAILABLE",
     "RUNEFORGE_LEGENDARY_CRAFTING_FRAME_UPGRADE_TITLE",
     "SOULBIND_SELECT_BEFORE_INSTALL",
-    "GetCursorPosition",
     "BlackMarketMoneyFrame",
     "DEFAULTS",
     "NEW_COMPACT_UNIT_FRAME_PROFILE",
@@ -3934,7 +3932,6 @@
     "GROUP7_CHAT_TAG2",
     "GROUP8_CHAT_TAG1",
     "GROUP8_CHAT_TAG2",
-    "ClearFocus",
     "CHAT_JOIN_HELP",
     "NPEV2_CHAT_AVAILABLE",
     "NPEV2_CHAT_UNAVAILABLE",
@@ -4625,7 +4622,8 @@
     "NONE_KEY",
     "VIDEO_OPTIONS_NEED_CLIENTRESTART",
     "VIDEO_OPTIONS_RECOMMENDED",
-    "WARNING_FONT_COLOR"
+    "WARNING_FONT_COLOR",
+    "SOUNDKIT"
   ],
   "Lua.format.enable": false,
   "[lua]": {
@@ -4638,5 +4636,20 @@
         "fontStyle": "italic underline"
       }
     }
-  }
+  },
+  "Lua.runtime.version": "Lua 5.1",
+  "Lua.runtime.builtin": {
+    "basic": "disable",
+    "debug": "disable",
+    "io": "disable",
+    "math": "disable",
+    "os": "disable",
+    "package": "disable",
+    "string": "disable",
+    "table": "disable",
+    "utf8": "disable"
+  },
+  "Lua.workspace.library": [
+    "~/.vscode/extensions/ketho.wow-api-0.21.0/Annotations/Core"
+  ]
 }
