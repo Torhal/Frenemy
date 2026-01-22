@@ -240,7 +240,7 @@ function WoWFriendSection:GenerateData()
         return
     end
 
-    for friendIndex = 1, People.Friends.Online do
+    for friendIndex = 1, People.Friends.Total do
         local friendInfo = C_FriendList.GetFriendInfoByIndex(friendIndex)
 
         if friendInfo.connected then
