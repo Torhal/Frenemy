@@ -11,7 +11,7 @@ local private = select(2, ...) ---@type PrivateNamespace
 
 ---@return string
 local function GetBuildVersion()
-    local metaVersion = GetAddOnMetadata(AddOnFolderName, "Version")
+    local metaVersion = C_AddOns.GetAddOnMetadata(AddOnFolderName, "Version")
     local isDevelopmentVersion = false
     local isAlphaVersion = false
 
