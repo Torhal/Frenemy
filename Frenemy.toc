@@ -1,4 +1,4 @@
-## Interface: 100100
+## Interface: 120000
 ## Title: Frenemy
 ## IconTexture: Interface\Calendar\MeetingIcon
 ## Notes: A customizable view of friends and guildmates.
