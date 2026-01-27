@@ -43,7 +43,7 @@ TooltipHandler.CellScripts = {
                 FriendsFrame.NotesID = friend.PresenceID
                 StaticPopup_Show("SET_BNFRIENDNOTE", friend.PresenceName)
             elseif not BNIsSelf(friend.PresenceID) then
-                ChatFrame_SendBNetTell(friend.PresenceName)
+                ChatFrameUtil.SendBNetTell(friend.PresenceName)
             end
         elseif mouseButton == "RightButton" then
             TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
