@@ -136,8 +136,8 @@ end
 --------------------------------------------------------------------------------
 
 local function PercentColorGradient(min, max)
-    local red_low, green_low, blue_low = 1, 0.10, 0.10
-    local red_mid, green_mid, blue_mid = 1, 1, 0
+    local red_low, green_low, blue_low = 1.0, 0.10, 0.10
+    local red_mid, green_mid, blue_mid = 1.0, 1.0, 0.0
     local red_high, green_high, blue_high = 0.25, 0.75, 0.25
     local percentage = min / max
 
