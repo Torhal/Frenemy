@@ -94,10 +94,3 @@ function Preferences:ToggleOptionsVisibility()
         AceConfigDialog:SelectGroup(AddOnFolderName, "Tooltip", "General")
     end
 end
-
---------------------------------------------------------------------------------
----- Type Augmentation
---------------------------------------------------------------------------------
-
----@class AceConfigDialog-3.0
----@field OpenFrames table<string, unknown>
