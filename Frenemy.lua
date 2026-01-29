@@ -117,7 +117,7 @@ do
 end
 
 do
-    local SUBCOMMAND_FUNCS = {
+    local SUBCOMMAND_FUNCTIONS = {
         --@debug@
         DEBUG = function()
             local debugger = private.GetDebugger()
@@ -139,7 +139,7 @@ do
         local subcommand, arguments = self:GetArgs(input, 2)
 
         if subcommand then
-            local func = SUBCOMMAND_FUNCS[subcommand:upper()]
+            local func = SUBCOMMAND_FUNCTIONS[subcommand:upper()]
 
             if func then
                 func(arguments or "")
