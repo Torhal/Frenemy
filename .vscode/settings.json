@@ -25,14 +25,18 @@
       }
     }
   },
+  "Lua.completion.callSnippet": "Disable",
   "Lua.diagnostics.globals": [
     "ADD_FRIEND",
+    "ADVANCED_OPTIONS",
     "BATTLENET_FONT_COLOR_CODE",
     "BATTLENET_FRIEND",
     "BATTLENET_OPTIONS_LABEL",
     "BATTLENET_UNAVAILABLE",
     "BATTLETAG_FRIEND_LABEL",
     "BATTLETAG",
+    "BINDING_NAME_TOGGLEFRIENDSTAB",
+    "BINDING_NAME_TOGGLEGUILDTAB",
     "BLOCK_INVITES",
     "BNET_BROADCAST_SENT_TIME",
     "BNET_FRIEND_TOOLTIP_ZONE_AND_REALM",
@@ -100,6 +104,8 @@
     "HIGHLIGHT_FONT_COLOR_CODE",
     "IGNORE_LIST",
     "INFO",
+    "INTERFACE_OPTIONS",
+    "INVITE",
     "Kiosk",
     "KOREA",
     "LABEL_NOTE",
@@ -137,9 +143,11 @@
     "REPORT_PLAYER",
     "REQUEST_INVITE_CROSS_FACTION",
     "REQUEST_INVITE",
+    "SET_NOTE",
     "SOCIAL_QUEUE_ALSO_IN_GROUP",
     "SOCIAL_QUEUE_AND_MORE",
     "SOCIAL_QUICK_JOIN_TAB_HELP_TIP",
+    "STAT_FORMAT",
     "SUGGEST_INVITE_CROSS_FACTION",
     "SUGGEST_INVITE",
     "TAIWAN",
@@ -148,6 +156,7 @@
     "TYPE",
     "UNKNOWN",
     "UserScaledFontGameNormalSmall",
+    "WHISPER",
     "WHO_FRAME_SHOWN_TEMPLATE",
     "WHO_FRAME_TOTAL_TEMPLATE",
     "WHO_LIST_LEVEL_TOOLTIP",
@@ -155,6 +164,7 @@
     "WHO_TAG_ZONE",
     "ZONE"
   ],
+  "Lua.diagnostics.libraryFiles": "Enable",
   "Lua.format.enable": false,
   "Lua.runtime.builtin": {
     "basic": "disable",
@@ -170,6 +180,7 @@
   "Lua.runtime.version": "Lua 5.1",
   "Lua.workspace.library": [
     "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/Core",
-    "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML"
+    "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML",
+    "Libraries"
   ]
 }
