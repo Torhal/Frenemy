@@ -34,7 +34,7 @@ function Frenemy:HandleZoneChange(_, mapID)
     local pvpType, _, factionName = GetZonePVPInfo()
 
     if pvpType == "hostile" or pvpType == "friendly" then
-        pvpType = factionName
+        pvpType = factionName or "normal"
     elseif not pvpType or pvpType == "" then
         pvpType = "normal"
     end
