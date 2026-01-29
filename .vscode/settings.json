@@ -179,8 +179,8 @@
   },
   "Lua.runtime.version": "Lua 5.1",
   "Lua.workspace.library": [
+    "Libraries",
     "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/Core",
-    "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML",
-    "Libraries"
+    "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML"
   ]
 }
