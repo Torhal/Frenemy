@@ -46,21 +46,23 @@ local Options
 ---@field DefaultValues AceDB.Schema
 ---@field Tooltip Preferences.Tooltip
 ---@field OptionsFrame Frame
+private.Preferences = {
+    DataObject = {},
+    DefaultValues = {
+        global = {
+            ZoneData = {}, -- Populated during travel.
+        },
+    },
+    Tooltip = {
+        NotesArrangement = {
+            Column = 1,
+            Row = 2,
+        },
+    },
+}
+
+---@class Preferences
 local Preferences = private.Preferences
-
-Preferences.DataObject = {}
-Preferences.DefaultValues = {
-    global = {
-        ZoneData = {}, -- Populated during travel.
-    },
-}
-
-Preferences.Tooltip = {
-    NotesArrangement = {
-        Column = 1,
-        Row = 2,
-    },
-}
 
 ---@return AceConfig.OptionsTable
 function Preferences:GetOptions()

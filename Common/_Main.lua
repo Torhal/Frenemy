@@ -28,7 +28,6 @@ private.People = {
     },
 }
 
-private.Preferences = {}
 private.TooltipHandler = {}
 
 --------------------------------------------------------------------------------
