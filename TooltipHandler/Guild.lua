@@ -283,7 +283,7 @@ function GuildSection:Display(tooltip)
             )
             :SetScript("OnMouseUp", GuildMember_OnMouseUp, guildMate)
 
-        -- The higher the rank index, the lower the priviledge; guild leader is rank 1.
+        -- The higher the rank index, the lower the privilege; guild leader is rank 1.
         local r, g, b = PercentColorGradient(guildMate.RankIndex, numGuildRanks)
         row:GetCell(ColumnID.Rank)
             :SetColSpan(ColSpan.Rank)
