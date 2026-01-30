@@ -55,7 +55,12 @@ Preferences.DefaultValues = {
     },
 }
 
-Preferences.Tooltip = {}
+Preferences.Tooltip = {
+    NotesArrangement = {
+        Column = 1,
+        Row = 2,
+    },
+}
 
 ---@return AceConfig.OptionsTable
 function Preferences:GetOptions()
