@@ -7,9 +7,11 @@
     "Bliz",
     "BNET",
     "BNFRIENDNOTE",
+    "editboxes",
     "FRIENDLIST",
     "FRIENDNOTE",
     "GROUPFRAME",
+    "GUILDCONTROL",
     "GUILDOFFICERNOTE",
     "GUILDPLAYERNOTE",
     "HIDEDELAY",
@@ -24,6 +26,7 @@
     "Torhal",
     "UIDROPDOWNMENU"
   ],
+  "editor.formatOnSave": true,
   "editor.semanticTokenColorCustomizations": {
     "rules": {
       "variable.global": {
@@ -131,6 +134,7 @@
     "NOT_APPLICABLE",
     "NOTE",
     "NUMBER_IN_PARENTHESES",
+    "OKAY",
     "ORANGE_FONT_COLOR_CODE",
     "PARENS_TEMPLATE",
     "QUICK_JOIN",
