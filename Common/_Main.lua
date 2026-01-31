@@ -39,8 +39,7 @@ function private.UpdateStatistics()
     People.Friends.Online = C_FriendList.GetNumOnlineFriends()
 
     if IsInGuild() then
-        local _
-        People.GuildMembers.Total, _, People.GuildMembers.Online = GetNumGuildMembers()
+        People.GuildMembers.Total, People.GuildMembers.Online = GetNumGuildMembers()
     end
 end
 
