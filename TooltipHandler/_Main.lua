@@ -22,114 +22,116 @@ local QTip = LibStub("LibQTip-2.0")
 ---@field PlayerLists TooltipHandler.PlayerLists
 ---@field Tooltip TooltipHandler.Tooltip
 ---@field WoWFriendSection TooltipHandler.WoWFriendSection
+private.TooltipHandler = {
+    BattleNetSection = {},
+
+    ---@class TooltipHandler.CellScripts
+    ---@field BattleNetFriend_OnMouseUp function
+    ---@field ToggleColumnSortMethod function
+    CellScripts = {},
+
+    ---@class TooltipHandler.ClassData
+    ---@field Color Dictionary<string> Dictionary of localizedName to class color
+    ---@field Token table<"Female"|"Male", Dictionary<string>> Dictionary of feminine or masculine localizedName to classToken
+    Class = {
+        Color = {},
+        Token = {
+            Female = {},
+            Male = {},
+        },
+    },
+
+    GuildSection = {},
+    OnlineFriendsByName = {},
+
+    ---@class TooltipHandler.Player
+    ---@field Faction string
+    ---@field Name string
+    ---@field RealmName string
+    Player = {
+        Faction = UnitFactionGroup("player"),
+        Name = UnitName("player") or UNKNOWN,
+        RealmName = GetRealmName(),
+    },
+
+    ---@class TooltipHandler.PlayerLists
+    ---@field BattleNetApp BattleNetFriend[]
+    ---@field BattleNetGames BattleNetFriend[]
+    ---@field Guild GuildMember[]
+    ---@field WoWFriends WoWFriend[]
+    PlayerLists = {
+        BattleNetApp = {},
+        BattleNetGames = {},
+        Guild = {},
+        WoWFriends = {},
+    },
+
+    ---@class TooltipHandler.Tooltip
+    ---@field AnchorFrame? Frame
+    ---@field Help? LibQTip-2.0.Tooltip
+    ---@field Main? LibQTip-2.0.Tooltip
+    Tooltip = {
+        AnchorFrame = nil,
+        Help = nil,
+        Main = nil,
+    },
+    WoWFriendSection = {},
+}
+
+---@class TooltipHandler
 local TooltipHandler = private.TooltipHandler
 
-TooltipHandler.BattleNetSection = {}
+---@param _ LibQTip-2.0.Cell
+---@param friend BattleNetFriend|WoWFriend
+---@param mouseButton string
+function TooltipHandler.CellScripts.BattleNetFriend_OnMouseUp(_, friend, mouseButton)
+    PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
 
----@class TooltipHandler.CellScripts
----@field BattleNetFriend_OnMouseUp function
----@field ToggleColumnSortMethod function
-TooltipHandler.CellScripts = {
-    ---@param _ LibQTip-2.0.Cell
-    ---@param friend BattleNetFriend|WoWFriend
-    ---@param mouseButton string
-    BattleNetFriend_OnMouseUp = function(_, friend, mouseButton)
-        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
-
-        if mouseButton == "LeftButton" then
-            if IsAltKeyDown() and friend.RealmName == TooltipHandler.Player.RealmName then
-                C_PartyInfo.InviteUnit(friend.ToonName)
-            elseif IsControlKeyDown() then
-                FriendsFrame.NotesID = friend.PresenceID
-                StaticPopup_Show("SET_BNFRIENDNOTE", friend.PresenceName)
-            elseif not BNIsSelf(friend.PresenceID) then
-                ChatFrameUtil.SendBNetTell(friend.PresenceName)
-            end
-        elseif mouseButton == "RightButton" then
-            TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
-            CloseDropDownMenus()
-            FriendsFrame_ShowBNDropdown(friend.PresenceName, true, nil, nil, nil, true, friend.PresenceID)
+    if mouseButton == "LeftButton" then
+        if IsAltKeyDown() and friend.RealmName == TooltipHandler.Player.RealmName then
+            C_PartyInfo.InviteUnit(friend.ToonName)
+        elseif IsControlKeyDown() then
+            FriendsFrame.NotesID = friend.PresenceID
+            StaticPopup_Show("SET_BNFRIENDNOTE", friend.PresenceName)
+        elseif not BNIsSelf(friend.PresenceID) then
+            ChatFrameUtil.SendBNetTell(friend.PresenceName)
         end
-    end,
+    elseif mouseButton == "RightButton" then
+        TooltipHandler.Tooltip.Main:SetFrameStrata("DIALOG")
+        CloseDropDownMenus()
+        FriendsFrame_ShowBNDropdown(friend.PresenceName, true, nil, nil, nil, true, friend.PresenceID)
+    end
+end
 
-    ---@param _ LibQTip-2.0.Cell
-    ---@param sortFieldData string
-    ToggleColumnSortMethod = function(_, sortFieldData)
-        local sectionName, fieldName = strsplit(":", sortFieldData)
+---@param _ LibQTip-2.0.Cell
+---@param sortFieldData string
+function TooltipHandler.CellScripts.ToggleColumnSortMethod(_, sortFieldData)
+    local sectionName, fieldName = string.split(":", sortFieldData)
 
-        if not sectionName or not fieldName then
-            return
-        end
+    if not sectionName or not fieldName then
+        return
+    end
 
-        local DB = private.DB
-        local savedSortField = DB.Tooltip.Sorting[sectionName]
-        local columnSortFieldID = Sorting.FieldIDs[sectionName][fieldName]
+    local DB = private.DB
+    local savedSortField = DB.Tooltip.Sorting[sectionName]
+    local columnSortFieldID = Sorting.FieldIDs[sectionName][fieldName]
 
-        if savedSortField.Field == columnSortFieldID then
-            savedSortField.Order = savedSortField.Order == SortOrder.Enum.Ascending and SortOrder.Enum.Descending
-                or SortOrder.Enum.Ascending
-        else
-            savedSortField = DB.Tooltip.Sorting[sectionName]
-            savedSortField.Field = columnSortFieldID
-            savedSortField.Order = SortOrder.Enum.Ascending
-        end
+    if savedSortField.Field == columnSortFieldID then
+        savedSortField.Order = savedSortField.Order == SortOrder.Enum.Ascending and SortOrder.Enum.Descending
+            or SortOrder.Enum.Ascending
+    else
+        savedSortField = DB.Tooltip.Sorting[sectionName]
+        savedSortField.Field = columnSortFieldID
+        savedSortField.Order = SortOrder.Enum.Ascending
+    end
 
-        table.sort(
-            TooltipHandler.PlayerLists[sectionName],
-            Sorting.Functions[sectionName .. fieldName .. SortOrder.Name[savedSortField.Order]]
-        )
+    table.sort(
+        TooltipHandler.PlayerLists[sectionName],
+        Sorting.Functions[sectionName .. fieldName .. SortOrder.Name[savedSortField.Order]]
+    )
 
-        TooltipHandler:Render()
-    end,
-}
-
----@class TooltipHandler.ClassData
----@field Color Dictionary<string> Dictionary of localizedName to class color
----@field Token table<"Female"|"Male", Dictionary<string>> Dictionary of feminine or masculine localizedName to classToken
-TooltipHandler.Class = {
-    Color = {},
-    Token = {
-        Female = {},
-        Male = {},
-    },
-}
-
-TooltipHandler.GuildSection = {}
-TooltipHandler.OnlineFriendsByName = {}
-
----@class TooltipHandler.Player
----@field Faction string
----@field Name string
----@field RealmName string
-TooltipHandler.Player = {
-    Faction = UnitFactionGroup("player"),
-    Name = UnitName("player") or UNKNOWN,
-    RealmName = GetRealmName(),
-}
-
----@class TooltipHandler.PlayerLists
----@field BattleNetApp BattleNetFriend[]
----@field BattleNetGames BattleNetFriend[]
----@field Guild GuildMember[]
----@field WoWFriends WoWFriend[]
-TooltipHandler.PlayerLists = {
-    BattleNetApp = {},
-    BattleNetGames = {},
-    Guild = {},
-    WoWFriends = {},
-}
-
----@class TooltipHandler.Tooltip
----@field AnchorFrame? Frame
----@field Help? LibQTip-2.0.Tooltip
----@field Main? LibQTip-2.0.Tooltip
-TooltipHandler.Tooltip = {
-    AnchorFrame = nil,
-    Help = nil,
-    Main = nil,
-}
-
-TooltipHandler.WoWFriendSection = {}
+    TooltipHandler:Render()
+end
 
 --------------------------------------------------------------------------------
 ---- Constants
