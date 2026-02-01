@@ -1,7 +1,7 @@
 ## Interface: 120000
 ## Title: Frenemy
 ## IconTexture: Interface\Calendar\MeetingIcon
-## Notes: A customizable view of friends and guildmates.
+## Notes: A customizable view of friends and guild mates.
 ## Author: Torhal
 ## Version: @project-version@
 ## X-Date: @project-date-iso@
