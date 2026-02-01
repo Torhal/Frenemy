@@ -4,11 +4,6 @@
 local AddOnFolderName = ... ---@type string
 local private = select(2, ...) ---@class PrivateNamespace
 
-local DataObject = private.DataObject
-local MapHandler = private.MapHandler
-local Preferences = private.Preferences
-local TooltipHandler = private.TooltipHandler
-
 ---@class Frenemy: AceAddon, AceBucket-3.0, AceConsole-3.0, AceEvent-3.0, AceTimer-3.0
 local Frenemy =
     LibStub("AceAddon-3.0"):NewAddon(AddOnFolderName, "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
@@ -21,7 +16,9 @@ local HereBeDragons = LibStub("HereBeDragons-2.0")
 ---@param _ string Callback name. Unused, but is passed from HereBeDragons so it must be handled in the parameter list.
 ---@param mapID number
 function Frenemy:HandleZoneChange(_, mapID)
+    local MapHandler = private.MapHandler
     local needDisplayUpdate = MapHandler.Data.MapID ~= mapID
+
     MapHandler.Data.MapID = mapID
 
     if not MapHandler.Data.MapID or MapHandler.Data.MapID <= 0 then
@@ -78,21 +75,21 @@ function Frenemy:OnEnable()
 end
 
 function Frenemy:OnInitialize()
-    local DB = Preferences:InitializeDatabase()
+    local DB = private.Preferences:InitializeDatabase()
 
     private.DB = DB
 
     local LDBIcon = LibStub("LibDBIcon-1.0")
     if LDBIcon then
-        LDBIcon:Register(AddOnFolderName, DataObject, DB.DataObject.MinimapIcon)
+        LDBIcon:Register(AddOnFolderName, private.DataObject, DB.DataObject.MinimapIcon)
     end
 
-    Preferences:SetupOptions()
+    private.Preferences:SetupOptions()
 
     self:RegisterChatCommand("frenemy", "ChatCommand")
 
     for zoneID, zonePVPStatus in pairs(DB.ZoneData) do
-        MapHandler:SetRGBColor(zoneID, zonePVPStatus)
+        private.MapHandler:SetRGBColor(zoneID, zonePVPStatus)
     end
 end
 
@@ -102,7 +99,9 @@ do
 
     function Frenemy:UpdateData()
         private.UpdateStatistics()
-        DataObject:UpdateDisplay()
+        private.DataObject:UpdateDisplay()
+
+        local TooltipHandler = private.TooltipHandler
 
         if TooltipHandler.Tooltip.Main and TooltipHandler.Tooltip.Main:IsShown() then
             local now = time()
@@ -110,7 +109,7 @@ do
             if now > lastUpdateTime + UpdateDisplayThrottleIntervalSeconds then
                 lastUpdateTime = now
 
-                TooltipHandler:Render(DataObject)
+                TooltipHandler:Render(private.DataObject)
             end
         end
     end
@@ -148,6 +147,6 @@ do
             return
         end
 
-        Preferences:ToggleOptionsVisibility()
+        private.Preferences:ToggleOptionsVisibility()
     end
 end -- do-block
