@@ -158,7 +158,7 @@ function TooltipHandler:Render(anchorFrame)
             :GetCell(1)
             :SetColSpan(0)
             :SetJustifyH("LEFT")
-            :SetMaxWidth(tooltip:GetWidth() --[[@as integer]] - 20)
+            :SetMaxWidth(tooltip:GetWidth() - 20)
             :SetFormattedText("%s%s|r", GREEN_FONT_COLOR_CODE, MOTD.Text)
     end
 
