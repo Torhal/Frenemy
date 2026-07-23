@@ -4,7 +4,7 @@
 
 local QTip = LibStub:GetLibrary("LibQTip-2.0")
 
-local providerValues = QTip:CreateCellProvider(QTip:GetCellProvider("LibQTip-2.0 Icon"))
+local providerValues = QTip:CreateCellProvider(QTip:GetCellProvider("Frenemy Icon"))
 
 QTip:RegisterCellProvider("Frenemy Game Icon", providerValues.newCellProvider)
 

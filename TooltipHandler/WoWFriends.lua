@@ -169,7 +169,7 @@ do
             local row = tooltip:AddRow()
 
             row
-                :GetCell(ColumnID.Class, QTip:GetCellProvider("LibQTip-2.0 Class Icon"))
+                :GetCell(ColumnID.Class, QTip:GetCellProvider("Frenemy Class Icon"))
                 :SetColSpan(ColSpan.Class) --[[@as LibQTip-2.0.ClassIconCell]]
                 :SetIconTexture(classToken.Female[friend.Class] or classToken.Male[friend.Class])
 

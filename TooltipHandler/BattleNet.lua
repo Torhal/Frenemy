@@ -155,7 +155,7 @@ local function RenderBattleNetRows(tooltip, playerList, dataPrefix, headerRow, n
         local row = tooltip:AddRow()
 
         row
-            :GetCell(ColumnID.ClientIcon, QTip:GetCellProvider("LibQTip-2.0 Game Icon"))
+            :GetCell(ColumnID.ClientIcon, QTip:GetCellProvider("Frenemy Game Icon"))
             :SetColSpan(ColSpan.ClientIcon) --[[@as LibQTip-2.0.GameIconCell]]
             :SetIconTexture(friend.Client)
 
