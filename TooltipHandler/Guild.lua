@@ -67,7 +67,7 @@ Dialog:Register("FrenemySetGuildMOTD", {
     editboxes = {
         {
             on_enter_pressed = function(self)
-                GuildSetMOTD(self:GetText())
+                C_GuildInfo.SetMOTD(self:GetText())
                 Dialog:Dismiss("FrenemySetGuildMOTD")
             end,
             on_escape_pressed = function(self)
