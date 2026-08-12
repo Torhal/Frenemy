@@ -1,12 +1,6 @@
-package-as: Frenemy
-
-enable-nolib-creation: no
-
+---
+enable-nolib-creation: 'no'
 externals:
-  Libraries/LibStub:
-    url: https://repos.curseforge.com/wow/libstub/trunk
-  Libraries/CallbackHandler-1.0:
-    url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
   Libraries/AceAddon-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceAddon-3.0
   Libraries/AceBucket-3.0:
@@ -25,16 +19,22 @@ externals:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0
   Libraries/AceTimer-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceTimer-3.0
+  Libraries/CallbackHandler-1.0:
+    url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
   Libraries/HereBeDragons:
     url: https://repos.curseforge.com/wow/herebedragons
-  Libraries/LibDataBroker-1.1:
-    url: https://repos.curseforge.com/wow/libdatabroker-1-1
-    tag: v1.1.4
   Libraries/LibDBIcon-1.0:
     url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+  Libraries/LibDataBroker-1.1:
+    tag: v1.1.4
+    url: https://repos.curseforge.com/wow/libdatabroker-1-1
   Libraries/LibDialog-1.0:
     url: https://repos.curseforge.com/wow/libdialog-1-0
   Libraries/LibQTip-2.0:
-    url: https://repos.curseforge.com/wow/libqtip-2-0
+    curse-slug: libqtip-2-0
+    url: https://github.com/Torhal/LibQTip-2.0.git/LibQTip-2.0
+  Libraries/LibStub:
+    url: https://repos.curseforge.com/wow/libstub/trunk
   Libraries/LibTextDump-1.0:
     url: https://repos.curseforge.com/wow/libtextdump-1-0
+package-as: Frenemy
